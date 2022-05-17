@@ -10,8 +10,9 @@ public class BusterController : MonoBehaviour
     private WeaponController _weaponController;
     private PlayerController _playerController;
     private HealthSystem _healthSystem;
-    
-    
+
+    private bool _isMoveSpeedBusterActive;
+    private float _moveSpeedTimer;
 
     private void Awake()
     {
@@ -75,13 +76,17 @@ public class BusterController : MonoBehaviour
         
     }
     
-    public void PickMoveSpeed(int count)
+    public void PickMoveSpeed(int count, float duration)
     {
         IEnumerator Activate()
         {
+            _isMoveSpeedBusterActive = true;
+            _moveSpeedTimer = Time.time + duration;
             
             
             yield return null;
+            
+            _isMoveSpeedBusterActive = false;
         }
     }
 }
