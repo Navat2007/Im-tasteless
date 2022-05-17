@@ -58,6 +58,9 @@ public class WeaponController : MonoBehaviour
     private Vector3 _crosshairPosition;
 
     private bool _isReloading;
+    private float _bonusDamagePercent;
+    private float _bonusAttackSpeedPercent;
+    private float _bonusReloadSpeedPercent;
 
     private void Awake()
     {
@@ -187,7 +190,9 @@ public class WeaponController : MonoBehaviour
             {
                 Projectile projectile = Instantiate(_equippedWeapon.Projectile, _equippedWeapon.ProjectileSpawnPoint[i].position, _equippedWeapon.ProjectileSpawnPoint[i].rotation);
                 projectile.SetSpeed(_equippedWeapon.MuzzleVelocity);
-                projectile.SetDamage(_equippedWeapon.Damage);
+                projectile.SetDamage(_equippedWeapon.Damage + (_equippedWeapon.Damage / 100 * _bonusDamagePercent));
+                projectile.SetCriticalChance(_equippedWeapon.CriticalChance);
+                projectile.SetCriticalBonus(_equippedWeapon.CriticalBonus);
             }
 
             _equippedWeapon.ProjectileInClip--;
@@ -212,7 +217,7 @@ public class WeaponController : MonoBehaviour
             _audioManager.PlaySound(_equippedWeapon.ShootClip, _equippedWeapon.MuzzlePoint.position);
         }
         
-        _nextShootTime = Time.time + _equippedWeapon.MsBetweenShots / 1000;
+        _nextShootTime = Time.time + (_equippedWeapon.MsBetweenShots - (_equippedWeapon.MsBetweenShots / 100 * _bonusAttackSpeedPercent)) / 1000;
         
         _animator?.SetTrigger("Attack");
         
@@ -277,7 +282,7 @@ public class WeaponController : MonoBehaviour
             OnReloadStart?.Invoke();
             yield return new WaitForSeconds(.2f);
 
-            float reloadSpeed = 1 / _equippedWeapon.ReloadSpeed;
+            float reloadSpeed = 1 / (_equippedWeapon.ReloadSpeed - (_equippedWeapon.ReloadSpeed / 100 * _bonusReloadSpeedPercent));
             float percent = 0;
             float maxReloadAngle = 40;
 
@@ -443,7 +448,21 @@ public class WeaponController : MonoBehaviour
                 break;
         }
     }
+
+    public void SetBonusDamagePercent(float value)
+    {
+        _bonusDamagePercent += value;
+    }
     
+    public void SetBonusAttackSpeedPercent(float value)
+    {
+        _bonusAttackSpeedPercent += value;
+    }
+    
+    public void SetBonusReloadSpeedPercent(float value)
+    {
+        _bonusReloadSpeedPercent += value;
+    }
 }
 
 public struct WeaponInfo

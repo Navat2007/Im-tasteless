@@ -236,6 +236,8 @@ public class GameUI : MonoBehaviour
         _weaponController.OnAmmoChange += OnWeaponAmmoChange;
         
         _busterController.OnMoveSpeedChange += OnMoveSpeedBusterChange;
+        _busterController.OnDamageChange += OnDamageBusterChange;
+        _busterController.OnAttackSpeedChange += OnAttackSpeedBusterChange;
     }
 
     private void Unsubscribe()
@@ -257,6 +259,8 @@ public class GameUI : MonoBehaviour
         _weaponController.OnAmmoChange -= OnWeaponAmmoChange;
         
         _busterController.OnMoveSpeedChange -= OnMoveSpeedBusterChange;
+        _busterController.OnDamageChange -= OnDamageBusterChange;
+        _busterController.OnAttackSpeedChange -= OnAttackSpeedBusterChange;
     }
 
     private void HandleSlot1(InputAction.CallbackContext context)
@@ -405,6 +409,20 @@ public class GameUI : MonoBehaviour
         moveSpeedBuffIconStruct.icon.gameObject.SetActive(time > 0);
         TimeSpan timeSpan = TimeSpan.FromSeconds(time);
         moveSpeedBuffIconStruct.timerText.text = $"{timeSpan:m\\:ss}";
+    }
+    
+    private void OnDamageBusterChange(float time)
+    {
+        damageBuffIconStruct.icon.gameObject.SetActive(time > 0);
+        TimeSpan timeSpan = TimeSpan.FromSeconds(time);
+        damageBuffIconStruct.timerText.text = $"{timeSpan:m\\:ss}";
+    }
+    
+    private void OnAttackSpeedBusterChange(float time)
+    {
+        attackSpeedBuffIconStruct.icon.gameObject.SetActive(time > 0);
+        TimeSpan timeSpan = TimeSpan.FromSeconds(time);
+        attackSpeedBuffIconStruct.timerText.text = $"{timeSpan:m\\:ss}";
     }
 
     private IEnumerator Fade(Color from, Color to, float time)

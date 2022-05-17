@@ -4,6 +4,8 @@ public class Weapon : MonoBehaviour
 {
     [field: SerializeField] public WeaponType CurrentWeaponType { get; private set; }
     [field: SerializeField] public float Damage { get; private set; }
+    [field: SerializeField] public float CriticalChance { get; private set; } = 10;
+    [field: SerializeField] public float CriticalBonus { get; private set; } = 2;
     [field: SerializeField] public float ReloadSpeed { get; private set; }
     [field: SerializeField] public float MsBetweenShots { get; private set; } = 100;
     [field: SerializeField] public float RecoilPower { get; private set; } = .2f;

@@ -5,6 +5,8 @@ public class Projectile : MonoBehaviour
 {
     [SerializeField] private float speed = 10;
     [SerializeField] private float damage = 1;
+    [SerializeField] private float criticalChance = 10;
+    [SerializeField] private float criticalBonus = 2;
     [SerializeField] private LayerMask collisionMask;
 
     private float _timeToDestroy = 3;
@@ -27,7 +29,7 @@ public class Projectile : MonoBehaviour
         
         if (enemy.GetComponent<IDamageable>() != null && enemy.TryGetComponent(out HealthSystem healthSystem))
         {
-            healthSystem.TakeHit(damage, Helper.GetCriticalChance(10), other.ClosestPoint(transform.position), transform.forward);
+            healthSystem.TakeHit(damage, Helper.GetCriticalChance(criticalChance), other.ClosestPoint(transform.position), transform.forward);
         }
         
         Destroy(gameObject);
@@ -41,5 +43,15 @@ public class Projectile : MonoBehaviour
     public void SetDamage(float value)
     {
         damage = value;
+    }
+    
+    public void SetCriticalChance(float value)
+    {
+        criticalChance = value;
+    }
+    
+    public void SetCriticalBonus(float value)
+    {
+        criticalBonus = value;
     }
 }

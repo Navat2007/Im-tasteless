@@ -8,6 +8,8 @@ using UnityEngine;
 public class BusterController : MonoBehaviour
 {
     public event Action<float> OnMoveSpeedChange;
+    public event Action<float> OnDamageChange;
+    public event Action<float> OnAttackSpeedChange;
     
     private Player _player;
     private WeaponController _weaponController;
@@ -16,6 +18,12 @@ public class BusterController : MonoBehaviour
 
     private bool _isMoveSpeedBusterActive;
     private float _moveSpeedTimer;
+    
+    private bool _isDamageBusterActive;
+    private float _damageTimer;
+    
+    private bool _isAttackSpeedBusterActive;
+    private float _attackSpeedTimer;
 
     private void Awake()
     {
@@ -65,19 +73,54 @@ public class BusterController : MonoBehaviour
         _healthSystem.AddArmor(count);
     }
     
-    public void PickDamage(int count)
+    public void PickDamage(int count, float duration, float damagePercent)
     {
         IEnumerator Activate()
         {
-            
-            
-            yield return null;
+            _isDamageBusterActive = true;
+            _weaponController.SetBonusDamagePercent(damagePercent);
+
+            while (_damageTimer > 0)
+            {
+                _damageTimer -= Time.deltaTime;
+                OnDamageChange?.Invoke(_damageTimer);
+                yield return null;
+            }
+
+            _isDamageBusterActive = false;
+            _weaponController.SetBonusDamagePercent(-damagePercent);
         }
+        
+        _damageTimer = duration;
+        
+        if(!_isDamageBusterActive)
+            StartCoroutine(Activate());
     }
     
-    public void PickAttackSpeed(int count)
+    public void PickAttackSpeed(int count, float duration, float speedPercent)
     {
+        IEnumerator Activate()
+        {
+            _isAttackSpeedBusterActive = true;
+            _weaponController.SetBonusAttackSpeedPercent(speedPercent);
+            _weaponController.SetBonusReloadSpeedPercent(speedPercent);
+
+            while (_attackSpeedTimer > 0)
+            {
+                _attackSpeedTimer -= Time.deltaTime;
+                OnAttackSpeedChange?.Invoke(_attackSpeedTimer);
+                yield return null;
+            }
+
+            _isAttackSpeedBusterActive = false;
+            _weaponController.SetBonusAttackSpeedPercent(-speedPercent);
+            _weaponController.SetBonusReloadSpeedPercent(-speedPercent);
+        }
         
+        _attackSpeedTimer = duration;
+        
+        if(!_isAttackSpeedBusterActive)
+            StartCoroutine(Activate());
     }
     
     public void PickMoveSpeed(int count, float duration, float moveSpeedPercent)
