@@ -41,7 +41,7 @@ public class Player : MonoBehaviour, IHealth, IDamageable
             _cameraAudioListener.enabled = value;
     }
 
-    public void SetMoveSpeed(float value)
+    public void SetBonusMoveSpeed(float value)
     {
         BonusMoveSpeed += value;
     }

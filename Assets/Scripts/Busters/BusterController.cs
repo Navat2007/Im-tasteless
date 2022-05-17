@@ -7,6 +7,9 @@ using UnityEngine;
 [RequireComponent(typeof(HealthSystem))]
 public class BusterController : MonoBehaviour
 {
+    public event Action<float> OnMoveSpeedChange;
+    
+    private Player _player;
     private WeaponController _weaponController;
     private PlayerController _playerController;
     private HealthSystem _healthSystem;
@@ -16,6 +19,7 @@ public class BusterController : MonoBehaviour
 
     private void Awake()
     {
+        _player = GetComponent<Player>();
         _weaponController = GetComponent<WeaponController>();
         _playerController = GetComponent<PlayerController>();
         _healthSystem = GetComponent<HealthSystem>();
@@ -76,17 +80,28 @@ public class BusterController : MonoBehaviour
         
     }
     
-    public void PickMoveSpeed(int count, float duration)
+    public void PickMoveSpeed(int count, float duration, float moveSpeedPercent)
     {
         IEnumerator Activate()
         {
             _isMoveSpeedBusterActive = true;
-            _moveSpeedTimer = Time.time + duration;
-            
-            
-            yield return null;
-            
+            float speedToAdd = _player.MoveSpeed / 100 * moveSpeedPercent;
+            _player.SetBonusMoveSpeed(speedToAdd);
+
+            while (_moveSpeedTimer > 0)
+            {
+                _moveSpeedTimer -= Time.deltaTime;
+                OnMoveSpeedChange?.Invoke(_moveSpeedTimer);
+                yield return null;
+            }
+
             _isMoveSpeedBusterActive = false;
+            _player.SetBonusMoveSpeed(-speedToAdd);
         }
+        
+        _moveSpeedTimer = duration;
+        
+        if(!_isMoveSpeedBusterActive)
+            StartCoroutine(Activate());
     }
 }

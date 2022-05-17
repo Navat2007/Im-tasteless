@@ -60,7 +60,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _rigidbody.MovePosition(_rigidbody.position + _moveVelocity * Time.fixedDeltaTime);
+        _rigidbody.MovePosition(_rigidbody.position + _moveVelocity * (_player.MoveSpeed + _player.BonusMoveSpeed) * Time.fixedDeltaTime);
         _animator.SetFloat("Forward", _moveVelocity.z);
         _animator.SetFloat("Turn", _moveVelocity.x);
     }
@@ -82,7 +82,7 @@ public class PlayerController : MonoBehaviour
     private void OnMove (InputAction.CallbackContext context)
     {
         var inputValue = context.ReadValue<Vector2>();
-        _moveVelocity = new Vector3(inputValue.x, 0, inputValue.y).normalized * (_player.MoveSpeed + _player.BonusMoveSpeed);
+        _moveVelocity = new Vector3(inputValue.x, 0, inputValue.y).normalized;
     }
 
     private void LookAt(Vector3 point)

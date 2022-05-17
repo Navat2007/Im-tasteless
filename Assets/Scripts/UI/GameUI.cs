@@ -102,6 +102,7 @@ public class GameUI : MonoBehaviour
     private HealthSystem _healthSystem;
     private ExperienceSystem _experienceSystem;
     private WeaponController _weaponController;
+    private BusterController _busterController;
     
     private Stack<PanelUIStruct> _panelStack = new ();
 
@@ -216,6 +217,7 @@ public class GameUI : MonoBehaviour
         _healthSystem = _player.GetComponent<HealthSystem>();
         _experienceSystem = _player.GetComponent<ExperienceSystem>();
         _weaponController = _player.GetComponent<WeaponController>();
+        _busterController = _player.GetComponent<BusterController>();
         
         _playerInput.actions["Slot1"].performed += HandleSlot1;
         _playerInput.actions["Slot2"].performed += HandleSlot2;
@@ -232,6 +234,8 @@ public class GameUI : MonoBehaviour
         _weaponController.OnReloadEnd += OnWeaponReloadEnd;
         _weaponController.OnReloadPercent += OnWeaponReloadPercent;
         _weaponController.OnAmmoChange += OnWeaponAmmoChange;
+        
+        _busterController.OnMoveSpeedChange += OnMoveSpeedBusterChange;
     }
 
     private void Unsubscribe()
@@ -251,6 +255,8 @@ public class GameUI : MonoBehaviour
         _weaponController.OnReloadEnd -= OnWeaponReloadEnd;
         _weaponController.OnReloadPercent -= OnWeaponReloadPercent;
         _weaponController.OnAmmoChange -= OnWeaponAmmoChange;
+        
+        _busterController.OnMoveSpeedChange -= OnMoveSpeedBusterChange;
     }
 
     private void HandleSlot1(InputAction.CallbackContext context)
@@ -392,6 +398,13 @@ public class GameUI : MonoBehaviour
                     throw new NotImplementedException("Текст для кол-ва гранат не назначен");
                 break;
         }
+    }
+    
+    private void OnMoveSpeedBusterChange(float time)
+    {
+        moveSpeedBuffIconStruct.icon.gameObject.SetActive(time > 0);
+        TimeSpan timeSpan = TimeSpan.FromSeconds(time);
+        moveSpeedBuffIconStruct.timerText.text = $"{timeSpan:m\\:ss}";
     }
 
     private IEnumerator Fade(Color from, Color to, float time)
