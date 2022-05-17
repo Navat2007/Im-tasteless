@@ -10,6 +10,15 @@ public class BusterController : MonoBehaviour
     public event Action<float> OnMoveSpeedChange;
     public event Action<float> OnDamageChange;
     public event Action<float> OnAttackSpeedChange;
+
+    [SerializeField] private GameObject firstAidKitPrefab;
+    [SerializeField] private GameObject bandagePrefab;
+    [SerializeField] private GameObject clipPrefab;
+    [SerializeField] private GameObject grenadePrefab;
+    [SerializeField] private GameObject armorPrefab;
+    [SerializeField] private GameObject damagePrefab;
+    [SerializeField] private GameObject attackSpeedPrefab;
+    [SerializeField] private GameObject moveSpeedPrefab;
     
     private Player _player;
     private WeaponController _weaponController;
@@ -146,5 +155,30 @@ public class BusterController : MonoBehaviour
         
         if(!_isMoveSpeedBusterActive)
             StartCoroutine(Activate());
+    }
+
+    public GameObject GetBusterPrefab(BusterType busterType)
+    {
+        switch (busterType)
+        {
+            case BusterType.FIRST_AID_KIT:
+                return firstAidKitPrefab;
+            case BusterType.BANDAGE:
+                return bandagePrefab;
+            case BusterType.CLIP:
+                return clipPrefab;
+            case BusterType.GRENADE:
+                return grenadePrefab;
+            case BusterType.BODY_ARMOR:
+                return armorPrefab;
+            case BusterType.DAMAGE:
+                return damagePrefab;
+            case BusterType.ATTACK_SPEED:
+                return attackSpeedPrefab;
+            case BusterType.MOVE_SPEED:
+                return moveSpeedPrefab;
+            default:
+                return null;
+        }
     }
 }

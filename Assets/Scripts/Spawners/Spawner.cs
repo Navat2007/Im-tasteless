@@ -12,15 +12,18 @@ public class Spawner : MonoBehaviour
     [Space(10)]
     [SerializeField] private float minSpawnDistance = -5;
     [SerializeField] private float maxSpawnDistance = 5;
+    [SerializeField] private float busterSpawnChance = 12.5f;
     [SerializeField] private Transform enemyPool;
+    [SerializeField] private Transform busterPool;
 
     private ExperienceSystem _playerExperienceSystem;
+    private BusterController _busterController;
     
     private void Start()
     {
-        _playerExperienceSystem = GameObject.FindGameObjectWithTag("Player").GetComponent<ExperienceSystem>();
-        
-        //print($"Spawner: waves count {waves.Count}");
+        var player = GameObject.FindGameObjectWithTag("Player");
+        _playerExperienceSystem = player.GetComponent<ExperienceSystem>();
+        _busterController = player.GetComponent<BusterController>();
         
         if(waves.Count > 0)
             ActivateNextWave(waves[0], 0);
@@ -202,6 +205,25 @@ public class Spawner : MonoBehaviour
         
             if(_playerExperienceSystem != null)
                 _playerExperienceSystem.AddXp(spawnedEnemy.XpOnDeath);
+
+            if (Helper.GetCriticalChance(busterSpawnChance))
+            {
+                SpawnBuster(spawnedEnemy);
+            }
+        }
+
+        void SpawnBuster(Enemy spawnedEnemy)
+        {
+            Array values = Enum.GetValues(typeof(BusterType));
+            System.Random random = new System.Random();
+            BusterType busterType = (BusterType)values.GetValue(random.Next(values.Length));
+            
+            Instantiate(
+                _busterController.GetBusterPrefab(busterType), 
+                spawnedEnemy.transform.position, 
+                Quaternion.identity, 
+                busterPool
+            );
         }
         
         Enemy spawnedEnemy = Instantiate(
