@@ -206,7 +206,7 @@ public class Spawner : MonoBehaviour
             if(_playerExperienceSystem != null)
                 _playerExperienceSystem.AddXp(spawnedEnemy.XpOnDeath);
 
-            if (Helper.GetCriticalChance(busterSpawnChance))
+            if (Helper.GetCriticalChance(isPowerZombie? 100 : busterSpawnChance))
             {
                 SpawnBuster(spawnedEnemy);
             }
