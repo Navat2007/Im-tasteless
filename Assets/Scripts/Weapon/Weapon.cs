@@ -12,6 +12,7 @@ public class Weapon : MonoBehaviour
     
     [field: Header("Audio")]
     [field: SerializeField] public AudioClip ShootClip { get; private set; }
+    [field: SerializeField] public AudioClip EmptyAmmoClip { get; private set; }
     
     [field: Header("Projectile")]
     [field: SerializeField] public bool infiniteProjectile { get; private set; }

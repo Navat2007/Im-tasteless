@@ -51,6 +51,7 @@ public class WeaponController : MonoBehaviour
 
     private float _nextShootTime;
     private float _nextThrowingTime;
+    private float _nextEmptyShootTime;
     private Vector3 _recoilSmoothDampVelocity;
     private float _recoilRotationSmoothDampVelocity;
     private float _recoilAngle;
@@ -174,6 +175,11 @@ public class WeaponController : MonoBehaviour
         
         if(!_isReloading && Time.time > _nextShootTime && _equippedWeapon.ProjectileInClip > 0 && !IsPointerOverUI())
             Shoot();
+        else if (!_isReloading && _equippedWeapon.ProjectileInClip == 0 && Time.time > _nextEmptyShootTime)
+        {
+            _nextEmptyShootTime = Time.time + (_equippedWeapon.MsBetweenShots - (_equippedWeapon.MsBetweenShots / 100 * _bonusAttackSpeedPercent)) / 1000;
+            _audioManager.PlaySound(_equippedWeapon.EmptyAmmoClip, _equippedWeapon.MuzzlePoint.position);
+        }
     }
     
     private void OnThrowGrenade(InputAction.CallbackContext context)

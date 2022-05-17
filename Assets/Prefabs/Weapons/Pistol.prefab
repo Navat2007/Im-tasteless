@@ -9878,10 +9878,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <CurrentWeaponType>k__BackingField: 0
   <Damage>k__BackingField: 10
+  <CriticalChance>k__BackingField: 10
+  <CriticalBonus>k__BackingField: 2
   <ReloadSpeed>k__BackingField: 1.5
   <MsBetweenShots>k__BackingField: 500
   <RecoilPower>k__BackingField: 0.2
-  <ShootClip>k__BackingField: {fileID: 8300000, guid: 85215d871588ec94a815a62b82379631,
+  <ShootClip>k__BackingField: {fileID: 8300000, guid: 40bf19b7fd1d11944a353cfafb1e57de,
+    type: 3}
+  <EmptyAmmoClip>k__BackingField: {fileID: 8300000, guid: 50737f391152e2c489084469d5bab5e7,
     type: 3}
   <infiniteProjectile>k__BackingField: 1
   <Projectile>k__BackingField: {fileID: 7583622359539837063, guid: 4ec0a547a72f0aa4591069b4660e65b0,

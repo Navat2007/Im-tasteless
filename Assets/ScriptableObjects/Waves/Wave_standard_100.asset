@@ -25,5 +25,5 @@ MonoBehaviour:
   colorFast: {r: 0, g: 0, b: 1, a: 1}
   xpOnDeath: 1
   damage: 10
-  moveSpeed: 5
+  moveSpeed: 6
   health: 40
