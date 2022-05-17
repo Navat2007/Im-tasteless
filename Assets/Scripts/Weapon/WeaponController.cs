@@ -1,0 +1,455 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using Vector3 = UnityEngine.Vector3;
+
+[RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(PlayerController))]
+[RequireComponent(typeof(Animator))]
+public class WeaponController : MonoBehaviour
+{
+    public event Action OnReloadStart; 
+    public event Action OnReloadEnd; 
+    public event Action<float> OnReloadPercent; 
+    public event Action<int, int, bool, WeaponType> OnAmmoChange; 
+
+    public Transform GetWeaponHold => weaponHold;
+    
+    [SerializeField] private Transform weaponHold;
+    [SerializeField] private Transform leftHandHold;
+    [SerializeField] private WeaponType startingWeapon;
+    
+    [Header("Weapons List")] 
+    [SerializeField] private Weapon pistol;
+    [SerializeField] private Weapon shotgun;
+    [SerializeField] private Weapon rifle;
+    
+    [Header("Grenade")] 
+    [SerializeField] private GameObject grenadePrefab;
+    [SerializeField] private bool infiniteGrenade;
+    [SerializeField] private int grenadeCount;
+    [SerializeField] private int grenadeMaxCount = 10;
+    [SerializeField] private float grenadeCooldownMs = 800;
+    [SerializeField] private float grenadeMaxThrowingForce = 15;
+    [SerializeField] private float grenadeThrowingUpwardForce = 4;
+
+    private GameUI _gameUI;
+    private PlayerInput _playerInput;
+    private PlayerController _playerController;
+    private Animator _animator;
+    private AudioManager _audioManager;
+    private Weapon _equippedWeapon;
+
+    private bool _isPistolActive = true;
+    private bool _isShogunActive;
+    private bool _isRifleActive;
+    private bool _isGrenadeActive;
+
+    private float _nextShootTime;
+    private float _nextThrowingTime;
+    private Vector3 _recoilSmoothDampVelocity;
+    private float _recoilRotationSmoothDampVelocity;
+    private float _recoilAngle;
+    private Vector3 _initialRotation;
+    private Vector3 _crosshairPosition;
+
+    private bool _isReloading;
+
+    private void Awake()
+    {
+        _gameUI = GameObject.FindGameObjectWithTag("GameUI").GetComponent<GameUI>();
+        _playerInput = GetComponent<PlayerInput>();
+        _playerController = GetComponent<PlayerController>();
+        _animator = GetComponent<Animator>();
+        _audioManager = FindObjectOfType<AudioManager>();
+    }
+
+    private void Start()
+    {
+        EquipWeapon(startingWeapon);
+    }
+    
+    private void OnEnable()
+    {
+        _playerInput.actions["Reload"].performed += HandleReload;
+        _playerInput.actions["Slot1"].performed += HandleSlot1;
+        _playerInput.actions["Slot2"].performed += HandleSlot2;
+        _playerInput.actions["Slot3"].performed += HandleSlot3;
+        _playerInput.actions["Grenade"].performed += OnThrowGrenade;
+        _playerController.OnCrosshairMove += HandleCrossHairMove;
+    }
+
+    private void OnDisable()
+    {
+        _playerInput.actions["Reload"].performed -= HandleReload;
+        _playerInput.actions["Slot1"].performed -= HandleSlot1;
+        _playerInput.actions["Slot2"].performed -= HandleSlot2;
+        _playerInput.actions["Slot3"].performed -= HandleSlot3;
+        _playerInput.actions["Grenade"].performed -= OnThrowGrenade;
+        _playerController.OnCrosshairMove -= HandleCrossHairMove;
+    }
+
+    private void Update()
+    {
+        if(_playerInput.actions["Fire"].IsPressed())
+            OnFire(new InputAction.CallbackContext());
+        
+        Vector2 scrollVector = Mouse.current.scroll.ReadValue();
+        //print(scrollVector);
+    }
+
+    private void LateUpdate()
+    {
+        _equippedWeapon.transform.localPosition =
+            Vector3.SmoothDamp(_equippedWeapon.transform.localPosition, Vector3.zero, ref _recoilSmoothDampVelocity, .1f);
+        //_recoilAngle = Mathf.SmoothDamp(_recoilAngle, 0, ref _recoilRotationSmoothDampVelocity, .1f);
+        //_equippedWeapon.transform.localEulerAngles += Vector3.left * _recoilAngle;
+
+        if (!_isReloading && _equippedWeapon.ProjectileInClip <= 0 && (_equippedWeapon.CurrentProjectileAmount > 0 || _equippedWeapon.infiniteProjectile))
+        {
+            Reload();
+        }
+    }
+    
+    private void HandleSlot1(InputAction.CallbackContext context)
+    {
+        if(_isPistolActive)
+            EquipWeapon(WeaponType.PISTOL);
+    }
+    
+    private void HandleSlot2(InputAction.CallbackContext context)
+    {
+        if(_isShogunActive)
+            EquipWeapon(WeaponType.SHOTGUN);
+    }
+    
+    private void HandleSlot3(InputAction.CallbackContext context)
+    {
+        if(_isRifleActive)
+            EquipWeapon(WeaponType.RIFLE);
+    }
+    
+    private void HandleReload(InputAction.CallbackContext context)
+    {
+        if (!_isReloading)
+        {
+            Reload();
+        }
+    }
+    
+    private void HandleCrossHairMove(Vector3 position)
+    {
+        _crosshairPosition = position; 
+    }
+
+    private void OnFire(InputAction.CallbackContext context)
+    {
+        bool IsPointerOverUI()
+        {
+            bool found = false;
+            
+            PointerEventData eventData = new PointerEventData(EventSystem.current)
+            {
+                position = Mouse.current.position.ReadValue()
+            };
+            
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(eventData, results);
+            
+            foreach (var result in results)
+            {
+                if (result.gameObject.GetComponent<Button>() != null)
+                    found = true;
+            }
+            
+            return found;
+        }
+        
+        if(!_isReloading && Time.time > _nextShootTime && _equippedWeapon.ProjectileInClip > 0 && !IsPointerOverUI())
+            Shoot();
+    }
+    
+    private void OnThrowGrenade(InputAction.CallbackContext context)
+    {
+        if( Time.time > _nextThrowingTime && _isGrenadeActive && (grenadeCount > 0 || infiniteGrenade))
+            Throw();
+    }
+
+    private void Shoot()
+    {
+        void EjectProjectile()
+        {
+            for (int i = 0; i <  _equippedWeapon.ProjectileSpawnPoint.Length; i++)
+            {
+                Projectile projectile = Instantiate(_equippedWeapon.Projectile, _equippedWeapon.ProjectileSpawnPoint[i].position, _equippedWeapon.ProjectileSpawnPoint[i].rotation);
+                projectile.SetSpeed(_equippedWeapon.MuzzleVelocity);
+                projectile.SetDamage(_equippedWeapon.Damage);
+            }
+
+            _equippedWeapon.ProjectileInClip--;
+            OnAmmoChange?.Invoke(_equippedWeapon.ProjectileInClip, _equippedWeapon.CurrentProjectileAmount, _equippedWeapon.infiniteProjectile, _equippedWeapon.CurrentWeaponType);
+            _equippedWeapon.MuzzleParticleSystem.Play();
+        }
+        
+        void EjectShellCase()
+        {
+            Shell shell = Instantiate(_equippedWeapon.Shell, _equippedWeapon.ShellSpawnPoint.position, _equippedWeapon.ShellSpawnPoint.rotation);
+        }
+
+        void Recoil()
+        {
+            _equippedWeapon.transform.localPosition -= Vector3.forward * _equippedWeapon.RecoilPower;
+            //_recoilAngle += 5;
+            //_recoilAngle = Mathf.Clamp(_recoilAngle, 0, 15);
+        }
+
+        void ShootSound()
+        {
+            _audioManager.PlaySound(_equippedWeapon.ShootClip, _equippedWeapon.MuzzlePoint.position);
+        }
+        
+        _nextShootTime = Time.time + _equippedWeapon.MsBetweenShots / 1000;
+        
+        _animator?.SetTrigger("Attack");
+        
+        EjectProjectile();
+        EjectShellCase();
+        Recoil();
+        ShootSound();
+    }
+
+    private void Throw()
+    {
+        _nextThrowingTime = Time.time + grenadeCooldownMs / 1000;
+
+        if(!infiniteGrenade)
+            grenadeCount--;
+        
+        OnAmmoChange?.Invoke(grenadeCount, grenadeMaxCount, infiniteGrenade, WeaponType.GRENADE);
+
+        var distanceToCrosshair = Mathf.Clamp(Vector3.Distance(_crosshairPosition, leftHandHold.position), 0, grenadeMaxThrowingForce);
+
+        GameObject grenadeGameObject = Instantiate(grenadePrefab, leftHandHold.position, leftHandHold.rotation);
+        Rigidbody grenadeRigidbody = grenadeGameObject.GetComponent<Rigidbody>();
+        Vector3 forceToAdd = transform.forward * distanceToCrosshair + transform.up * grenadeThrowingUpwardForce;
+        grenadeRigidbody.AddForce(forceToAdd, ForceMode.Impulse);
+    }
+    
+    public void EquipWeapon(WeaponType weaponType)
+    {
+        _isReloading = false;
+
+        if (_equippedWeapon != null)
+        {
+            _equippedWeapon.transform.localEulerAngles = _initialRotation;
+            _equippedWeapon.gameObject.SetActive(false);
+        }
+
+        switch (weaponType)
+        {
+            case WeaponType.PISTOL:
+                _equippedWeapon = pistol;
+                break;
+            case WeaponType.SHOTGUN:
+                _equippedWeapon = shotgun;
+                break;
+            case WeaponType.RIFLE:
+                _equippedWeapon = rifle;
+                break;
+        }
+        
+        _equippedWeapon.gameObject.SetActive(true);
+        _initialRotation = _equippedWeapon.transform.localEulerAngles;
+        
+        OnAmmoChange?.Invoke(_equippedWeapon.ProjectileInClip, _equippedWeapon.CurrentProjectileAmount, _equippedWeapon.infiniteProjectile, _equippedWeapon.CurrentWeaponType);
+    }
+
+    public Weapon GetEquippedWeapon => _equippedWeapon;
+
+    public void Reload()
+    {
+        IEnumerator AnimateReload()
+        {
+            OnReloadStart?.Invoke();
+            yield return new WaitForSeconds(.2f);
+
+            float reloadSpeed = 1 / _equippedWeapon.ReloadSpeed;
+            float percent = 0;
+            float maxReloadAngle = 40;
+
+            while (percent < 1)
+            {
+                if (!_isReloading)
+                {
+                    _equippedWeapon.transform.localEulerAngles = _initialRotation;
+                    OnReloadEnd?.Invoke();
+                    OnReloadPercent?.Invoke(0);
+                    yield break;
+                }
+            
+                percent += Time.deltaTime * reloadSpeed;
+                
+                OnReloadPercent?.Invoke(percent);
+                
+                float interpolation = (-Mathf.Pow(percent, 2) + percent) * 4;
+                float reloadAngle = Mathf.Lerp(0, maxReloadAngle, interpolation);
+                _equippedWeapon.transform.localEulerAngles = _initialRotation + Vector3.left * reloadAngle;
+                
+                yield return null;
+            }
+            
+            _isReloading = false;
+            OnReloadEnd?.Invoke();
+            OnReloadPercent?.Invoke(0);
+            
+            if(_equippedWeapon.CurrentProjectileAmount >= _equippedWeapon.ProjectilePerClip)
+            {
+                if(!_equippedWeapon.infiniteProjectile)
+                    _equippedWeapon.CurrentProjectileAmount -= _equippedWeapon.ProjectilePerClip - _equippedWeapon.ProjectileInClip;
+                
+                _equippedWeapon.ProjectileInClip = _equippedWeapon.ProjectilePerClip;
+            }
+            else
+            {
+                _equippedWeapon.ProjectileInClip = _equippedWeapon.CurrentProjectileAmount;
+                
+                if(!_equippedWeapon.infiniteProjectile)
+                    _equippedWeapon.CurrentProjectileAmount -= _equippedWeapon.CurrentProjectileAmount;
+            }
+            
+            OnAmmoChange?.Invoke(_equippedWeapon.ProjectileInClip, _equippedWeapon.CurrentProjectileAmount, _equippedWeapon.infiniteProjectile, _equippedWeapon.CurrentWeaponType);
+        }
+        
+        if(_equippedWeapon.ProjectileInClip == _equippedWeapon.ProjectilePerClip || (_equippedWeapon.CurrentProjectileAmount <= 0 && !_equippedWeapon.infiniteProjectile))
+            return;
+
+        _isReloading = true;
+
+        StartCoroutine(AnimateReload());
+    }
+
+    public void Aim(Vector3 point)
+    {
+        _equippedWeapon.transform.LookAt(point);
+    }
+
+    public bool IsWeaponActive(WeaponType weaponType)
+    {
+        switch (weaponType)
+        {
+            case WeaponType.PISTOL:
+                return _isPistolActive;
+            case WeaponType.SHOTGUN:
+                return _isShogunActive;
+            case WeaponType.RIFLE:
+                return _isRifleActive;
+            case WeaponType.GRENADE:
+                return _isGrenadeActive;
+        }
+
+        return false;
+    }
+
+    public WeaponInfo GetWeaponInfo(WeaponType weaponType)
+    {
+        switch (weaponType)
+        {
+            case WeaponType.PISTOL:
+                return new WeaponInfo
+                {
+                    ammoInClip = pistol.ProjectileInClip,
+                    ammoPerClip = pistol.ProjectilePerClip,
+                    ammoCurrent = pistol.CurrentProjectileAmount,
+                    ammoMax = pistol.MaxProjectileAmount
+                };
+            case WeaponType.SHOTGUN:
+                return new WeaponInfo
+                {
+                    ammoInClip = shotgun.ProjectileInClip,
+                    ammoPerClip = shotgun.ProjectilePerClip,
+                    ammoCurrent = shotgun.CurrentProjectileAmount,
+                    ammoMax = shotgun.MaxProjectileAmount
+                };
+            case WeaponType.RIFLE:
+                return new WeaponInfo
+                {
+                    ammoInClip = rifle.ProjectileInClip,
+                    ammoPerClip = rifle.ProjectilePerClip,
+                    ammoCurrent = rifle.CurrentProjectileAmount,
+                    ammoMax = rifle.MaxProjectileAmount
+                };
+            case WeaponType.GRENADE:
+                return new WeaponInfo
+                {
+                    ammoInClip = 1,
+                    ammoPerClip = 1,
+                    ammoCurrent = grenadeCount,
+                    ammoMax = grenadeMaxCount
+                };
+            default:
+                return new WeaponInfo();
+        }
+    }
+    
+    public void AddAmmo(int count, WeaponType weaponType, bool activateWeapon)
+    {
+        switch (weaponType)
+        {
+            case WeaponType.SHOTGUN:
+                if (activateWeapon && !_isShogunActive)
+                {
+                    _isShogunActive = true;
+                    _gameUI.SetSlot(2, true);
+                }
+                
+                shotgun.CurrentProjectileAmount += count;
+
+                if (shotgun.CurrentProjectileAmount > shotgun.MaxProjectileAmount)
+                    shotgun.CurrentProjectileAmount = shotgun.MaxProjectileAmount;
+                
+                OnAmmoChange?.Invoke(shotgun.ProjectileInClip, shotgun.CurrentProjectileAmount, shotgun.infiniteProjectile, WeaponType.SHOTGUN);
+                break;
+            case WeaponType.RIFLE:
+                if (activateWeapon && !_isRifleActive)
+                {
+                    _isRifleActive = true;
+                    _gameUI.SetSlot(3, true);
+                }
+                
+                rifle.CurrentProjectileAmount += count;
+                
+                if (rifle.CurrentProjectileAmount > rifle.MaxProjectileAmount)
+                    rifle.CurrentProjectileAmount = rifle.MaxProjectileAmount;
+                
+                OnAmmoChange?.Invoke(rifle.ProjectileInClip, rifle.CurrentProjectileAmount, rifle.infiniteProjectile, WeaponType.RIFLE);
+                break;
+            case WeaponType.GRENADE:
+                if (activateWeapon && !_isGrenadeActive)
+                {
+                    _isGrenadeActive = true;
+                    _gameUI.SetSlot(4, true);
+                }
+                
+                grenadeCount += count;
+
+                if (grenadeCount > grenadeMaxCount)
+                    grenadeCount = grenadeMaxCount;
+                
+                OnAmmoChange?.Invoke(grenadeCount, grenadeMaxCount, infiniteGrenade, WeaponType.GRENADE);
+                break;
+        }
+    }
+    
+}
+
+public struct WeaponInfo
+{
+    public int ammoInClip;
+    public int ammoPerClip;
+    public int ammoCurrent;
+    public int ammoMax;
+}
