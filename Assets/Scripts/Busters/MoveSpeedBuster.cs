@@ -4,7 +4,7 @@
     {
         public override void PickUp()
         {
-            busterController.PickMoveSpeed(count);
+            busterController.PickMoveSpeed(count, 10);
             Destroy(gameObject);
         }
     }
