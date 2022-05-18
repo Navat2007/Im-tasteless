@@ -24,7 +24,7 @@ public class EnemyStandardController : MonoBehaviour
     {
         if (Time.time > _stuckTimer && _stuckCount > 0)
         {
-            _enemyController.SetSpeed(-moveSpeed * _stuckCount);
+            _enemyController.AddSpeed(-moveSpeed * _stuckCount);
             _stuckCount = 0;
         }
     }
@@ -34,7 +34,7 @@ public class EnemyStandardController : MonoBehaviour
         if (_stuckCount < stuckMaxCount)
         {
             _stuckCount++;
-            _enemyController.SetSpeed(moveSpeed);
+            _enemyController.AddSpeed(moveSpeed);
         }
         
         _stuckTimer = Time.time + stuckMaxTimer;

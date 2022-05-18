@@ -26,8 +26,8 @@ public class EnemyFatController : MonoBehaviour
 
         if (count > _prevCount)
         {
-            _enemyController.SetSpeed(moveSpeed * (count - _prevCount));
-            _enemyController.SetTurnSpeed(turnSpeed * (count - _prevCount));
+            _enemyController.AddSpeed(moveSpeed * (count - _prevCount));
+            _enemyController.AddTurnSpeed(turnSpeed * (count - _prevCount));
             _prevCount = count;
         }
     }

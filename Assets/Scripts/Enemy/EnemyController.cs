@@ -62,12 +62,12 @@ public class EnemyController : MonoBehaviour
         _navMeshAgent.SetDestination(position);
     }
     
-    public void SetSpeed(float value)
+    public void AddSpeed(float value)
     {
         _bonusSpeed += value;
     }
     
-    public void SetTurnSpeed(float value)
+    public void AddTurnSpeed(float value)
     {
         _bonusTurnSpeed += value;
     }
