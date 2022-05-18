@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -12,6 +11,9 @@ public class EnemyController : MonoBehaviour
     private Rigidbody _rigidbody;
     private NavMeshAgent _navMeshAgent;
     private TargetSystem _targetSystem;
+
+    private float _bonusSpeed;
+    private float _bonusTurnSpeed;
 
     private void Awake()
     {
@@ -43,6 +45,18 @@ public class EnemyController : MonoBehaviour
     
     private void OnTargetPositionChange(Vector3 position, GameObject target)
     {
+        _navMeshAgent.angularSpeed = _enemy.TurnSpeed + _bonusTurnSpeed;
+        _navMeshAgent.speed = _enemy.MoveSpeed + _bonusSpeed;
         _navMeshAgent.SetDestination(position);
+    }
+    
+    public void SetSpeed(float value)
+    {
+        _bonusSpeed += value;
+    }
+    
+    public void SetTurnSpeed(float value)
+    {
+        _bonusTurnSpeed += value;
     }
 }

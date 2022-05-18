@@ -21,7 +21,10 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
         _isExploded = true;
         base.OnDeath(projectileHitInfo);
         
-        GetComponent<EnemyPowerSkin>().Switch();
+        if(gameObject.TryGetComponent(out EnemyPowerSkin skin))
+        {
+            skin.Switch();
+        }
 
         if (enemy.IsPower)
         {
@@ -59,42 +62,42 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
 
             var deathEffectGameObject = Instantiate(
                 deathEffectParticlePrefab.gameObject,
-                projectileHitInfo.hitPoint,
+                transform.position,
                 Quaternion.FromToRotation(Vector3.forward, projectileHitInfo.hitDirection));
 
             var deathEffectGameObject2 = Instantiate(
                 deathEffectParticlePrefab.gameObject,
-                projectileHitInfo.hitPoint,
+                transform.position,
                 Quaternion.FromToRotation(Vector3.back, projectileHitInfo.hitDirection));
 
             var deathEffectGameObject3 = Instantiate(
                 deathEffectParticlePrefab.gameObject,
-                projectileHitInfo.hitPoint,
+                transform.position,
                 Quaternion.FromToRotation(Vector3.right, projectileHitInfo.hitDirection));
 
             var deathEffectGameObject4 = Instantiate(
                 deathEffectParticlePrefab.gameObject,
-                projectileHitInfo.hitPoint,
+                transform.position,
                 Quaternion.FromToRotation(Vector3.left, projectileHitInfo.hitDirection));
 
             var deathEffectGameObject5 = Instantiate(
                 deathEffectParticlePrefab.gameObject,
-                projectileHitInfo.hitPoint,
+                transform.position,
                 Quaternion.FromToRotation(Vector3.forward - Vector3.left, projectileHitInfo.hitDirection));
 
             var deathEffectGameObject6 = Instantiate(
                 deathEffectParticlePrefab.gameObject,
-                projectileHitInfo.hitPoint,
+                transform.position,
                 Quaternion.FromToRotation(Vector3.forward - Vector3.right, projectileHitInfo.hitDirection));
 
             var deathEffectGameObject7 = Instantiate(
                 deathEffectParticlePrefab.gameObject,
-                projectileHitInfo.hitPoint,
+                transform.position,
                 Quaternion.FromToRotation(Vector3.back - Vector3.left, projectileHitInfo.hitDirection));
 
             var deathEffectGameObject8 = Instantiate(
                 deathEffectParticlePrefab.gameObject,
-                projectileHitInfo.hitPoint,
+                transform.position,
                 Quaternion.FromToRotation(Vector3.back - Vector3.right, projectileHitInfo.hitDirection));
 
             Destroy(deathEffectGameObject, deathEffectParticlePrefab.main.startLifetime.constantMax);

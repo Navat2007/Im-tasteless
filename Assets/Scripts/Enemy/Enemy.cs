@@ -16,6 +16,7 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
     [field: SerializeField] public float AttackDistance { get; private set; }
     [field: SerializeField] public float MsBetweenAttack { get; private set; }
     [field: SerializeField] public float MoveSpeed { get; private set; }
+    [field: SerializeField] public float TurnSpeed { get; private set; }
     [field: SerializeField] public int XpOnDeath { get; private set; } = 1;
     [field: SerializeField] public Color Color { get; private set; }
     [field: SerializeField] public Vector3 Size { get; private set; }
@@ -29,6 +30,7 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
     [field: SerializeField] public float PowerAttackDistance { get; private set; }
     [field: SerializeField] public float PowerMsBetweenAttack { get; private set; }
     [field: SerializeField] public float PowerMoveSpeed { get; private set; }
+    [field: SerializeField] public float PowerTurnSpeed { get; private set; }
     [field: SerializeField] public int PowerXpOnDeath { get; private set; }
     [field: SerializeField] public Color PowerColor { get; private set; }
     [field: SerializeField] public Vector3 PowerSize { get; private set; }
@@ -61,6 +63,7 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
             AttackDistance = PowerAttackDistance;
             MsBetweenAttack = PowerMsBetweenAttack;
             MoveSpeed = PowerMoveSpeed;
+            TurnSpeed = PowerTurnSpeed;
             XpOnDeath = PowerXpOnDeath;
             
             transform.localScale = PowerSize;
@@ -74,6 +77,7 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
             switch (ZombieType)
             {
                 case ZombieType.FAT:
+                    gameObject.AddComponent<EnemyFatController>();
                     break;
                 case ZombieType.FAST:
                     break;

@@ -777,6 +777,7 @@ MonoBehaviour:
   <AttackDistance>k__BackingField: 3
   <MsBetweenAttack>k__BackingField: 1000
   <MoveSpeed>k__BackingField: 6
+  <TurnSpeed>k__BackingField: 120
   <XpOnDeath>k__BackingField: 1
   <Color>k__BackingField: {r: 1, g: 0, b: 0, a: 0}
   <Size>k__BackingField: {x: 1, y: 1, z: 1}
@@ -788,6 +789,7 @@ MonoBehaviour:
   <PowerAttackDistance>k__BackingField: 3
   <PowerMsBetweenAttack>k__BackingField: 1000
   <PowerMoveSpeed>k__BackingField: 6
+  <PowerTurnSpeed>k__BackingField: 0
   <PowerXpOnDeath>k__BackingField: 10
   <PowerColor>k__BackingField: {r: 1, g: 0, b: 0, a: 0}
   <PowerSize>k__BackingField: {x: 1, y: 1, z: 1}

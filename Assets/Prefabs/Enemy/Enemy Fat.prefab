@@ -610,6 +610,7 @@ GameObject:
   - component: {fileID: 4814742620544880133}
   - component: {fileID: 4814742620544880132}
   - component: {fileID: 7376974871789476948}
+  - component: {fileID: 5970432745941339887}
   m_Layer: 6
   m_Name: Enemy Fat
   m_TagString: Enemy
@@ -777,6 +778,7 @@ MonoBehaviour:
   <AttackDistance>k__BackingField: 4
   <MsBetweenAttack>k__BackingField: 500
   <MoveSpeed>k__BackingField: 2.75
+  <TurnSpeed>k__BackingField: 100
   <XpOnDeath>k__BackingField: 1
   <Color>k__BackingField: {r: 0.2735849, g: 0.23874155, b: 0.23874155, a: 0}
   <Size>k__BackingField: {x: 1.3, y: 1.3, z: 1.3}
@@ -788,6 +790,7 @@ MonoBehaviour:
   <PowerAttackDistance>k__BackingField: 4
   <PowerMsBetweenAttack>k__BackingField: 500
   <PowerMoveSpeed>k__BackingField: 3.5
+  <PowerTurnSpeed>k__BackingField: 0
   <PowerXpOnDeath>k__BackingField: 30
   <PowerColor>k__BackingField: {r: 0.27450982, g: 0.23921569, b: 0.23921569, a: 0}
   <PowerSize>k__BackingField: {x: 1.3, y: 1.3, z: 1.3}
@@ -862,10 +865,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deathEffectParticlePrefab: {fileID: 1902504369814592601, guid: e231fee14d6bdd84abbc0d1538adc545,
     type: 3}
+  timer: 2
   radius: 5
   force: 600
   damage: 10
   explodeClip: {fileID: 8300000, guid: b5dd78bd4cccb84498d982f20527c93a, type: 3}
+--- !u!114 &5970432745941339887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4814742620544880143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd7a35140309c5744b5eebb9f784c1f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 0.2
+  turnSpeed: -0.1
 --- !u!1 &6698355280391669456
 GameObject:
   m_ObjectHideFlags: 0
