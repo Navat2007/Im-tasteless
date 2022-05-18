@@ -46,7 +46,7 @@ public class CrateSpawner : MonoBehaviour
             return position;
         }
         
-        void OnEnemyDeath()
+        void OnCrateDeath(ProjectileHitInfo projectileHitInfo)
         {
             StartCoroutine(SpawnCrate(1, 0.4f, Random.Range(minTimeBetweenSpawn, maxTimeBetweenSpawn), false));
         }
@@ -69,7 +69,7 @@ public class CrateSpawner : MonoBehaviour
             
             if (spawnedCrate.gameObject.TryGetComponent(out HealthSystem healthSystem))
             {
-                healthSystem.OnDeath += OnEnemyDeath;
+                healthSystem.OnDeath += OnCrateDeath;
             }
         }
         

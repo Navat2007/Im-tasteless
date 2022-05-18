@@ -29,7 +29,14 @@ public class Projectile : MonoBehaviour
         
         if (enemy.GetComponent<IDamageable>() != null && enemy.TryGetComponent(out HealthSystem healthSystem))
         {
-            healthSystem.TakeHit(damage, Helper.GetCriticalChance(criticalChance), other.ClosestPoint(transform.position), transform.forward);
+            healthSystem.TakeDamage(new ProjectileHitInfo
+            {
+                damage = damage,
+                isCritical = Helper.GetCriticalChance(criticalChance),
+                criticalBonus = criticalBonus,
+                hitPoint = other.ClosestPoint(transform.position),
+                hitDirection = transform.forward
+            });
         }
         
         Destroy(gameObject);
@@ -53,5 +60,19 @@ public class Projectile : MonoBehaviour
     public void SetCriticalBonus(float value)
     {
         criticalBonus = value;
+    }
+}
+
+public struct ProjectileHitInfo
+{
+    public float damage;
+    public bool isCritical;
+    public float criticalBonus;
+    public Vector3 hitPoint;
+    public Vector3 hitDirection;
+
+    public void MakeDamageCritical()
+    {
+        damage *= criticalBonus;
     }
 }

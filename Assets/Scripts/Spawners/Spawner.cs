@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
@@ -230,7 +229,7 @@ public class Spawner : MonoBehaviour
         
         if (spawnedEnemy.gameObject.TryGetComponent(out HealthSystem healthSystem))
         {
-            healthSystem.OnDeath += () => OnEnemyDeath(spawnedEnemy);
+            healthSystem.OnDeath += (hitInfo) => OnEnemyDeath(spawnedEnemy);
         }
 
         return spawnedEnemy;

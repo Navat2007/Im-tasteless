@@ -10,6 +10,8 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
     [field: Header("Стандартные параметры")]
     [field: SerializeField] public float Health { get; set; }
     [field: SerializeField] public float Damage { get; private set; }
+    [field: SerializeField] public float CriticalChance { get; private set; }
+    [field: SerializeField] public float CriticalBonus { get; private set; }
     [field: SerializeField] public float AttackDistance { get; private set; }
     [field: SerializeField] public float MsBetweenAttack { get; private set; }
     [field: SerializeField] public float MoveSpeed { get; private set; }
@@ -21,6 +23,8 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
     [field: SerializeField] public bool IsPower { get; set; }
     [field: SerializeField] public float PowerHealth { get; private set; }
     [field: SerializeField] public float PowerDamage { get; private set; }
+    [field: SerializeField] public float PowerCriticalChance { get; private set; }
+    [field: SerializeField] public float PowerCriticalBonus { get; private set; }
     [field: SerializeField] public float PowerAttackDistance { get; private set; }
     [field: SerializeField] public float PowerMsBetweenAttack { get; private set; }
     [field: SerializeField] public float PowerMoveSpeed { get; private set; }
@@ -44,6 +48,8 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
         {
             Health = PowerHealth;
             Damage = PowerDamage;
+            CriticalChance = PowerCriticalChance;
+            CriticalBonus = PowerCriticalBonus;
             AttackDistance = PowerAttackDistance;
             MsBetweenAttack = PowerMsBetweenAttack;
             MoveSpeed = PowerMoveSpeed;

@@ -1,12 +1,11 @@
 using System;
 using System.Collections;
 using Interface;
-using TMPro;
 using UnityEngine;
 
 public class HealthSystem : MonoBehaviour
 {
-    public event Action OnDeath;
+    public event Action<ProjectileHitInfo> OnDeath;
     public event Action<float, float> OnHealthChange;
     public event Action<int> OnArmorChange;
     
@@ -19,10 +18,6 @@ public class HealthSystem : MonoBehaviour
     [SerializeField] private float blinkIntensity = 10;
     [SerializeField] private float blinkDuration = 0.1f;
     [SerializeField] private float blinkTimer;
-
-    [Header("Настройки при смерти")] 
-    [SerializeField] private bool isDestroyOnDeath;
-    [SerializeField] private ParticleSystem deathEffect;
 
     [Header("Настройки всплывающий текст")] 
     [SerializeField] private GameObject floatingTextPrefab;
@@ -122,38 +117,20 @@ public class HealthSystem : MonoBehaviour
         
         OnArmorChange?.Invoke(Armor);
     }
-
-    public void TakeHit(float amount, bool isCritical, Vector3 hitPoint, Vector3 hitDirection)
-    {
-        //print($"take hit {amount}");
-        if (amount >= CurrentHealth && deathEffect != null)
-        {
-            var deathEffectRenderer = deathEffect.GetComponent<ParticleSystemRenderer>();
-            deathEffectRenderer.material = _meshRenderer.material;
-            
-            var deathEffectGameObject = Instantiate(
-                deathEffect.gameObject,
-                hitPoint,
-                Quaternion.FromToRotation(Vector3.forward, hitDirection));
-            
-            Destroy(deathEffectGameObject, deathEffect.main.startLifetime.constantMax);
-        }
-        
-        TakeDamage(amount, isCritical);
-    }
     
-    public void TakeDamage(float amount, bool isCritical)
+    public void TakeDamage(ProjectileHitInfo projectileHitInfo)
     {
         blinkTimer = blinkDuration;
         
-        amount = isCritical ? amount * 2 : amount;
+        if(projectileHitInfo.isCritical)
+            projectileHitInfo.MakeDamageCritical();
 
         if (floatingTextPrefab != null)
         {
             GameObject floatingTextGameObject = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity);
             if (floatingTextGameObject.gameObject.TryGetComponent(out FloatingText floatingText))
             {
-                floatingText.Setup(amount.ToString(), isCritical, Armor > 0);
+                floatingText.Setup(projectileHitInfo.damage.ToString(), projectileHitInfo.isCritical, Armor > 0);
             }
         }
 
@@ -164,36 +141,37 @@ public class HealthSystem : MonoBehaviour
             return;
         }
 
-        CurrentHealth -= amount;
+        CurrentHealth -= projectileHitInfo.damage;
         
         if (CurrentHealth < 0)
             CurrentHealth = 0;
         
         OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
 
-        if (CurrentHealth <= 0) Die();
+        if (CurrentHealth <= 0) Die(projectileHitInfo);
     }
 
     [ContextMenu("Убить себя")]
-    private void Die()
+    private void Die(ProjectileHitInfo projectileHitInfo)
     {
-        OnDeath?.Invoke();
-        
-        if(isDestroyOnDeath)
-            Destroy(gameObject);
-        else
-            gameObject.SetActive(false);
+        OnDeath?.Invoke(projectileHitInfo);
     }
 
     [ContextMenu("Получить 10 урона")]
     private void Take10Damage()
     {
-        TakeDamage(10, false);
+        TakeDamage(new ProjectileHitInfo
+        {
+            damage = 10
+        });
     }
     
     [ContextMenu("Получить 50 урона")]
     private void Take50Damage()
     {
-        TakeDamage(50, false);
+        TakeDamage(new ProjectileHitInfo
+        {
+            damage = 50
+        });
     }
 }

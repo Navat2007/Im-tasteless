@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Enemy))]
@@ -47,7 +45,14 @@ public class EnemyAttackController : MonoBehaviour
 
         if (target.gameObject.TryGetComponent(out HealthSystem healthSystem))
         {
-            healthSystem.TakeDamage(_enemy.Damage, false);
+            healthSystem.TakeDamage(new ProjectileHitInfo
+            {
+                damage = _enemy.Damage,
+                isCritical = Helper.GetCriticalChance(_enemy.CriticalChance),
+                criticalBonus = _enemy.CriticalBonus,
+                hitPoint = transform.position,
+                hitDirection = transform.forward
+            });
         }
         
         _animator?.SetTrigger("Attack");

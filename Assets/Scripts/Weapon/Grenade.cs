@@ -77,11 +77,15 @@ public class Grenade : MonoBehaviour
                     var heading = nearbyObjects.transform.position - transform.position;
                     var distance = heading.magnitude;
                     var direction = heading / distance;
-                    healthSystem.TakeHit(
-                        nearbyObjects.gameObject.GetComponent<Player>() != null ? damage / 2 : damage, 
-                        false,
-                        nearbyObjects.transform.position, 
-                        direction);
+                    
+                    healthSystem.TakeDamage(new ProjectileHitInfo
+                    {
+                        damage = nearbyObjects.gameObject.GetComponent<Player>() != null ? damage / 2 : damage,
+                        isCritical = Helper.GetCriticalChance(0),
+                        criticalBonus = 0,
+                        hitPoint = nearbyObjects.transform.position,
+                        hitDirection = direction
+                    });
                 }
             }
         }

@@ -319,7 +319,7 @@ public class GameUI : MonoBehaviour
         }
     }
 
-    private void OnGameOver()
+    private void OnGameOver(ProjectileHitInfo projectileHitInfo)
     {
         StartCoroutine(Fade(Color.clear, Color.black, 1));
         gameOverUI.SetActive(true);
