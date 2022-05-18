@@ -128,13 +128,15 @@ public class HealthSystem : MonoBehaviour
         //print($"take hit {amount}");
         if (amount >= CurrentHealth && deathEffect != null)
         {
-            Destroy(
-                Instantiate(
-                    deathEffect.gameObject, 
-                    hitPoint, 
-                    Quaternion.FromToRotation(Vector3.forward, hitDirection)),
-                    deathEffect.main.startLifetime.constantMax 
-                );
+            var deathEffectRenderer = deathEffect.GetComponent<ParticleSystemRenderer>();
+            deathEffectRenderer.material = _meshRenderer.material;
+            
+            var deathEffectGameObject = Instantiate(
+                deathEffect.gameObject,
+                hitPoint,
+                Quaternion.FromToRotation(Vector3.forward, hitDirection));
+            
+            Destroy(deathEffectGameObject, deathEffect.main.startLifetime.constantMax);
         }
         
         TakeDamage(amount, isCritical);

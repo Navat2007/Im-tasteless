@@ -9,6 +9,7 @@ public class Spawner : MonoBehaviour
     
     [SerializeField] private List<Wave> waves = new ();
     [SerializeField] private List<SpawnPoint> spawnPoints = new ();
+    [SerializeField] private Enemy standardEnemyPrefab;
     
     [Space(10)]
     [Header("Spawn distance")]
@@ -21,8 +22,11 @@ public class Spawner : MonoBehaviour
     
     [Header("Buster spawn chance")]
     [SerializeField] private float standardBusterSpawnChance = 5.0f;
+    [SerializeField] private float powerStandardBusterSpawnChance = 100.0f;
     [SerializeField] private float fastBusterSpawnChance = 10.0f;
-    [SerializeField] private float strongBusterSpawnChance = 15.0f;
+    [SerializeField] private float powerFastBusterSpawnChance = 50.0f;
+    [SerializeField] private float fatBusterSpawnChance = 15.0f;
+    [SerializeField] private float powerFatBusterSpawnChance = 100.0f;
 
     private ExperienceSystem _playerExperienceSystem;
     private BusterController _busterController;
@@ -42,8 +46,6 @@ public class Spawner : MonoBehaviour
         for (int i = 0; i < waves.Count; i++)
         {
             Wave wave = waves[i];
-            
-            //print($"Wave {i}: active - {wave.active}, is time to spawn - {Time.time > wave.GetNextSpawnTime}, remaining to spawn - {wave.GetRemainingToSpawn}");
             
             if (wave.active && !wave.done && Time.time > wave.GetNextSpawnTime && (wave.GetRemainingToSpawn > 0 || wave.waveSO.infinite))
             {
@@ -99,20 +101,17 @@ public class Spawner : MonoBehaviour
     {
         int count = 0;
         var found = false;
-        var randomEnemy = prefabList[UnityEngine.Random.Range(0, prefabList.Count)];
+        Enemy randomEnemy = standardEnemyPrefab;
 
         while (!found && count < 1000)
         {
-            Array values = Enum.GetValues(typeof(ZombieType));
-            System.Random random = new System.Random();
-            ZombieType zombieType = (ZombieType)values.GetValue(random.Next(values.Length));
+            randomEnemy = prefabList[UnityEngine.Random.Range(0, prefabList.Count)];
             
-            switch (zombieType)
+            switch (randomEnemy.ZombieType)
             {
-                case ZombieType.STRONG:
-                    if (wave.GetStrongCount < wave.waveSO.strongMaxCount)
+                case ZombieType.FAT:
+                    if (wave.GetStrongCount < wave.waveSO.fatMaxCount)
                     {
-                        randomEnemy.SetZombieType(zombieType);
                         wave.SetStrongCount(wave.GetStrongCount + 1);
                         found = true;
                     }
@@ -120,13 +119,11 @@ public class Spawner : MonoBehaviour
                 case ZombieType.FAST:
                     if (wave.GetFastCount < wave.waveSO.fastMaxCount)
                     {
-                        randomEnemy.SetZombieType(zombieType);
                         wave.SetFastCount(wave.GetFastCount + 1);
                         found = true;
                     }
                     break;
                 case ZombieType.STANDARD:
-                    randomEnemy.SetZombieType(zombieType);
                     found = true;
                     break;
             }
@@ -170,40 +167,8 @@ public class Spawner : MonoBehaviour
         
         void SetupEnemy(Enemy spawnedEnemy)
         {
-            spawnedEnemy.SetSize(Vector3.one);
-            
-            switch (spawnedEnemy.ZombieType)
-            {
-                case ZombieType.STRONG:
-                    spawnedEnemy.SetHealth(isPowerZombie ? wave.waveSO.health * 30 : wave.waveSO.health * 3);
-                    spawnedEnemy.SetDamage(isPowerZombie ? wave.waveSO.damage * 6 : wave.waveSO.damage * 2);
-                    spawnedEnemy.SetMoveSpeed(isPowerZombie ? wave.waveSO.moveSpeed * 0.7f : wave.waveSO.moveSpeed * 0.55f);
-                    spawnedEnemy.SetXpOnDeath(isPowerZombie ? wave.waveSO.xpOnDeath * 20 : wave.waveSO.xpOnDeath * 2);
-                    spawnedEnemy.SetColor(wave.waveSO.colorStrong);
-                    spawnedEnemy.SetSize(spawnedEnemy.transform.localScale * 1.3f);
-                    break;
-                case ZombieType.FAST:
-                    spawnedEnemy.SetHealth(isPowerZombie ? wave.waveSO.health * 7.5f : wave.waveSO.health * 0.75f);
-                    spawnedEnemy.SetDamage(isPowerZombie ? wave.waveSO.damage * 3 : wave.waveSO.damage);
-                    spawnedEnemy.SetMoveSpeed(isPowerZombie ? wave.waveSO.moveSpeed * 1.15f : wave.waveSO.moveSpeed);
-                    spawnedEnemy.SetXpOnDeath(isPowerZombie ? wave.waveSO.xpOnDeath * 10 : wave.waveSO.xpOnDeath);
-                    spawnedEnemy.SetColor(wave.waveSO.colorFast);
-                    spawnedEnemy.SetSize(spawnedEnemy.transform.localScale * 0.9f);
-                    break;
-                case ZombieType.STANDARD:
-                    spawnedEnemy.SetHealth(isPowerZombie ? wave.waveSO.health * 10 : wave.waveSO.health);
-                    spawnedEnemy.SetDamage(isPowerZombie ? wave.waveSO.damage * 3 : wave.waveSO.damage);
-                    spawnedEnemy.SetMoveSpeed(isPowerZombie ? wave.waveSO.moveSpeed * 0.7f : wave.waveSO.moveSpeed * 0.75f);
-                    spawnedEnemy.SetXpOnDeath(isPowerZombie ? wave.waveSO.xpOnDeath * 10 : wave.waveSO.xpOnDeath);
-                    spawnedEnemy.SetColor(wave.waveSO.colorStandard);
-                    break;
-            }
-
-            if (isPowerZombie)
-            {
-                var powerSkin = spawnedEnemy.AddComponent<EnemyPowerSkin>();
-                powerSkin.SetColor(spawnedEnemy.GetColor());
-            }
+            spawnedEnemy.IsPower = isPowerZombie;
+            spawnedEnemy.Setup();
         }
         
         void OnEnemyDeath(Enemy spawnedEnemy)
@@ -215,20 +180,20 @@ public class Spawner : MonoBehaviour
 
             switch (spawnedEnemy.ZombieType)
             {
-                case ZombieType.STRONG:
-                    if (Helper.GetCriticalChance(isPowerZombie? 100 : strongBusterSpawnChance))
+                case ZombieType.FAT:
+                    if (Helper.GetCriticalChance(isPowerZombie? powerFatBusterSpawnChance : fatBusterSpawnChance))
                     {
                         SpawnBuster(spawnedEnemy);
                     }
                     break;
                 case ZombieType.FAST:
-                    if (Helper.GetCriticalChance(isPowerZombie? 50 : fastBusterSpawnChance))
+                    if (Helper.GetCriticalChance(isPowerZombie? powerFastBusterSpawnChance : fastBusterSpawnChance))
                     {
                         SpawnBuster(spawnedEnemy);
                     }
                     break;
                 case ZombieType.STANDARD:
-                    if (Helper.GetCriticalChance(isPowerZombie? 100 : standardBusterSpawnChance))
+                    if (Helper.GetCriticalChance(isPowerZombie? powerStandardBusterSpawnChance : standardBusterSpawnChance))
                     {
                         SpawnBuster(spawnedEnemy);
                     }

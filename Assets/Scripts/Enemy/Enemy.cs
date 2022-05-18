@@ -1,3 +1,4 @@
+using System;
 using Interface;
 using UnityEngine;
 
@@ -5,61 +6,75 @@ using UnityEngine;
 public class Enemy : MonoBehaviour, IHealth, IDamageable
 {
     [field: SerializeField] public ZombieType ZombieType { get; private set; }
+    
+    [field: Header("Стандартные параметры")]
     [field: SerializeField] public float Health { get; set; }
     [field: SerializeField] public float Damage { get; private set; }
     [field: SerializeField] public float AttackDistance { get; private set; }
     [field: SerializeField] public float MsBetweenAttack { get; private set; }
     [field: SerializeField] public float MoveSpeed { get; private set; }
     [field: SerializeField] public int XpOnDeath { get; private set; } = 1;
+    [field: SerializeField] public Color Color { get; private set; }
+    [field: SerializeField] public Vector3 Size { get; private set; }
+    
+    [field: Header("Усиленные параметры")]
+    [field: SerializeField] public bool IsPower { get; set; }
+    [field: SerializeField] public float PowerHealth { get; private set; }
+    [field: SerializeField] public float PowerDamage { get; private set; }
+    [field: SerializeField] public float PowerAttackDistance { get; private set; }
+    [field: SerializeField] public float PowerMsBetweenAttack { get; private set; }
+    [field: SerializeField] public float PowerMoveSpeed { get; private set; }
+    [field: SerializeField] public int PowerXpOnDeath { get; private set; }
+    [field: SerializeField] public Color PowerColor { get; private set; }
+    [field: SerializeField] public Vector3 PowerSize { get; private set; }
 
-    public void SetHealth(float value)
+    private void Start()
     {
-        Health = value;
-    }
-    
-    public void SetDamage(float value)
-    {
-        Damage = value;
-    }
-    
-    public void SetAttackDistance(float value)
-    {
-        AttackDistance = value;
-    }
-    
-    public void SetMsBetweenAttack(float value)
-    {
-        MsBetweenAttack = value;
-    }
-    
-    public void SetMoveSpeed(float value)
-    {
-        MoveSpeed = value;
+        Setup();
     }
 
-    public void SetSize(Vector3 size)
+    public void Setup(WaveSO waveSo = null)
     {
-        transform.localScale = size;
-    }
+        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        
+        transform.localScale = Size;
+        meshRenderer.material.color = Color;
 
-    public Color GetColor()
-    {
-        return GetComponent<MeshRenderer>().material.color;
-    }
+        if (IsPower)
+        {
+            Health = PowerHealth;
+            Damage = PowerDamage;
+            AttackDistance = PowerAttackDistance;
+            MsBetweenAttack = PowerMsBetweenAttack;
+            MoveSpeed = PowerMoveSpeed;
+            XpOnDeath = PowerXpOnDeath;
+            
+            transform.localScale = PowerSize;
+            meshRenderer.material.color = PowerColor;
+            
+            gameObject
+                .AddComponent<EnemyPowerSkin>()
+                .SetColor(meshRenderer.material.color);
 
-    public void SetColor(Color color)
-    {
-        GetComponent<MeshRenderer>().material.color = color;
-    }
-    
-    public void SetXpOnDeath(int amount)
-    {
-        XpOnDeath = amount;
-    }
+            //TODO поведение усиленного зомби
+            switch (ZombieType)
+            {
+                case ZombieType.FAT:
+                    break;
+                case ZombieType.FAST:
+                    break;
+                case ZombieType.STANDARD:
+                    break;
+            }
+        }
 
-    public void SetZombieType(ZombieType type)
-    {
-        ZombieType = type;
+        if (waveSo != null)
+        {
+            Health += waveSo.health;
+            Damage += waveSo.damage;
+            MoveSpeed += waveSo.moveSpeed;
+            XpOnDeath += waveSo.xpOnDeath;
+        }
     }
 }
 
@@ -67,5 +82,5 @@ public enum ZombieType
 {
     STANDARD,
     FAST, 
-    STRONG
+    FAT
 }

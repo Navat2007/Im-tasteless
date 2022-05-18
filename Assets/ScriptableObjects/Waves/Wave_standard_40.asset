@@ -16,14 +16,13 @@ MonoBehaviour:
   enemyCount: 40
   timeBetweenSpawn: 2
   enemyList:
-  - {fileID: 4814742620544880140, guid: dc1d778433e29ca4e80c5ee25cce4e97, type: 3}
+  - {fileID: 4814742620544880140, guid: 5d0b88853c5dee94aaa7604aa43bf0a4, type: 3}
+  - {fileID: 4814742620544880140, guid: b73c493fa6fb2a541af3313ac4231f48, type: 3}
+  - {fileID: 4814742620544880140, guid: 91a007076b045da4eb3a9e0c01b6efb5, type: 3}
   powerEnemyChance: 5
   strongMaxCount: 4
   fastMaxCount: 4
-  colorStandard: {r: 1, g: 0, b: 0, a: 1}
-  colorStrong: {r: 0.18431373, g: 0.30980393, b: 0.30980393, a: 1}
-  colorFast: {r: 0, g: 0, b: 1, a: 1}
-  xpOnDeath: 1
-  damage: 10
-  moveSpeed: 6
-  health: 40
+  xpOnDeath: 0
+  damage: 0
+  moveSpeed: 0
+  health: 0

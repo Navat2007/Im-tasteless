@@ -14,16 +14,12 @@ public class WaveSO : ScriptableObject
     public List<Enemy> enemyList = new ();
     [Space]
     public float powerEnemyChance;
-    public int strongMaxCount;
+    public int fatMaxCount;
     public int fastMaxCount;
-    [Space]
-    public Color colorStandard = Color.red;
-    public Color colorStrong = Color.gray;
-    public Color colorFast = Color.blue;
 
-    [Header("Параметры стандартного врага")]
-    public int xpOnDeath = 1;
-    public float damage = 10;
-    public float moveSpeed = 5;
-    public float health = 40;
+    [Header("Дополнительная прибавка к параметрам каждого врага")]
+    public int xpOnDeath = 0;
+    public float damage = 0;
+    public float moveSpeed = 0;
+    public float health = 0;
 }
