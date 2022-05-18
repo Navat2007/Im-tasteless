@@ -59,4 +59,10 @@ public class EnemyController : MonoBehaviour
     {
         _bonusTurnSpeed += value;
     }
+
+    public void ResetBonusSpeed()
+    {
+        _bonusSpeed = 0;
+        _bonusTurnSpeed = 0;
+    }
 }

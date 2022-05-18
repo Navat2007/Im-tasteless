@@ -25,6 +25,11 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
         {
             skin.Switch();
         }
+        
+        if(gameObject.TryGetComponent(out EnemyController controller))
+        {
+            controller.ResetBonusSpeed();
+        }
 
         if (enemy.IsPower)
         {
@@ -47,7 +52,7 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
                 meshRenderer.material.SetColor("_EmissionColor", Color.red * intensity);
                 yield return new WaitForSeconds(.1f);
             }
-            
+
             ShowEffect();
             AddForce();
             ExplodeSound();

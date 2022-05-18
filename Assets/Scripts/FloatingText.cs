@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -79,7 +77,7 @@ public class FloatingText : MonoBehaviour
         _textColor = text.color;
         _disappearTimer = DisappearTimerMax;
         
-        _moveVector = new Vector3(UnityEngine.Random.Range(-.8f, .8f), 1) * 20f;
+        _moveVector = new Vector3(UnityEngine.Random.Range(-1.5f, 1.5f), UnityEngine.Random.Range(1.0f, 1.5f)) * 20f;
         
         if(isShield)
             armorImage.gameObject.SetActive(true);
