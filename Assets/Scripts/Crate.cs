@@ -40,7 +40,8 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
             while (count < 1000)
             {
                 Array values = Enum.GetValues(typeof(WeaponType));
-                WeaponType weaponType = (WeaponType)values.GetValue(UnityEngine.Random.Range(0, values.Length));
+                System.Random random = new System.Random();
+                WeaponType weaponType = (WeaponType)values.GetValue(random.Next(values.Length));
             
                 switch (weaponType)
                 {

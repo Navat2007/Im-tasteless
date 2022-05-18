@@ -159,7 +159,8 @@ public class Spawner : MonoBehaviour
 
             while (index == -1 && count < 1000)
             {
-                var randomIndex = UnityEngine.Random.Range(0, spawnPoints.Count);
+                System.Random random = new System.Random();
+                var randomIndex = random.Next(spawnPoints.Count);
                 var randomPoint = spawnPoints[randomIndex];
 
                 if (randomPoint.available)

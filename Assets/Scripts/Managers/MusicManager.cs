@@ -17,7 +17,11 @@ public class MusicManager : MonoBehaviour
 
     private void Start()
     {
-        if(musicClips.Length > 0)
-            AudioManager.instance.PlayMusic(musicClips[Random.Range(0, musicClips.Length)], 2f);
+        if (musicClips.Length > 0)
+        {
+            System.Random random = new System.Random();
+            AudioManager.instance.PlayMusic(musicClips[random.Next(musicClips.Length)], 2f);
+        }
+            
     }
 }
