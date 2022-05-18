@@ -73,15 +73,16 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
                 .AddComponent<EnemyPowerSkin>()
                 .SetColor(meshRenderer.material.color);
 
-            //TODO поведение усиленного зомби
             switch (ZombieType)
             {
                 case ZombieType.FAT:
                     gameObject.AddComponent<EnemyFatController>();
                     break;
                 case ZombieType.FAST:
+                    gameObject.AddComponent<EnemyFastController>();
                     break;
                 case ZombieType.STANDARD:
+                    gameObject.AddComponent<EnemyStandardController>();
                     break;
             }
         }

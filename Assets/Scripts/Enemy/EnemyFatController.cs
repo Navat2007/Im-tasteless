@@ -30,8 +30,5 @@ public class EnemyFatController : MonoBehaviour
             _enemyController.SetTurnSpeed(turnSpeed * (count - _prevCount));
             _prevCount = count;
         }
-        
-        print($"Percent: {percent}");
-        print($"Module: {Math.Round(percent / 5)}");
     }
 }

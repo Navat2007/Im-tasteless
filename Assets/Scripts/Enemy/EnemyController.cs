@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,6 +8,8 @@ using UnityEngine.AI;
 [RequireComponent(typeof(TargetSystem))]
 public class EnemyController : MonoBehaviour
 {
+    [SerializeField] private float timeUpdateSpeed = 0.2f;
+    
     private Enemy _enemy;
     private Rigidbody _rigidbody;
     private NavMeshAgent _navMeshAgent;
@@ -14,6 +17,7 @@ public class EnemyController : MonoBehaviour
 
     private float _bonusSpeed;
     private float _bonusTurnSpeed;
+    private float _nextTimeUpdateSpeed;
 
     private void Awake()
     {
@@ -37,7 +41,17 @@ public class EnemyController : MonoBehaviour
     {
         _targetSystem.OnTargetPositionChange -= OnTargetPositionChange;
     }
-    
+
+    private void Update()
+    {
+        if (Time.time > _nextTimeUpdateSpeed)
+        {
+            _nextTimeUpdateSpeed = Time.time + timeUpdateSpeed;
+            _navMeshAgent.angularSpeed = _enemy.TurnSpeed + _bonusTurnSpeed;
+            _navMeshAgent.speed = _enemy.MoveSpeed + _bonusSpeed;
+        }
+    }
+
     private void OnTargetChange(GameObject target)
     {
         _navMeshAgent.SetDestination(target.transform.position);
@@ -45,8 +59,6 @@ public class EnemyController : MonoBehaviour
     
     private void OnTargetPositionChange(Vector3 position, GameObject target)
     {
-        _navMeshAgent.angularSpeed = _enemy.TurnSpeed + _bonusTurnSpeed;
-        _navMeshAgent.speed = _enemy.MoveSpeed + _bonusSpeed;
         _navMeshAgent.SetDestination(position);
     }
     
