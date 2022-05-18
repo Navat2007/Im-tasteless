@@ -789,7 +789,7 @@ MonoBehaviour:
   <PowerAttackDistance>k__BackingField: 4
   <PowerMsBetweenAttack>k__BackingField: 500
   <PowerMoveSpeed>k__BackingField: 3.5
-  <PowerTurnSpeed>k__BackingField: 0
+  <PowerTurnSpeed>k__BackingField: 100
   <PowerXpOnDeath>k__BackingField: 30
   <PowerColor>k__BackingField: {r: 0.27450982, g: 0.23921569, b: 0.23921569, a: 0}
   <PowerSize>k__BackingField: {x: 1.3, y: 1.3, z: 1.3}
@@ -805,6 +805,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52407f4437a9b5346a97a81d5f2979bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timeUpdateSpeed: 0.2
 --- !u!114 &1393763479768124120
 MonoBehaviour:
   m_ObjectHideFlags: 0

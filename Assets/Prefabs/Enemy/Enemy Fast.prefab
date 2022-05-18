@@ -776,21 +776,21 @@ MonoBehaviour:
   <CriticalBonus>k__BackingField: 0
   <AttackDistance>k__BackingField: 3
   <MsBetweenAttack>k__BackingField: 1000
-  <MoveSpeed>k__BackingField: 6
+  <MoveSpeed>k__BackingField: 5
   <TurnSpeed>k__BackingField: 150
   <XpOnDeath>k__BackingField: 1
   <Color>k__BackingField: {r: 0.1318975, g: 0.28810883, b: 0.7169812, a: 0}
   <Size>k__BackingField: {x: 0.8, y: 0.8, z: 0.8}
   <IsPower>k__BackingField: 0
-  <PowerHealth>k__BackingField: 200
+  <PowerHealth>k__BackingField: 150
   <PowerDamage>k__BackingField: 30
   <PowerCriticalChance>k__BackingField: 0
   <PowerCriticalBonus>k__BackingField: 0
   <PowerAttackDistance>k__BackingField: 3
   <PowerMsBetweenAttack>k__BackingField: 1000
-  <PowerMoveSpeed>k__BackingField: 6
-  <PowerTurnSpeed>k__BackingField: 0
-  <PowerXpOnDeath>k__BackingField: 20
+  <PowerMoveSpeed>k__BackingField: 5.75
+  <PowerTurnSpeed>k__BackingField: 150
+  <PowerXpOnDeath>k__BackingField: 10
   <PowerColor>k__BackingField: {r: 0.13333334, g: 0.28627452, b: 0.7176471, a: 0}
   <PowerSize>k__BackingField: {x: 0.8, y: 0.8, z: 0.8}
 --- !u!114 &4814742620544880135
@@ -805,6 +805,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52407f4437a9b5346a97a81d5f2979bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timeUpdateSpeed: 0.2
 --- !u!114 &1393763479768124120
 MonoBehaviour:
   m_ObjectHideFlags: 0

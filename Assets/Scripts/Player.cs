@@ -12,27 +12,34 @@ public class Player : MonoBehaviour, IHealth, IDamageable
     [field: SerializeField] public float BonusMoveSpeed { get; private set; }
     
     private AudioListener _cameraAudioListener;
+    private HealthSystem _healthSystem;
 
     private void Awake()
     {
         _cameraAudioListener = Camera.main.GetComponent<AudioListener>();
+        _healthSystem = GetComponent<HealthSystem>();
     }
 
     private void OnEnable()
     {
+        _healthSystem.OnDeath += OnDeath;
         SetCameraAudioListener(false);
     }
 
     private void OnDisable()
     {
-        //print("Player disable");
+        _healthSystem.OnDeath -= OnDeath;
         SetCameraAudioListener(true);
     }
 
     private void OnDestroy()
     {
-        //print("Player destroy");
         SetCameraAudioListener(true);
+    }
+    
+    private void OnDeath(ProjectileHitInfo obj)
+    {
+        gameObject.SetActive(false);
     }
 
     private void SetCameraAudioListener(bool value)
