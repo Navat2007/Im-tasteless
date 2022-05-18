@@ -609,7 +609,7 @@ GameObject:
   - component: {fileID: 1393763479768124120}
   - component: {fileID: 4814742620544880133}
   - component: {fileID: 4814742620544880132}
-  - component: {fileID: 1888461609785524665}
+  - component: {fileID: 7503028224824944745}
   m_Layer: 6
   m_Name: Enemy Fast
   m_TagString: Enemy
@@ -848,7 +848,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeBetweenSearchTarget: 0.25
---- !u!114 &1888461609785524665
+--- !u!114 &7503028224824944745
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -857,10 +857,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4814742620544880143}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7b27984f10ba714aa35c03c878ad2b9, type: 3}
+  m_Script: {fileID: 11500000, guid: 63b70566fb60df5429b6ede285b41cdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deathEffect: {fileID: 1902504369814592601, guid: e231fee14d6bdd84abbc0d1538adc545,
+  deathEffectParticlePrefab: {fileID: 1902504369814592601, guid: e231fee14d6bdd84abbc0d1538adc545,
     type: 3}
 --- !u!1 &6698355280391669456
 GameObject:
@@ -1172,6 +1172,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8682569575275528541, guid: e231fee14d6bdd84abbc0d1538adc545,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 9100205437479387905, guid: e231fee14d6bdd84abbc0d1538adc545,
         type: 3}

@@ -1,42 +1,37 @@
+using System;
 using UnityEngine;
 
-public class EnemyDeathEffect : MonoBehaviour
+public abstract class EnemyDeathEffect : MonoBehaviour
 {
     [Header("Настройки при смерти")] 
-    [SerializeField] private ParticleSystem deathEffect;
+    [SerializeField] protected ParticleSystem deathEffectParticlePrefab;
     
-    private Enemy _enemy;
-    private MeshRenderer _meshRenderer;
-    private HealthSystem _healthSystem;
+    protected Enemy enemy;
+    protected MeshRenderer meshRenderer;
+    protected HealthSystem healthSystem;
 
     private void Awake()
     {
-        _enemy = GetComponent<Enemy>();
-        _meshRenderer = GetComponent<MeshRenderer>();
-        _healthSystem = GetComponent<HealthSystem>();
+        enemy = GetComponent<Enemy>();
+        meshRenderer = GetComponent<MeshRenderer>();
+        healthSystem = GetComponent<HealthSystem>();
+        
+        if (deathEffectParticlePrefab == null)
+            throw new NotImplementedException("EnemyDeathEffect: не прикреплён ParticleSystem префаб");
     }
 
     private void OnEnable()
     {
-        _healthSystem.OnDeath += OnDeath;
+        healthSystem.OnDeath += OnDeath;
     }
 
     private void OnDisable()
     {
-        _healthSystem.OnDeath -= OnDeath;
+        healthSystem.OnDeath -= OnDeath;
     }
-    
-    private void OnDeath(ProjectileHitInfo projectileHitInfo)
+
+    protected virtual void OnDeath(ProjectileHitInfo projectileHitInfo)
     {
-        var deathEffectRenderer = deathEffect.GetComponent<ParticleSystemRenderer>();
-        deathEffectRenderer.material = _meshRenderer.material;
-            
-        var deathEffectGameObject = Instantiate(
-            deathEffect.gameObject,
-            projectileHitInfo.hitPoint,
-            Quaternion.FromToRotation(Vector3.forward, projectileHitInfo.hitDirection));
-            
-        Destroy(deathEffectGameObject, deathEffect.main.startLifetime.constantMax);
-        Destroy(gameObject);
+        healthSystem.enabled = false;
     }
 }

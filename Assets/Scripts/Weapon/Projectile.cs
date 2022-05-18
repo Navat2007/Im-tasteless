@@ -29,14 +29,17 @@ public class Projectile : MonoBehaviour
         
         if (enemy.GetComponent<IDamageable>() != null && enemy.TryGetComponent(out HealthSystem healthSystem))
         {
-            healthSystem.TakeDamage(new ProjectileHitInfo
+            if (healthSystem.enabled)
             {
-                damage = damage,
-                isCritical = Helper.GetCriticalChance(criticalChance),
-                criticalBonus = criticalBonus,
-                hitPoint = other.ClosestPoint(transform.position),
-                hitDirection = transform.forward
-            });
+                healthSystem.TakeDamage(new ProjectileHitInfo
+                {
+                    damage = damage,
+                    isCritical = Helper.GetCriticalChance(criticalChance),
+                    criticalBonus = criticalBonus,
+                    hitPoint = other.ClosestPoint(transform.position),
+                    hitDirection = transform.forward
+                });
+            }
         }
         
         Destroy(gameObject);
