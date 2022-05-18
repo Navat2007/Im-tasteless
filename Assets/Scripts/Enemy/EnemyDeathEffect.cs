@@ -37,5 +37,6 @@ public class EnemyDeathEffect : MonoBehaviour
             Quaternion.FromToRotation(Vector3.forward, projectileHitInfo.hitDirection));
             
         Destroy(deathEffectGameObject, deathEffect.main.startLifetime.constantMax);
+        Destroy(gameObject);
     }
 }

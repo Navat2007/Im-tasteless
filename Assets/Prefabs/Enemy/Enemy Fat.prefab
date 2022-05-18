@@ -772,6 +772,8 @@ MonoBehaviour:
   <ZombieType>k__BackingField: 2
   <Health>k__BackingField: 120
   <Damage>k__BackingField: 20
+  <CriticalChance>k__BackingField: 0
+  <CriticalBonus>k__BackingField: 0
   <AttackDistance>k__BackingField: 4
   <MsBetweenAttack>k__BackingField: 500
   <MoveSpeed>k__BackingField: 2.75
@@ -781,6 +783,8 @@ MonoBehaviour:
   <IsPower>k__BackingField: 0
   <PowerHealth>k__BackingField: 1200
   <PowerDamage>k__BackingField: 60
+  <PowerCriticalChance>k__BackingField: 0
+  <PowerCriticalBonus>k__BackingField: 0
   <PowerAttackDistance>k__BackingField: 4
   <PowerMsBetweenAttack>k__BackingField: 500
   <PowerMoveSpeed>k__BackingField: 3.5
@@ -829,9 +833,6 @@ MonoBehaviour:
   blinkIntensity: 10
   blinkDuration: 0.1
   blinkTimer: 0
-  isDestroyOnDeath: 1
-  deathEffect: {fileID: 1902504369814592601, guid: e231fee14d6bdd84abbc0d1538adc545,
-    type: 3}
   floatingTextPrefab: {fileID: 8207889132182933893, guid: 56202c895bbbd2f46a668a38c741d200,
     type: 3}
 --- !u!114 &4814742620544880132
@@ -859,6 +860,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7b27984f10ba714aa35c03c878ad2b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deathEffect: {fileID: 1902504369814592601, guid: e231fee14d6bdd84abbc0d1538adc545,
+    type: 3}
 --- !u!1 &6698355280391669456
 GameObject:
   m_ObjectHideFlags: 0

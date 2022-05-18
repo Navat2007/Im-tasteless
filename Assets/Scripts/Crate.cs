@@ -31,7 +31,7 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
         _healthSystem.OnDeath += OnDeath;
     }
 
-    private void OnDeath()
+    private void OnDeath(ProjectileHitInfo projectileHitInfo)
     {
         GameObject GetWeaponToSpawn()
         {
@@ -82,5 +82,7 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
             Quaternion.identity, 
             GameObject.FindGameObjectWithTag("WeaponPool").transform
         );
+        
+        Destroy(gameObject);
     }
 }
