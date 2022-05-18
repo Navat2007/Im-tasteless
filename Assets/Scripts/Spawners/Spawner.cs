@@ -9,12 +9,20 @@ public class Spawner : MonoBehaviour
     
     [SerializeField] private List<Wave> waves = new ();
     [SerializeField] private List<SpawnPoint> spawnPoints = new ();
+    
     [Space(10)]
+    [Header("Spawn distance")]
     [SerializeField] private float minSpawnDistance = -5;
     [SerializeField] private float maxSpawnDistance = 5;
-    [SerializeField] private float busterSpawnChance = 12.5f;
+    
+    [Header("Pools")]
     [SerializeField] private Transform enemyPool;
     [SerializeField] private Transform busterPool;
+    
+    [Header("Buster spawn chance")]
+    [SerializeField] private float standardBusterSpawnChance = 5.0f;
+    [SerializeField] private float fastBusterSpawnChance = 10.0f;
+    [SerializeField] private float strongBusterSpawnChance = 15.0f;
 
     private ExperienceSystem _playerExperienceSystem;
     private BusterController _busterController;
@@ -206,9 +214,26 @@ public class Spawner : MonoBehaviour
             if(_playerExperienceSystem != null)
                 _playerExperienceSystem.AddXp(spawnedEnemy.XpOnDeath);
 
-            if (Helper.GetCriticalChance(isPowerZombie? 100 : busterSpawnChance))
+            switch (spawnedEnemy.ZombieType)
             {
-                SpawnBuster(spawnedEnemy);
+                case ZombieType.STRONG:
+                    if (Helper.GetCriticalChance(isPowerZombie? 100 : strongBusterSpawnChance))
+                    {
+                        SpawnBuster(spawnedEnemy);
+                    }
+                    break;
+                case ZombieType.FAST:
+                    if (Helper.GetCriticalChance(isPowerZombie? 50 : fastBusterSpawnChance))
+                    {
+                        SpawnBuster(spawnedEnemy);
+                    }
+                    break;
+                case ZombieType.STANDARD:
+                    if (Helper.GetCriticalChance(isPowerZombie? 100 : standardBusterSpawnChance))
+                    {
+                        SpawnBuster(spawnedEnemy);
+                    }
+                    break;
             }
         }
 
