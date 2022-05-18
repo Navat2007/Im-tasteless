@@ -7,7 +7,7 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
 {
     [SerializeField] private float timer = 2;
     [SerializeField] private float radius = 5;
-    [SerializeField] private float force = 5;
+    [SerializeField] private float force = 600;
     [SerializeField] private float damage = 10;
     [SerializeField] private AudioClip explodeClip;
 
@@ -20,6 +20,16 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
 
         _isExploded = true;
         base.OnDeath(projectileHitInfo);
+        
+        GetComponent<EnemyPowerSkin>().Switch();
+
+        if (enemy.IsPower)
+        {
+            timer += 1;
+            radius += 3;
+            force *= 3;
+            damage *= 4;
+        }
         
         IEnumerator Timer()
         {

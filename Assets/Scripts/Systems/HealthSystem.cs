@@ -67,7 +67,7 @@ public class HealthSystem : MonoBehaviour
         }
     }
 
-    private void Init(float value)
+    public void Init(float value)
     {
         MaxHealth = value;
         AddHealth(MaxHealth);

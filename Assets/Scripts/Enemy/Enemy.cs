@@ -1,5 +1,6 @@
 using System;
 using Interface;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(HealthSystem))]
@@ -31,6 +32,13 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
     [field: SerializeField] public int PowerXpOnDeath { get; private set; }
     [field: SerializeField] public Color PowerColor { get; private set; }
     [field: SerializeField] public Vector3 PowerSize { get; private set; }
+
+    private HealthSystem _healthSystem;
+
+    private void Awake()
+    {
+        _healthSystem = GetComponent<HealthSystem>();
+    }
 
     private void Start()
     {
@@ -81,6 +89,15 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
             MoveSpeed += waveSo.moveSpeed;
             XpOnDeath += waveSo.xpOnDeath;
         }
+
+        _healthSystem.Init(Health);
+    }
+
+    [ContextMenu("Сделать усиленным")]
+    private void MakePower()
+    {
+        IsPower = true;
+        Setup();
     }
 }
 
