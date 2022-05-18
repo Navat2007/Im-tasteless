@@ -50,13 +50,21 @@ public class Spawner : MonoBehaviour
             {
                 wave.SetNextSpawnTime(Time.time + wave.waveSO.timeBetweenSpawn);
 
-                var enemy = GetEnemy(wave.waveSO.enemyList, wave);
                 var powerEnemyChance = Helper.GetCriticalChance(wave.waveSO.powerEnemyChance);
-                
+                var enemy = GetEnemy(wave.waveSO.enemyList, wave, powerEnemyChance);
+
                 SpawnEnemy(enemy, powerEnemyChance, wave);
-                
-                if(enemy.ZombieType == ZombieType.FAST)
+
+                if (enemy.ZombieType == ZombieType.FAST)
+                {
                     SpawnEnemy(enemy, powerEnemyChance, wave);
+                    
+                    if (powerEnemyChance)
+                    {
+                        SpawnEnemy(enemy, powerEnemyChance, wave);
+                        SpawnEnemy(enemy, powerEnemyChance, wave);
+                    }
+                }
             }
 
             if(i < waves.Count - 1 && !waves[i + 1].done && CheckNextWave(waves[i], waves[i + 1]))
@@ -96,7 +104,7 @@ public class Spawner : MonoBehaviour
         wave.SetRemainingToSpawn(wave.waveSO.enemyCount);
     }
 
-    private Enemy GetEnemy(List<Enemy> prefabList, Wave wave)
+    private Enemy GetEnemy(List<Enemy> prefabList, Wave wave, bool isPower = false)
     {
         int count = 0;
         var found = false;
@@ -118,7 +126,7 @@ public class Spawner : MonoBehaviour
                 case ZombieType.FAST:
                     if (wave.GetFastCount < wave.waveSO.fastMaxCount)
                     {
-                        wave.SetFastCount(wave.GetFastCount + 1);
+                        wave.SetFastCount(wave.GetFastCount + (isPower ? 4 : 2));
                         found = true;
                     }
                     break;
