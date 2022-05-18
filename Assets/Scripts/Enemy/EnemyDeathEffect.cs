@@ -9,12 +9,14 @@ public abstract class EnemyDeathEffect : MonoBehaviour
     protected Enemy enemy;
     protected MeshRenderer meshRenderer;
     protected HealthSystem healthSystem;
+    protected Material material;
 
     private void Awake()
     {
         enemy = GetComponent<Enemy>();
         meshRenderer = GetComponent<MeshRenderer>();
         healthSystem = GetComponent<HealthSystem>();
+        material = meshRenderer.material;
         
         if (deathEffectParticlePrefab == null)
             throw new NotImplementedException("EnemyDeathEffect: не прикреплён ParticleSystem префаб");

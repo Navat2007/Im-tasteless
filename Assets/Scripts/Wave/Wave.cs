@@ -8,7 +8,7 @@ public class Wave
     public WaveSO waveSO;
 
     private float _nextSpawnTime;
-    private int _currentStrongCount;
+    private int _currentFatCount;
     private int _currentFastCount;
     private int _enemyRemainingToSpawn;
     private int _enemiesRemainingAlive;
@@ -26,8 +26,8 @@ public class Wave
     public int GetAlreadySpawned => _enemiesAlreadySpawned;
     public void SetAlreadySpawned (int value) => _enemiesAlreadySpawned = value;
         
-    public int GetStrongCount => _currentStrongCount;
-    public void SetStrongCount (int value) => _currentStrongCount = value;
+    public int GetFatCount => _currentFatCount;
+    public void SetFatCount (int value) => _currentFatCount = value;
         
     public int GetFastCount => _currentFastCount;
     public void SetFastCount (int value) => _currentFastCount = value;

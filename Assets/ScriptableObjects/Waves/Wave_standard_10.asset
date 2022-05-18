@@ -20,7 +20,7 @@ MonoBehaviour:
   - {fileID: 4814742620544880140, guid: b73c493fa6fb2a541af3313ac4231f48, type: 3}
   - {fileID: 4814742620544880140, guid: 91a007076b045da4eb3a9e0c01b6efb5, type: 3}
   powerEnemyChance: 0
-  strongMaxCount: 1
+  fatMaxCount: 1
   fastMaxCount: 1
   xpOnDeath: 0
   damage: 0

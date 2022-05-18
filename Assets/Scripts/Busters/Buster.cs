@@ -13,7 +13,10 @@ public abstract class Buster : MonoBehaviour, IPickable
     
     private void Awake()
     {
-        busterController = GameObject.FindGameObjectWithTag("Player").GetComponent<BusterController>();
+        var player = GameObject.FindGameObjectWithTag("Player");
+        
+        if(player != null)
+            busterController = player.GetComponent<BusterController>();
     }
     
     void Update()

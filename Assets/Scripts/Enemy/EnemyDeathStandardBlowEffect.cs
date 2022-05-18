@@ -7,7 +7,7 @@ public class EnemyDeathStandardBlowEffect : EnemyDeathEffect
         base.OnDeath(projectileHitInfo);
         
         var deathEffectRenderer = deathEffectParticlePrefab.GetComponent<ParticleSystemRenderer>();
-        deathEffectRenderer.material = meshRenderer.material;
+        deathEffectRenderer.material = material;
             
         var deathEffectGameObject = Instantiate(
             deathEffectParticlePrefab.gameObject,

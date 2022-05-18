@@ -112,14 +112,18 @@ public class Spawner : MonoBehaviour
 
         while (!found && count < 1000)
         {
-            randomEnemy = prefabList[UnityEngine.Random.Range(0, prefabList.Count)];
+            System.Random random = new System.Random();
+            randomEnemy = prefabList[random.Next(prefabList.Count)];
             
+            //Array values = Enum.GetValues(typeof(ZombieType));
+            //ZombieType zombieType = (ZombieType)values.GetValue(random.Next(values.Length));
+
             switch (randomEnemy.ZombieType)
             {
                 case ZombieType.FAT:
-                    if (wave.GetStrongCount < wave.waveSO.fatMaxCount)
+                    if (wave.GetFatCount < wave.waveSO.fatMaxCount)
                     {
-                        wave.SetStrongCount(wave.GetStrongCount + 1);
+                        wave.SetFatCount(wave.GetFatCount + 1);
                         found = true;
                     }
                     break;

@@ -63,7 +63,7 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
         void ShowEffect()
         {
             var deathEffectRenderer = deathEffectParticlePrefab.GetComponent<ParticleSystemRenderer>();
-            deathEffectRenderer.material = meshRenderer.material;
+            deathEffectRenderer.material = material;
 
             var deathEffectGameObject = Instantiate(
                 deathEffectParticlePrefab.gameObject,
