@@ -15,7 +15,8 @@ public class WeaponController : MonoBehaviour
     public event Action OnReloadStart; 
     public event Action OnReloadEnd; 
     public event Action<float> OnReloadPercent; 
-    public event Action<int, int, bool, WeaponType> OnAmmoChange; 
+    public event Action<int, int, bool, WeaponType> OnAmmoChange;
+    public event Action<WeaponType> OnEquipWeapon;
 
     public Transform GetWeaponHold => weaponHold;
     
@@ -44,7 +45,7 @@ public class WeaponController : MonoBehaviour
     private AudioManager _audioManager;
     private Weapon _equippedWeapon;
 
-    private bool _isPistolActive = true;
+    private const bool _isPistolActive = true;
     private bool _isShogunActive;
     private bool _isRifleActive;
     private bool _isGrenadeActive;
@@ -103,7 +104,7 @@ public class WeaponController : MonoBehaviour
             OnFire(new InputAction.CallbackContext());
         
         Vector2 scrollVector = Mouse.current.scroll.ReadValue();
-        //print(scrollVector);
+        HandleMouseScroll(scrollVector.y);
     }
 
     private void LateUpdate()
@@ -148,6 +149,70 @@ public class WeaponController : MonoBehaviour
     private void HandleCrossHairMove(Vector3 position)
     {
         _crosshairPosition = position; 
+    }
+
+    private void HandleMouseScroll(float yValue)
+    {
+        void Next()
+        {
+            switch (_equippedWeapon.CurrentWeaponType)
+            {
+                case WeaponType.PISTOL:
+                    if(IsWeaponActive(WeaponType.SHOTGUN))
+                        EquipWeapon(WeaponType.SHOTGUN);
+                    else if(IsWeaponActive(WeaponType.RIFLE))
+                        EquipWeapon(WeaponType.RIFLE);
+                    break;
+                case WeaponType.SHOTGUN:
+                    if(IsWeaponActive(WeaponType.RIFLE))
+                        EquipWeapon(WeaponType.RIFLE);
+                    else if(IsWeaponActive(WeaponType.PISTOL))
+                        EquipWeapon(WeaponType.PISTOL);
+                    break;
+                case WeaponType.RIFLE:
+                    if(IsWeaponActive(WeaponType.PISTOL))
+                        EquipWeapon(WeaponType.PISTOL);
+                    else if(IsWeaponActive(WeaponType.SHOTGUN))
+                        EquipWeapon(WeaponType.SHOTGUN);
+                    break;
+            }
+        }
+        
+        void Previous()
+        {
+            switch (_equippedWeapon.CurrentWeaponType)
+            {
+                case WeaponType.PISTOL:
+                    if(IsWeaponActive(WeaponType.RIFLE))
+                        EquipWeapon(WeaponType.RIFLE);
+                    else if(IsWeaponActive(WeaponType.SHOTGUN))
+                        EquipWeapon(WeaponType.SHOTGUN);
+                    break;
+                case WeaponType.SHOTGUN:
+                    if(IsWeaponActive(WeaponType.PISTOL))
+                        EquipWeapon(WeaponType.PISTOL);
+                    else if(IsWeaponActive(WeaponType.RIFLE))
+                        EquipWeapon(WeaponType.RIFLE);
+                    break;
+                case WeaponType.RIFLE:
+                    if(IsWeaponActive(WeaponType.SHOTGUN))
+                        EquipWeapon(WeaponType.SHOTGUN);
+                    else if(IsWeaponActive(WeaponType.PISTOL))
+                        EquipWeapon(WeaponType.PISTOL);
+                    break;
+            }
+        }
+        
+        switch (yValue)
+        {
+            case > 0:
+                Next();
+                break;
+            case < 0:
+                Previous();
+                break;
+        }
+        
     }
 
     private void OnFire(InputAction.CallbackContext context)
@@ -254,12 +319,13 @@ public class WeaponController : MonoBehaviour
     {
         _isReloading = false;
 
+        // Если уже что-то экипировано выключаем и сбрасываем вращение
         if (_equippedWeapon != null)
         {
             _equippedWeapon.transform.localEulerAngles = _initialRotation;
             _equippedWeapon.gameObject.SetActive(false);
         }
-
+        
         switch (weaponType)
         {
             case WeaponType.PISTOL:
@@ -276,6 +342,7 @@ public class WeaponController : MonoBehaviour
         _equippedWeapon.gameObject.SetActive(true);
         _initialRotation = _equippedWeapon.transform.localEulerAngles;
         
+        OnEquipWeapon?.Invoke(weaponType);
         OnAmmoChange?.Invoke(_equippedWeapon.ProjectileInClip, _equippedWeapon.CurrentProjectileAmount, _equippedWeapon.infiniteProjectile, _equippedWeapon.CurrentWeaponType);
     }
 

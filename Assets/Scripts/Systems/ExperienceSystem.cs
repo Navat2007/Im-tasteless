@@ -20,8 +20,6 @@ public class ExperienceSystem : MonoBehaviour
 
     public void AddXp(int amount)
     {
-        //print($"add xp {amount}");
-        
         Xp += amount;
 
         if (Xp >= NextLevelXp)

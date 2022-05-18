@@ -73,7 +73,6 @@ public class Spawner : MonoBehaviour
     {
         var percentAlreadySpawned = currentWave.GetAlreadySpawned * 100 / currentWave.waveSO.enemyCount;
         var percentRemainingAlive = currentWave.GetRemainingAlive * 100 / currentWave.waveSO.enemyCount;
-        //print($"Current wave percent: {percent}");
 
         return percentAlreadySpawned >= 80 && percentRemainingAlive <= 20 && !nextWave.active;
     }

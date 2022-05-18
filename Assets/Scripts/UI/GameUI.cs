@@ -218,11 +218,7 @@ public class GameUI : MonoBehaviour
         _experienceSystem = _player.GetComponent<ExperienceSystem>();
         _weaponController = _player.GetComponent<WeaponController>();
         _busterController = _player.GetComponent<BusterController>();
-        
-        _playerInput.actions["Slot1"].performed += HandleSlot1;
-        _playerInput.actions["Slot2"].performed += HandleSlot2;
-        _playerInput.actions["Slot3"].performed += HandleSlot3;
-        
+
         _healthSystem.OnDeath += OnGameOver;
         _healthSystem.OnHealthChange += OnHealthChange;
         _healthSystem.OnArmorChange += OnArmorChange;
@@ -234,6 +230,7 @@ public class GameUI : MonoBehaviour
         _weaponController.OnReloadEnd += OnWeaponReloadEnd;
         _weaponController.OnReloadPercent += OnWeaponReloadPercent;
         _weaponController.OnAmmoChange += OnWeaponAmmoChange;
+        _weaponController.OnEquipWeapon += OnEquipWeapon;
         
         _busterController.OnMoveSpeedChange += OnMoveSpeedBusterChange;
         _busterController.OnDamageChange += OnDamageBusterChange;
@@ -242,10 +239,6 @@ public class GameUI : MonoBehaviour
 
     private void Unsubscribe()
     {
-        _playerInput.actions["Slot1"].performed -= HandleSlot1;
-        _playerInput.actions["Slot2"].performed -= HandleSlot2;
-        _playerInput.actions["Slot3"].performed -= HandleSlot3;
-        
         _healthSystem.OnDeath -= OnGameOver;
         _healthSystem.OnHealthChange -= OnHealthChange;
         _healthSystem.OnArmorChange -= OnArmorChange;
@@ -257,42 +250,31 @@ public class GameUI : MonoBehaviour
         _weaponController.OnReloadEnd -= OnWeaponReloadEnd;
         _weaponController.OnReloadPercent -= OnWeaponReloadPercent;
         _weaponController.OnAmmoChange -= OnWeaponAmmoChange;
+        _weaponController.OnEquipWeapon -= OnEquipWeapon;
         
         _busterController.OnMoveSpeedChange -= OnMoveSpeedBusterChange;
         _busterController.OnDamageChange -= OnDamageBusterChange;
         _busterController.OnAttackSpeedChange -= OnAttackSpeedBusterChange;
     }
 
-    private void HandleSlot1(InputAction.CallbackContext context)
+    private void OnEquipWeapon(WeaponType weaponType)
     {
-        if (_weaponController.IsWeaponActive(WeaponType.PISTOL))
+        UnSelectSlots();
+        
+        switch (weaponType)
         {
-            UnSelectSlots();
-
-            slot1Struct.focusButton.gameObject.SetActive(true);
-            slot1Struct.focusTab.gameObject.SetActive(true);
-        }
-    }
-    
-    private void HandleSlot2(InputAction.CallbackContext context)
-    {
-        if (_weaponController.IsWeaponActive(WeaponType.SHOTGUN))
-        {
-            UnSelectSlots();
-
-            slot2Struct.focusButton.gameObject.SetActive(true);
-            slot2Struct.focusTab.gameObject.SetActive(true);
-        }
-    }
-    
-    private void HandleSlot3(InputAction.CallbackContext context)
-    {
-        if (_weaponController.IsWeaponActive(WeaponType.RIFLE))
-        {
-            UnSelectSlots();
-
-            slot3Struct.focusButton.gameObject.SetActive(true);
-            slot3Struct.focusTab.gameObject.SetActive(true);
+            case WeaponType.PISTOL:
+                slot1Struct.focusButton.gameObject.SetActive(true);
+                slot1Struct.focusTab.gameObject.SetActive(true);
+                break;
+            case WeaponType.SHOTGUN:
+                slot2Struct.focusButton.gameObject.SetActive(true);
+                slot2Struct.focusTab.gameObject.SetActive(true);
+                break;
+            case WeaponType.RIFLE:
+                slot3Struct.focusButton.gameObject.SetActive(true);
+                slot3Struct.focusTab.gameObject.SetActive(true);
+                break;
         }
     }
 
