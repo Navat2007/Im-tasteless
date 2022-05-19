@@ -770,15 +770,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <ZombieType>k__BackingField: 1
-  <Health>k__BackingField: 30
+  <Health>k__BackingField: 20
   <Damage>k__BackingField: 10
   <CriticalChance>k__BackingField: 0
   <CriticalBonus>k__BackingField: 0
   <AttackDistance>k__BackingField: 3
   <MsBetweenAttack>k__BackingField: 1000
-  <MoveSpeed>k__BackingField: 5
+  <MoveSpeed>k__BackingField: 5.1
   <TurnSpeed>k__BackingField: 150
-  <XpOnDeath>k__BackingField: 100
+  <XpOnDeath>k__BackingField: 50
   <Color>k__BackingField: {r: 0.1318975, g: 0.28810883, b: 0.7169812, a: 0}
   <Size>k__BackingField: {x: 0.8, y: 0.8, z: 0.8}
   <IsPower>k__BackingField: 0

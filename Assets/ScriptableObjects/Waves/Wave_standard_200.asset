@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 884b012b78b579d47b984d807d71d50e, type: 3}
+  m_Name: Wave_standard_200
+  m_EditorClassIdentifier: 
+  infinite: 0
+  enemyCount: 200
+  timeBetweenSpawn: 2
+  enemyList:
+  - {fileID: 4814742620544880140, guid: 5d0b88853c5dee94aaa7604aa43bf0a4, type: 3}
+  - {fileID: 4814742620544880140, guid: b73c493fa6fb2a541af3313ac4231f48, type: 3}
+  - {fileID: 4814742620544880140, guid: 91a007076b045da4eb3a9e0c01b6efb5, type: 3}
+  powerEnemyChance: 8
+  fatMaxCount: 20
+  fastMaxCount: 20
+  xpOnDeath: 0
+  damage: 0
+  moveSpeed: 0
+  health: 0
