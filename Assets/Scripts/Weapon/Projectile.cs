@@ -7,7 +7,6 @@ public class Projectile : MonoBehaviour
     [SerializeField] private float damage = 1;
     [SerializeField] private float criticalChance = 10;
     [SerializeField] private float criticalBonus = 2;
-    [SerializeField] private LayerMask collisionMask;
 
     private float _timeToDestroy = 3;
     private float _skinWidth = .1f;
@@ -34,7 +33,7 @@ public class Projectile : MonoBehaviour
                 healthSystem.TakeDamage(new ProjectileHitInfo
                 {
                     damage = damage,
-                    isCritical = Helper.GetCriticalChance(criticalChance),
+                    isCritical = Helper.IsCritical(criticalChance),
                     criticalBonus = criticalBonus,
                     hitPoint = other.ClosestPoint(transform.position),
                     hitDirection = transform.forward

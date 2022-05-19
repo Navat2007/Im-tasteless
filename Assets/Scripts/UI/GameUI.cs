@@ -37,23 +37,35 @@ public struct SkillPanelStruct
     [Header("Первый скилл для выбора")]
     public Button skill1Button;
     public Image skill1Image;
+    public TMP_Text skill1ImageText;
     public TMP_Text skill1Text;
-    public TMP_Text skill1Text2;
+    public TMP_Text skill1Description;
     public Action skill1Callback;
     
     [Header("Второй скилл для выбора")]
     public Button skill2Button;
     public Image skill2Image;
+    public TMP_Text skill2ImageText;
     public TMP_Text skill2Text;
-    public TMP_Text skill2Text2;
+    public TMP_Text skill2Description;
     public Action skill2Callback;
     
     [Header("Третий скилл для выбора")]
     public Button skill3Button;
     public Image skill3Image;
+    public TMP_Text skill3ImageText;
     public TMP_Text skill3Text;
-    public TMP_Text skill3Text2;
+    public TMP_Text skill3Description;
     public Action skill3Callback;
+}
+
+public enum PanelType
+{
+    GAME,
+    RESULT,
+    PAUSE,
+    SETTINGS,
+    SKILLS
 }
 
 public class GameUI : MonoBehaviour
@@ -148,7 +160,6 @@ public class GameUI : MonoBehaviour
         {
             openPausePanelButton.onClick.AddListener(() =>
             {
-                StartPause();
                 OpenPanel(PanelType.PAUSE);
             });
         }
@@ -234,7 +245,7 @@ public class GameUI : MonoBehaviour
     private void Restart()
     {
         GameManager.LevelRestart();
-        StopPause();
+        GameManager.StopPause();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -326,7 +337,7 @@ public class GameUI : MonoBehaviour
         armorBuffIconStruct.icon.gameObject.SetActive(currentArmor > 0);
     }
 
-    private void OnXpChange(int currentXp, int nextLevelXp)
+    private void OnXpChange(float currentXp, int nextLevelXp)
     {
         if (xpText != null)
         {
@@ -525,6 +536,7 @@ public class GameUI : MonoBehaviour
                 resultPanel.gameObject.SetActive(true);
                 break;
             case PanelType.PAUSE:
+                GameManager.StartPause();
                 _panelStack.Push(new PanelUIStruct
                 {
                     panel = pausePanel,
@@ -543,7 +555,49 @@ public class GameUI : MonoBehaviour
                 settingsPanel.gameObject.SetActive(true);
                 break;
             case PanelType.SKILLS:
-                StartPause();
+                GameManager.StartPause();
+
+                var skill1 = ControllerManager.skillController.GetRandomSkill();
+                var skill2 = ControllerManager.skillController.GetRandomSkill();
+                var skill3 = ControllerManager.skillController.GetRandomSkill();
+                
+                print(skill1.GetDescription);
+                print(skill2.GetDescription);
+                print(skill3.GetDescription);
+
+                skillPanelStruct.skill1Image.sprite = skill1.GetImage;
+                skillPanelStruct.skill1ImageText.SetText($"{skill1.GetCurrentLevel}");
+                skillPanelStruct.skill1Text.SetText(skill1.GetName);
+                skillPanelStruct.skill1Description.SetText(skill1.GetDescription);
+                skillPanelStruct.skill1Button.onClick.RemoveAllListeners();
+                skillPanelStruct.skill1Button.onClick.AddListener(() =>
+                {
+                    ControllerManager.skillController.AddToSkillsList(skill1);
+                    ClosePanel();
+                });
+                
+                skillPanelStruct.skill2Image.sprite = skill2.GetImage;
+                skillPanelStruct.skill2ImageText.SetText($"{skill2.GetCurrentLevel}");
+                skillPanelStruct.skill2Text.SetText(skill2.GetName);
+                skillPanelStruct.skill2Description.SetText(skill2.GetDescription);
+                skillPanelStruct.skill2Button.onClick.RemoveAllListeners();
+                skillPanelStruct.skill2Button.onClick.AddListener(() =>
+                {
+                    ControllerManager.skillController.AddToSkillsList(skill2);
+                    ClosePanel();
+                });
+                
+                skillPanelStruct.skill3Image.sprite = skill3.GetImage;
+                skillPanelStruct.skill3ImageText.SetText($"{skill3.GetCurrentLevel}");
+                skillPanelStruct.skill3Text.SetText(skill3.GetName);
+                skillPanelStruct.skill3Description.SetText(skill3.GetDescription);
+                skillPanelStruct.skill3Button.onClick.RemoveAllListeners();
+                skillPanelStruct.skill3Button.onClick.AddListener(() =>
+                {
+                    ControllerManager.skillController.AddToSkillsList(skill3);
+                    ClosePanel();
+                });
+                
                 _panelStack.Push(new PanelUIStruct
                 {
                     panel = skillChoicePanel,
@@ -563,7 +617,7 @@ public class GameUI : MonoBehaviour
         if (_panelStack.Count == 0)
         {
             OpenPanel(PanelType.PAUSE);
-            StartPause();
+            GameManager.StartPause();
         }
         else
         {
@@ -573,32 +627,8 @@ public class GameUI : MonoBehaviour
             
             if (_panelStack.Count == 0)
             {
-                StopPause();
+                GameManager.StopPause();
             }
         }
     }
-
-    public void StartPause()
-    {
-        Time.timeScale = 0;
-        Cursor.visible = true;
-        GameManager.SetGameState(GameManager.GameState.PAUSE);
-    }
-    
-    public void StopPause()
-    {
-        Time.timeScale = 1;
-        Cursor.visible = false;
-        GameManager.SetGameState(GameManager.GameState.PLAY); 
-    }
-
-}
-
-public enum PanelType
-{
-    GAME,
-    RESULT,
-    PAUSE,
-    SETTINGS,
-    SKILLS
 }

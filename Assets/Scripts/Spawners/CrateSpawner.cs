@@ -14,6 +14,16 @@ public class CrateSpawner : MonoBehaviour
     [SerializeField] private float maxTimeBetweenSpawn = 15;
 
     private bool _isStartSpawn;
+    
+    private void OnEnable()
+    {
+        ControllerManager.crateSpawner = this;
+    }
+
+    private void OnDisable()
+    {
+        ControllerManager.crateSpawner = null;
+    }
 
     public IEnumerator SpawnCrate(int count, float spawnYPosition, float spawnDelaySeconds, bool airSpawn)
     {

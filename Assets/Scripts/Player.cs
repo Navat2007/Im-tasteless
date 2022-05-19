@@ -22,12 +22,18 @@ public class Player : MonoBehaviour, IHealth, IDamageable
 
     private void OnEnable()
     {
+        ControllerManager.player = this;
+        ControllerManager.healthSystem = _healthSystem;
+        
         _healthSystem.OnDeath += OnDeath;
         SetCameraAudioListener(false);
     }
 
     private void OnDisable()
     {
+        ControllerManager.player = null;
+        ControllerManager.healthSystem = null;
+        
         _healthSystem.OnDeath -= OnDeath;
         SetCameraAudioListener(true);
     }
@@ -48,7 +54,7 @@ public class Player : MonoBehaviour, IHealth, IDamageable
             _cameraAudioListener.enabled = value;
     }
 
-    public void SetBonusMoveSpeed(float value)
+    public void AddBonusMoveSpeed(float value)
     {
         BonusMoveSpeed += value;
     }

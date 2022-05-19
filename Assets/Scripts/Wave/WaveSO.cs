@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Wave", menuName = "ScriptableObjects/CreateWaveObject", order = 1)]
+[CreateAssetMenu(fileName = "Wave", menuName = "ScriptableObjects/Создать волну", order = 1)]
 public class WaveSO : ScriptableObject
 {
     [Header("Параметры волны")]

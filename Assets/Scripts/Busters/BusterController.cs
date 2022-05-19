@@ -41,6 +41,16 @@ public class BusterController : MonoBehaviour
         _playerController = GetComponent<PlayerController>();
         _healthSystem = GetComponent<HealthSystem>();
     }
+    
+    private void OnEnable()
+    {
+        ControllerManager.busterController = this;
+    }
+
+    private void OnDisable()
+    {
+        ControllerManager.busterController = null;
+    }
 
     public void PickFirstAidKit(int count, float percent)
     {
@@ -62,11 +72,17 @@ public class BusterController : MonoBehaviour
             {
                 case WeaponType.SHOTGUN:
                     if(_weaponController.IsWeaponActive(WeaponType.SHOTGUN))
-                        _weaponController.AddAmmo(_weaponController.GetWeaponInfo(WeaponType.SHOTGUN).ammoPerClip, WeaponType.SHOTGUN, false);
+                    {
+                        var ammoPerClip = _weaponController.GetWeaponInfo(WeaponType.SHOTGUN).GetAmmoPerClip();
+                        _weaponController.AddAmmo(ammoPerClip, WeaponType.SHOTGUN, false);
+                    }    
                     break;
                 case WeaponType.RIFLE:
-                    if(_weaponController.IsWeaponActive(WeaponType.RIFLE))
-                        _weaponController.AddAmmo(_weaponController.GetWeaponInfo(WeaponType.RIFLE).ammoPerClip, WeaponType.RIFLE, false);
+                    if (_weaponController.IsWeaponActive(WeaponType.RIFLE))
+                    {
+                        var ammoPerClip = _weaponController.GetWeaponInfo(WeaponType.RIFLE).GetAmmoPerClip();
+                        _weaponController.AddAmmo(ammoPerClip, WeaponType.RIFLE, false);
+                    }
                     break;
             }
         }
@@ -87,7 +103,7 @@ public class BusterController : MonoBehaviour
         IEnumerator Activate()
         {
             _isDamageBusterActive = true;
-            _weaponController.SetBonusDamagePercent(damagePercent);
+            _weaponController.AddBonusDamagePercent(damagePercent);
 
             while (_damageTimer > 0)
             {
@@ -97,7 +113,7 @@ public class BusterController : MonoBehaviour
             }
 
             _isDamageBusterActive = false;
-            _weaponController.SetBonusDamagePercent(-damagePercent);
+            _weaponController.AddBonusDamagePercent(-damagePercent);
         }
         
         _damageTimer = duration;
@@ -111,8 +127,8 @@ public class BusterController : MonoBehaviour
         IEnumerator Activate()
         {
             _isAttackSpeedBusterActive = true;
-            _weaponController.SetBonusAttackSpeedPercent(speedPercent);
-            _weaponController.SetBonusReloadSpeedPercent(speedPercent);
+            _weaponController.AddBonusAttackSpeedPercent(speedPercent);
+            _weaponController.AddBonusReloadSpeedPercent(speedPercent);
 
             while (_attackSpeedTimer > 0)
             {
@@ -122,8 +138,8 @@ public class BusterController : MonoBehaviour
             }
 
             _isAttackSpeedBusterActive = false;
-            _weaponController.SetBonusAttackSpeedPercent(-speedPercent);
-            _weaponController.SetBonusReloadSpeedPercent(-speedPercent);
+            _weaponController.AddBonusAttackSpeedPercent(-speedPercent);
+            _weaponController.AddBonusReloadSpeedPercent(-speedPercent);
         }
         
         _attackSpeedTimer = duration;
@@ -138,7 +154,7 @@ public class BusterController : MonoBehaviour
         {
             _isMoveSpeedBusterActive = true;
             float speedToAdd = _player.MoveSpeed / 100 * moveSpeedPercent;
-            _player.SetBonusMoveSpeed(speedToAdd);
+            _player.AddBonusMoveSpeed(speedToAdd);
 
             while (_moveSpeedTimer > 0)
             {
@@ -148,7 +164,7 @@ public class BusterController : MonoBehaviour
             }
 
             _isMoveSpeedBusterActive = false;
-            _player.SetBonusMoveSpeed(-speedToAdd);
+            _player.AddBonusMoveSpeed(-speedToAdd);
         }
         
         _moveSpeedTimer = duration;

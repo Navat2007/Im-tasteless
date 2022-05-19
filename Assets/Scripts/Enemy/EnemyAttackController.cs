@@ -48,7 +48,7 @@ public class EnemyAttackController : MonoBehaviour
             healthSystem.TakeDamage(new ProjectileHitInfo
             {
                 damage = _enemy.Damage,
-                isCritical = Helper.GetCriticalChance(_enemy.CriticalChance),
+                isCritical = Helper.IsCritical(_enemy.CriticalChance),
                 criticalBonus = _enemy.CriticalBonus,
                 hitPoint = transform.position,
                 hitDirection = transform.forward

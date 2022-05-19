@@ -46,19 +46,19 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
                 switch (weaponType)
                 {
                     case WeaponType.SHOTGUN:
-                        if (Helper.GetCriticalChance(shotgunSpawnChance))
+                        if (Helper.IsCritical(shotgunSpawnChance))
                         {
                             return shotgunPrefab;
                         }
                         break;
                     case WeaponType.RIFLE:
-                        if (Helper.GetCriticalChance(rifleSpawnChance))
+                        if (Helper.IsCritical(rifleSpawnChance))
                         {
                             return riflePrefab;
                         }
                         break;
                     case WeaponType.GRENADE:
-                        if (Helper.GetCriticalChance(grenadeSpawnChance))
+                        if (Helper.IsCritical(grenadeSpawnChance))
                         {
                             return grenadePrefab;
                         }

@@ -26,16 +26,19 @@ public class Spawner : MonoBehaviour
     [SerializeField] private float powerFastBusterSpawnChance = 50.0f;
     [SerializeField] private float fatBusterSpawnChance = 15.0f;
     [SerializeField] private float powerFatBusterSpawnChance = 100.0f;
+    
+    private void OnEnable()
+    {
+        ControllerManager.spawner = this;
+    }
 
-    private ExperienceSystem _playerExperienceSystem;
-    private BusterController _busterController;
+    private void OnDisable()
+    {
+        ControllerManager.spawner = null;
+    }
     
     private void Start()
     {
-        var player = GameObject.FindGameObjectWithTag("Player");
-        _playerExperienceSystem = player.GetComponent<ExperienceSystem>();
-        _busterController = player.GetComponent<BusterController>();
-        
         if(waves.Count > 0)
             ActivateNextWave(waves[0], 0);
     }
@@ -50,7 +53,7 @@ public class Spawner : MonoBehaviour
             {
                 wave.SetNextSpawnTime(Time.time + wave.waveSO.timeBetweenSpawn);
 
-                var powerEnemyChance = Helper.GetCriticalChance(wave.waveSO.powerEnemyChance);
+                var powerEnemyChance = Helper.IsCritical(wave.waveSO.powerEnemyChance);
                 var enemy = GetEnemy(wave.waveSO.enemyList, wave, powerEnemyChance);
 
                 SpawnEnemy(enemy, powerEnemyChance, wave);
@@ -187,25 +190,25 @@ public class Spawner : MonoBehaviour
         {
             wave.SetRemainingAlive(wave.GetRemainingAlive - 1);
         
-            if(_playerExperienceSystem != null)
-                _playerExperienceSystem.AddXp(spawnedEnemy.XpOnDeath);
+            if(ControllerManager.experienceSystem != null)
+                ControllerManager.experienceSystem.AddXp(spawnedEnemy.XpOnDeath);
 
             switch (spawnedEnemy.ZombieType)
             {
                 case ZombieType.FAT:
-                    if (Helper.GetCriticalChance(isPowerZombie? powerFatBusterSpawnChance : fatBusterSpawnChance))
+                    if (Helper.IsCritical(isPowerZombie? powerFatBusterSpawnChance : fatBusterSpawnChance))
                     {
                         SpawnBuster(spawnedEnemy);
                     }
                     break;
                 case ZombieType.FAST:
-                    if (Helper.GetCriticalChance(isPowerZombie? powerFastBusterSpawnChance : fastBusterSpawnChance))
+                    if (Helper.IsCritical(isPowerZombie? powerFastBusterSpawnChance : fastBusterSpawnChance))
                     {
                         SpawnBuster(spawnedEnemy);
                     }
                     break;
                 case ZombieType.STANDARD:
-                    if (Helper.GetCriticalChance(isPowerZombie? powerStandardBusterSpawnChance : standardBusterSpawnChance))
+                    if (Helper.IsCritical(isPowerZombie? powerStandardBusterSpawnChance : standardBusterSpawnChance))
                     {
                         SpawnBuster(spawnedEnemy);
                     }
@@ -215,12 +218,15 @@ public class Spawner : MonoBehaviour
 
         void SpawnBuster(Enemy spawnedEnemy)
         {
+            if (ControllerManager.busterController == null)
+                throw new NotImplementedException("ControllerManager.busterController is null");
+            
             Array values = Enum.GetValues(typeof(BusterType));
             System.Random random = new System.Random();
             BusterType busterType = (BusterType)values.GetValue(random.Next(values.Length));
             
             Instantiate(
-                _busterController.GetBusterPrefab(busterType), 
+                ControllerManager.busterController.GetBusterPrefab(busterType), 
                 spawnedEnemy.transform.position, 
                 Quaternion.identity, 
                 busterPool

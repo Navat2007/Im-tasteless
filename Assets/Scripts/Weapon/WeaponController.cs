@@ -63,6 +63,10 @@ public class WeaponController : MonoBehaviour
     private float _bonusDamagePercent;
     private float _bonusAttackSpeedPercent;
     private float _bonusReloadSpeedPercent;
+    private float _bonusCriticalChance;
+    private float _bonusCriticalBonus;
+    private int _bonusMaxClip;
+    private int _bonusTakeClip;
 
     private void Awake()
     {
@@ -80,6 +84,8 @@ public class WeaponController : MonoBehaviour
     
     private void OnEnable()
     {
+        ControllerManager.weaponController = this;
+        
         _playerInput.actions["Reload"].performed += HandleReload;
         _playerInput.actions["Slot1"].performed += HandleSlot1;
         _playerInput.actions["Slot2"].performed += HandleSlot2;
@@ -90,6 +96,8 @@ public class WeaponController : MonoBehaviour
 
     private void OnDisable()
     {
+        ControllerManager.weaponController = null;
+        
         _playerInput.actions["Reload"].performed -= HandleReload;
         _playerInput.actions["Slot1"].performed -= HandleSlot1;
         _playerInput.actions["Slot2"].performed -= HandleSlot2;
@@ -262,8 +270,8 @@ public class WeaponController : MonoBehaviour
                 Projectile projectile = Instantiate(_equippedWeapon.Projectile, _equippedWeapon.ProjectileSpawnPoint[i].position, _equippedWeapon.ProjectileSpawnPoint[i].rotation);
                 projectile.SetSpeed(_equippedWeapon.MuzzleVelocity);
                 projectile.SetDamage(_equippedWeapon.Damage + (_equippedWeapon.Damage / 100 * _bonusDamagePercent));
-                projectile.SetCriticalChance(_equippedWeapon.CriticalChance);
-                projectile.SetCriticalBonus(_equippedWeapon.CriticalBonus);
+                projectile.SetCriticalChance(_equippedWeapon.CriticalChance + _bonusCriticalChance);
+                projectile.SetCriticalBonus(_equippedWeapon.CriticalBonus + _bonusCriticalBonus);
             }
 
             _equippedWeapon.ProjectileInClip--;
@@ -442,7 +450,9 @@ public class WeaponController : MonoBehaviour
                     ammoInClip = pistol.ProjectileInClip,
                     ammoPerClip = pistol.ProjectilePerClip,
                     ammoCurrent = pistol.CurrentProjectileAmount,
-                    ammoMax = pistol.MaxProjectileAmount
+                    ammoMax = pistol.MaxProjectileAmount,
+                    bonusMaxClip = _bonusMaxClip,
+                    bonusTakeClip = _bonusTakeClip
                 };
             case WeaponType.SHOTGUN:
                 return new WeaponInfo
@@ -450,7 +460,9 @@ public class WeaponController : MonoBehaviour
                     ammoInClip = shotgun.ProjectileInClip,
                     ammoPerClip = shotgun.ProjectilePerClip,
                     ammoCurrent = shotgun.CurrentProjectileAmount,
-                    ammoMax = shotgun.MaxProjectileAmount
+                    ammoMax = shotgun.MaxProjectileAmount,
+                    bonusMaxClip = _bonusMaxClip,
+                    bonusTakeClip = _bonusTakeClip
                 };
             case WeaponType.RIFLE:
                 return new WeaponInfo
@@ -458,7 +470,9 @@ public class WeaponController : MonoBehaviour
                     ammoInClip = rifle.ProjectileInClip,
                     ammoPerClip = rifle.ProjectilePerClip,
                     ammoCurrent = rifle.CurrentProjectileAmount,
-                    ammoMax = rifle.MaxProjectileAmount
+                    ammoMax = rifle.MaxProjectileAmount,
+                    bonusMaxClip = _bonusMaxClip,
+                    bonusTakeClip = _bonusTakeClip
                 };
             case WeaponType.GRENADE:
                 return new WeaponInfo
@@ -522,19 +536,42 @@ public class WeaponController : MonoBehaviour
         }
     }
 
-    public void SetBonusDamagePercent(float value)
+    public void AddBonusDamagePercent(float value)
     {
         _bonusDamagePercent += value;
     }
     
-    public void SetBonusAttackSpeedPercent(float value)
+    public void AddBonusAttackSpeedPercent(float value)
     {
         _bonusAttackSpeedPercent += value;
     }
     
-    public void SetBonusReloadSpeedPercent(float value)
+    public void AddBonusReloadSpeedPercent(float value)
     {
         _bonusReloadSpeedPercent += value;
+    }
+    
+    public void AddBonusCriticalChance(float value)
+    {
+        _bonusCriticalChance += value;
+    }
+    
+    public void AddBonusCriticalBonus(float value)
+    {
+        _bonusCriticalBonus += value;
+    }
+    
+    public void AddBonusMaxClip(int value)
+    {
+        _bonusMaxClip += value;
+
+        shotgun.MaxProjectileAmount += shotgun.ProjectilePerClip * value;
+        rifle.MaxProjectileAmount += rifle.ProjectilePerClip * value;
+    }
+    
+    public void AddBonusTakeClip(int value)
+    {
+        _bonusTakeClip += value;
     }
 }
 
@@ -544,4 +581,11 @@ public struct WeaponInfo
     public int ammoPerClip;
     public int ammoCurrent;
     public int ammoMax;
+    public int bonusMaxClip;
+    public int bonusTakeClip;
+
+    public int GetAmmoPerClip()
+    {
+        return ammoPerClip * (bonusTakeClip > 0 ? bonusTakeClip : 1);
+    }
 }

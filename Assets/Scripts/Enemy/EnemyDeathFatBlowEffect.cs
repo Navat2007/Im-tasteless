@@ -136,7 +136,7 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
                     healthSystem.TakeDamage(new ProjectileHitInfo
                     {
                         damage = damage,
-                        isCritical = Helper.GetCriticalChance(0),
+                        isCritical = Helper.IsCritical(0),
                         criticalBonus = 0,
                         hitPoint = nearbyObjects.transform.position,
                         hitDirection = direction
