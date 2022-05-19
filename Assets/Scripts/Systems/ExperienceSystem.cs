@@ -57,7 +57,7 @@ public class ExperienceSystem : MonoBehaviour
         Level++;
 
         Xp = 0;
-        NextLevelXp += 10;
+        NextLevelXp += 1000;
         
         OnLevelChange?.Invoke(Level);
     }
