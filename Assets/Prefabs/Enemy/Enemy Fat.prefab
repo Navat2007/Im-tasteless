@@ -792,7 +792,7 @@ MonoBehaviour:
   <PowerTurnSpeed>k__BackingField: 100
   <PowerXpOnDeath>k__BackingField: 3000
   <PowerColor>k__BackingField: {r: 0.27450982, g: 0.23921569, b: 0.23921569, a: 0}
-  <PowerSize>k__BackingField: {x: 1.3, y: 1.3, z: 1.3}
+  <PowerSize>k__BackingField: {x: 1.5, y: 1.5, z: 1.5}
 --- !u!114 &4814742620544880135
 MonoBehaviour:
   m_ObjectHideFlags: 0
