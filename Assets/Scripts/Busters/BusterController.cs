@@ -10,7 +10,11 @@ public class BusterController : MonoBehaviour
     public event Action<float> OnMoveSpeedChange;
     public event Action<float> OnDamageChange;
     public event Action<float> OnAttackSpeedChange;
+    
+    [Header("Pools")]
+    [SerializeField] private Transform busterPool;
 
+    [Header("Prefabs")]
     [SerializeField] private GameObject firstAidKitPrefab;
     [SerializeField] private GameObject bandagePrefab;
     [SerializeField] private GameObject clipPrefab;
@@ -183,5 +187,19 @@ public class BusterController : MonoBehaviour
             default:
                 return null;
         }
+    }
+
+    public void SpawnBuster(Vector3 position)
+    {
+        Array values = Enum.GetValues(typeof(BusterType));
+        System.Random random = new System.Random();
+        BusterType busterType = (BusterType)values.GetValue(random.Next(values.Length));
+
+        Instantiate(
+            ControllerManager.busterController.GetBusterPrefab(busterType),
+            new Vector3(position.x, 1, position.z),
+            Quaternion.identity,
+            busterPool
+        );
     }
 }

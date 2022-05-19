@@ -18,7 +18,6 @@ public class Spawner : MonoBehaviour
 
     [Header("Pools")] 
     [SerializeField] private Transform enemyPool;
-    [SerializeField] private Transform busterPool;
 
     [Header("Buster spawn chance")] 
     [SerializeField] private float standardBusterSpawnChance = 5.0f;
@@ -232,16 +231,7 @@ public class Spawner : MonoBehaviour
             if (ControllerManager.busterController == null)
                 throw new NotImplementedException("ControllerManager.busterController is null");
 
-            Array values = Enum.GetValues(typeof(BusterType));
-            System.Random random = new System.Random();
-            BusterType busterType = (BusterType)values.GetValue(random.Next(values.Length));
-
-            Instantiate(
-                ControllerManager.busterController.GetBusterPrefab(busterType),
-                spawnedEnemy.transform.position,
-                Quaternion.identity,
-                busterPool
-            );
+            ControllerManager.busterController.SpawnBuster(spawnedEnemy.transform.position);
         }
 
         Enemy spawnedEnemy = Instantiate(
