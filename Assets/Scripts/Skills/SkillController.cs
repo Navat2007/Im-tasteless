@@ -190,10 +190,4 @@ public class SkillController : MonoBehaviour
     {
         AddToSkillsList(commonSkills[6]);
     }
-    
-    [ContextMenu("Получить takeClip скилл в списке обычных")]
-    private void Get2Skill()
-    {
-        AddToSkillsList(commonSkills[7]);
-    }
 }
