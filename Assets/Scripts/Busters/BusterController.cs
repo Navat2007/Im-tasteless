@@ -20,11 +20,6 @@ public class BusterController : MonoBehaviour
     [SerializeField] private GameObject attackSpeedPrefab;
     [SerializeField] private GameObject moveSpeedPrefab;
     
-    private Player _player;
-    private WeaponController _weaponController;
-    private PlayerController _playerController;
-    private HealthSystem _healthSystem;
-
     private bool _isMoveSpeedBusterActive;
     private float _moveSpeedTimer;
     
@@ -33,14 +28,6 @@ public class BusterController : MonoBehaviour
     
     private bool _isAttackSpeedBusterActive;
     private float _attackSpeedTimer;
-
-    private void Awake()
-    {
-        _player = GetComponent<Player>();
-        _weaponController = GetComponent<WeaponController>();
-        _playerController = GetComponent<PlayerController>();
-        _healthSystem = GetComponent<HealthSystem>();
-    }
     
     private void OnEnable()
     {
@@ -54,14 +41,14 @@ public class BusterController : MonoBehaviour
 
     public void PickFirstAidKit(int count, float percent)
     {
-        float healthToAdd = _healthSystem.MaxHealth / 100 * percent;
-        _healthSystem.AddHealth(healthToAdd);
+        float healthToAdd = ControllerManager.healthSystem.MaxHealth / 100 * percent;
+        ControllerManager.healthSystem.AddHealth(healthToAdd);
     }
     
     public void PickBandage(int count, float percent, float tickTimePeriod, int tickAmount)
     {
-        float healthToAdd = _healthSystem.MaxHealth / 100 * percent;
-        _healthSystem.AddHealth(healthToAdd, tickTimePeriod, tickAmount);
+        float healthToAdd = ControllerManager.healthSystem.MaxHealth / 100 * percent;
+        ControllerManager.healthSystem.AddHealth(healthToAdd, tickTimePeriod, tickAmount);
     }
     
     public void PickClip(int count)
@@ -71,17 +58,17 @@ public class BusterController : MonoBehaviour
             switch (weapon)
             {
                 case WeaponType.SHOTGUN:
-                    if(_weaponController.IsWeaponActive(WeaponType.SHOTGUN))
+                    if(ControllerManager.weaponController.IsWeaponActive(WeaponType.SHOTGUN))
                     {
-                        var ammoPerClip = _weaponController.GetWeaponInfo(WeaponType.SHOTGUN).GetAmmoPerClip();
-                        _weaponController.AddAmmo(ammoPerClip, WeaponType.SHOTGUN, false);
+                        var ammoPerClip = ControllerManager.weaponController.GetWeaponInfo(WeaponType.SHOTGUN).GetAmmoPerClip();
+                        ControllerManager.weaponController.AddAmmo(ammoPerClip, WeaponType.SHOTGUN, false);
                     }    
                     break;
                 case WeaponType.RIFLE:
-                    if (_weaponController.IsWeaponActive(WeaponType.RIFLE))
+                    if (ControllerManager.weaponController.IsWeaponActive(WeaponType.RIFLE))
                     {
-                        var ammoPerClip = _weaponController.GetWeaponInfo(WeaponType.RIFLE).GetAmmoPerClip();
-                        _weaponController.AddAmmo(ammoPerClip, WeaponType.RIFLE, false);
+                        var ammoPerClip = ControllerManager.weaponController.GetWeaponInfo(WeaponType.RIFLE).GetAmmoPerClip();
+                        ControllerManager.weaponController.AddAmmo(ammoPerClip, WeaponType.RIFLE, false);
                     }
                     break;
             }
@@ -90,12 +77,12 @@ public class BusterController : MonoBehaviour
     
     public void PickGrenade(int count)
     {
-        _weaponController.AddAmmo(count, WeaponType.GRENADE, true);
+        ControllerManager.weaponController.AddAmmo(count, WeaponType.GRENADE, true);
     }
     
     public void PickBodyArmor(int count)
     {
-        _healthSystem.AddArmor(count);
+        ControllerManager.healthSystem.AddArmor(count);
     }
     
     public void PickDamage(int count, float duration, float damagePercent)
@@ -103,7 +90,7 @@ public class BusterController : MonoBehaviour
         IEnumerator Activate()
         {
             _isDamageBusterActive = true;
-            _weaponController.AddBonusDamagePercent(damagePercent);
+            ControllerManager.weaponController.AddBonusDamagePercent(damagePercent);
 
             while (_damageTimer > 0)
             {
@@ -113,7 +100,7 @@ public class BusterController : MonoBehaviour
             }
 
             _isDamageBusterActive = false;
-            _weaponController.AddBonusDamagePercent(-damagePercent);
+            ControllerManager.weaponController.AddBonusDamagePercent(-damagePercent);
         }
         
         _damageTimer = duration;
@@ -127,8 +114,8 @@ public class BusterController : MonoBehaviour
         IEnumerator Activate()
         {
             _isAttackSpeedBusterActive = true;
-            _weaponController.AddBonusAttackSpeedPercent(speedPercent);
-            _weaponController.AddBonusReloadSpeedPercent(speedPercent);
+            ControllerManager.weaponController.AddBonusAttackSpeedPercent(speedPercent);
+            ControllerManager.weaponController.AddBonusReloadSpeedPercent(speedPercent);
 
             while (_attackSpeedTimer > 0)
             {
@@ -138,8 +125,8 @@ public class BusterController : MonoBehaviour
             }
 
             _isAttackSpeedBusterActive = false;
-            _weaponController.AddBonusAttackSpeedPercent(-speedPercent);
-            _weaponController.AddBonusReloadSpeedPercent(-speedPercent);
+            ControllerManager.weaponController.AddBonusAttackSpeedPercent(-speedPercent);
+            ControllerManager.weaponController.AddBonusReloadSpeedPercent(-speedPercent);
         }
         
         _attackSpeedTimer = duration;
@@ -153,8 +140,8 @@ public class BusterController : MonoBehaviour
         IEnumerator Activate()
         {
             _isMoveSpeedBusterActive = true;
-            float speedToAdd = _player.MoveSpeed / 100 * moveSpeedPercent;
-            _player.AddBonusMoveSpeed(speedToAdd);
+            float speedToAdd = ControllerManager.player.MoveSpeed / 100 * moveSpeedPercent;
+            ControllerManager.player.AddBonusMoveSpeed(speedToAdd);
 
             while (_moveSpeedTimer > 0)
             {
@@ -164,7 +151,7 @@ public class BusterController : MonoBehaviour
             }
 
             _isMoveSpeedBusterActive = false;
-            _player.AddBonusMoveSpeed(-speedToAdd);
+            ControllerManager.player.AddBonusMoveSpeed(-speedToAdd);
         }
         
         _moveSpeedTimer = duration;

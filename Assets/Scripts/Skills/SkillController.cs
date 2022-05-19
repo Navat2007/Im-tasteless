@@ -4,16 +4,16 @@ using Skills;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+public struct SkillStruct
+{
+    public int id;
+    public string title;
+    public int level;
+    public Skill skill;
+}
+
 public class SkillController : MonoBehaviour
 {
-    public struct SkillStruct
-    {
-        public int id;
-        public string title;
-        public int level;
-        public Skill skill;
-    }
-
     [Header("Скилы когда закончились остальные")] 
     [SerializeField] private Skill lastSkill;
     
@@ -43,7 +43,7 @@ public class SkillController : MonoBehaviour
     private int _uniqueSkillCount;
 
     private List<Skill> _currentChoiceList = new ();
-    private List<SkillStruct> _currentSkillsList = new ();
+    public List<SkillStruct> _currentSkillsList = new ();
 
     private void OnEnable()
     {
@@ -176,5 +176,17 @@ public class SkillController : MonoBehaviour
             existSkillStruct.level++;
             existSkillStruct.skill.Activate();
         }
+    }
+
+    [ContextMenu("Получить maxClip скилл в списке обычных")]
+    private void Get1Skill()
+    {
+        AddToSkillsList(commonSkills[6]);
+    }
+    
+    [ContextMenu("Получить takeClip скилл в списке обычных")]
+    private void Get2Skill()
+    {
+        AddToSkillsList(commonSkills[7]);
     }
 }

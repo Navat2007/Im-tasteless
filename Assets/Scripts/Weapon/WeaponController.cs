@@ -586,6 +586,6 @@ public struct WeaponInfo
 
     public int GetAmmoPerClip()
     {
-        return ammoPerClip * (bonusTakeClip > 0 ? bonusTakeClip : 1);
+        return ammoPerClip * (bonusTakeClip > 0 ? bonusTakeClip + 1 : 1);
     }
 }
