@@ -119,23 +119,26 @@ public class SkillController : MonoBehaviour
             count++;
         }
 
+        print($"Не нашли скилл с {count} попытки");
         return lastSkill;
     }
 
     private Skill GetRandomSkill(SkillRarity skillRarity)
     {
+        System.Random random = new System.Random();
+        
         switch (skillRarity)
         {
             case SkillRarity.COMMON:
-                return commonSkills.Count == 0 ? null : commonSkills[Random.Range(0, commonSkills.Count)];
+                return commonSkills.Count == 0 ? null : commonSkills[random.Next(commonSkills.Count)];
             case SkillRarity.UNCOMMON:
-                return uncommonSkills.Count == 0 ? null :  uncommonSkills[Random.Range(0, uncommonSkills.Count)];
+                return uncommonSkills.Count == 0 ? null :  uncommonSkills[random.Next(uncommonSkills.Count)];
             case SkillRarity.RARE:
-                return rareSkills.Count == 0 ? null :  rareSkills[Random.Range(0, rareSkills.Count)];
+                return rareSkills.Count == 0 ? null :  rareSkills[random.Next(rareSkills.Count)];
             case SkillRarity.UNIQUE:
-                return uniqueSkills.Count == 0 ? null :  uniqueSkills[Random.Range(0, uniqueSkills.Count)];
+                return uniqueSkills.Count == 0 ? null :  uniqueSkills[random.Next(uniqueSkills.Count)];
             default:
-                return commonSkills.Count == 0 ? null :  commonSkills[Random.Range(0, commonSkills.Count)];
+                return commonSkills.Count == 0 ? null :  commonSkills[random.Next(commonSkills.Count)];
         }
     }
 

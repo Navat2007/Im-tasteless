@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class EnemyFatController : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 0.2f;
+    [SerializeField] private float moveSpeed = 0.1f;
     [SerializeField] private float turnSpeed = -3.0f;
     
     private EnemyController _enemyController;
