@@ -122,7 +122,7 @@ public class HealthSystem : MonoBehaviour
     
     public void TakeDamage(ProjectileHitInfo projectileHitInfo)
     {
-        if(!_isDeath) return;
+        if(_isDeath) return;
         
         blinkTimer = blinkDuration;
         
