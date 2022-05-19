@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 7
+  skillImage: {fileID: 21300000, guid: ad409c1be5f0941b5a14d953b1d821dc, type: 3}
   skillName: "\u0421\u0442\u0440\u0435\u043B\u044F\u0442\u044C \u043D\u0435 \u043F\u0435\u0440\u0435\u0441\u0442\u0435\u043B\u044F\u0442\u044C"
   skillDescription: "+2 \u043A \u043C\u0430\u043A\u0441\u0438\u043C\u0443\u043C\u0443
     \u043E\u0431\u043E\u0439\u043C"

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Skills;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -36,6 +37,7 @@ public struct SkillPanelStruct
 {
     [Header("Первый скилл для выбора")]
     public Button skill1Button;
+    public Image skill1FrameImage;
     public Image skill1Image;
     public TMP_Text skill1ImageText;
     public TMP_Text skill1Text;
@@ -44,6 +46,7 @@ public struct SkillPanelStruct
     
     [Header("Второй скилл для выбора")]
     public Button skill2Button;
+    public Image skill2FrameImage;
     public Image skill2Image;
     public TMP_Text skill2ImageText;
     public TMP_Text skill2Text;
@@ -52,6 +55,7 @@ public struct SkillPanelStruct
     
     [Header("Третий скилл для выбора")]
     public Button skill3Button;
+    public Image skill3FrameImage;
     public Image skill3Image;
     public TMP_Text skill3ImageText;
     public TMP_Text skill3Text;
@@ -135,6 +139,14 @@ public class GameUI : MonoBehaviour
     [Header("Skill choice panel")] 
     [SerializeField] private Transform skillChoicePanel;
     [SerializeField] private SkillPanelStruct skillPanelStruct;
+    [Space(10)] 
+    [SerializeField] private Sprite frameWhiteSprite;
+    [SerializeField] private Sprite frameRedSprite;
+    [SerializeField] private Sprite frameOrangeSprite;
+    [SerializeField] private Sprite frameGraySprite;
+    [SerializeField] private Sprite framePurpleSprite;
+    [SerializeField] private Sprite frameBlueSprite;
+    [SerializeField] private Sprite frameGreenSprite;
 
     private float _maximumFade = 0.75f;
 
@@ -557,47 +569,80 @@ public class GameUI : MonoBehaviour
             case PanelType.SKILLS:
                 GameManager.StartPause();
 
+                void SetPanelStruct(int index, Skill skill)
+                {
+                    switch (index)
+                    {
+                        case 1:
+                            skillPanelStruct.skill1Image.sprite = skill.GetImage;
+                            skillPanelStruct.skill1ImageText.SetText($"{skill.GetCurrentLevel}");
+                            skillPanelStruct.skill1Text.SetText(skill.GetName);
+                            skillPanelStruct.skill1Description.SetText(skill.GetDescription);
+                            skillPanelStruct.skill1Button.onClick.RemoveAllListeners();
+                            skillPanelStruct.skill1Button.onClick.AddListener(() =>
+                            {
+                                ControllerManager.skillController.AddToSkillsList(skill);
+                                ClosePanel();
+                            });
+                            break;
+                        case 2:
+                            skillPanelStruct.skill2Image.sprite = skill.GetImage;
+                            skillPanelStruct.skill2ImageText.SetText($"{skill.GetCurrentLevel}");
+                            skillPanelStruct.skill2Text.SetText(skill.GetName);
+                            skillPanelStruct.skill2Description.SetText(skill.GetDescription);
+                            skillPanelStruct.skill2Button.onClick.RemoveAllListeners();
+                            skillPanelStruct.skill2Button.onClick.AddListener(() =>
+                            {
+                                ControllerManager.skillController.AddToSkillsList(skill);
+                                ClosePanel();
+                            });
+                            break;
+                        case 3:
+                            skillPanelStruct.skill3Image.sprite = skill.GetImage;
+                            skillPanelStruct.skill3ImageText.SetText($"{skill.GetCurrentLevel}");
+                            skillPanelStruct.skill3Text.SetText(skill.GetName);
+                            skillPanelStruct.skill3Description.SetText(skill.GetDescription);
+                            skillPanelStruct.skill3Button.onClick.RemoveAllListeners();
+                            skillPanelStruct.skill3Button.onClick.AddListener(() =>
+                            {
+                                ControllerManager.skillController.AddToSkillsList(skill);
+                                ClosePanel();
+                            });
+                            break;
+                    }
+                }
+
+                void SetFrameColor(Image image, Skill skill)
+                {
+                    switch (skill.GetSkillRarity)
+                    {
+                        case SkillRarity.COMMON:
+                            image.sprite = frameWhiteSprite;
+                            break;
+                        case SkillRarity.UNCOMMON:
+                            image.sprite = frameGraySprite;
+                            break;
+                        case SkillRarity.RARE:
+                            image.sprite = frameBlueSprite;
+                            break;
+                        case SkillRarity.UNIQUE:
+                            image.sprite = frameOrangeSprite;
+                            break;
+                    }
+                }
+
                 var skill1 = ControllerManager.skillController.GetRandomSkill();
                 var skill2 = ControllerManager.skillController.GetRandomSkill();
                 var skill3 = ControllerManager.skillController.GetRandomSkill();
                 
-                print(skill1.GetDescription);
-                print(skill2.GetDescription);
-                print(skill3.GetDescription);
+                SetPanelStruct(1, skill1);
+                SetPanelStruct(2, skill2);
+                SetPanelStruct(3, skill3);
+                
+                SetFrameColor(skillPanelStruct.skill1FrameImage, skill1);
+                SetFrameColor(skillPanelStruct.skill2FrameImage, skill2);
+                SetFrameColor(skillPanelStruct.skill3FrameImage, skill3);
 
-                skillPanelStruct.skill1Image.sprite = skill1.GetImage;
-                skillPanelStruct.skill1ImageText.SetText($"{skill1.GetCurrentLevel}");
-                skillPanelStruct.skill1Text.SetText(skill1.GetName);
-                skillPanelStruct.skill1Description.SetText(skill1.GetDescription);
-                skillPanelStruct.skill1Button.onClick.RemoveAllListeners();
-                skillPanelStruct.skill1Button.onClick.AddListener(() =>
-                {
-                    ControllerManager.skillController.AddToSkillsList(skill1);
-                    ClosePanel();
-                });
-                
-                skillPanelStruct.skill2Image.sprite = skill2.GetImage;
-                skillPanelStruct.skill2ImageText.SetText($"{skill2.GetCurrentLevel}");
-                skillPanelStruct.skill2Text.SetText(skill2.GetName);
-                skillPanelStruct.skill2Description.SetText(skill2.GetDescription);
-                skillPanelStruct.skill2Button.onClick.RemoveAllListeners();
-                skillPanelStruct.skill2Button.onClick.AddListener(() =>
-                {
-                    ControllerManager.skillController.AddToSkillsList(skill2);
-                    ClosePanel();
-                });
-                
-                skillPanelStruct.skill3Image.sprite = skill3.GetImage;
-                skillPanelStruct.skill3ImageText.SetText($"{skill3.GetCurrentLevel}");
-                skillPanelStruct.skill3Text.SetText(skill3.GetName);
-                skillPanelStruct.skill3Description.SetText(skill3.GetDescription);
-                skillPanelStruct.skill3Button.onClick.RemoveAllListeners();
-                skillPanelStruct.skill3Button.onClick.AddListener(() =>
-                {
-                    ControllerManager.skillController.AddToSkillsList(skill3);
-                    ClosePanel();
-                });
-                
                 _panelStack.Push(new PanelUIStruct
                 {
                     panel = skillChoicePanel,

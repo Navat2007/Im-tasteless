@@ -149,6 +149,5 @@ public class SkillController : MonoBehaviour
         {
             _currentSkillsList.Find(item => item.GetID == skill.GetID).Activate();
         }
-            
     }
 }
