@@ -6,7 +6,7 @@ public class CratePointer : MonoBehaviour
 
     private void Awake()
     {
-        _camera = Camera.current;
+        _camera = Camera.main;
     }
 
     private void Update()
