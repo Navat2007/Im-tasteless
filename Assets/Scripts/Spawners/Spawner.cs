@@ -5,28 +5,30 @@ using UnityEngine;
 public class Spawner : MonoBehaviour
 {
     public event Action<int, int> OnNewWave;
-    
-    [SerializeField] private List<Wave> waves = new ();
-    [SerializeField] private List<SpawnPoint> spawnPoints = new ();
+
+    [SerializeField] private List<Wave> waves = new();
+    [SerializeField] private List<SpawnPoint> spawnPoints = new();
     [SerializeField] private Enemy standardEnemyPrefab;
-    
-    [Space(10)]
-    [Header("Spawn distance")]
+
+    [Space(10)] 
+    [Header("Spawn distance")] 
     [SerializeField] private float minSpawnDistance = -5;
+
     [SerializeField] private float maxSpawnDistance = 5;
-    
-    [Header("Pools")]
+
+    [Header("Pools")] 
     [SerializeField] private Transform enemyPool;
     [SerializeField] private Transform busterPool;
-    
-    [Header("Buster spawn chance")]
+
+    [Header("Buster spawn chance")] 
     [SerializeField] private float standardBusterSpawnChance = 5.0f;
+
     [SerializeField] private float powerStandardBusterSpawnChance = 100.0f;
     [SerializeField] private float fastBusterSpawnChance = 10.0f;
     [SerializeField] private float powerFastBusterSpawnChance = 50.0f;
     [SerializeField] private float fatBusterSpawnChance = 15.0f;
     [SerializeField] private float powerFatBusterSpawnChance = 100.0f;
-    
+
     private void OnEnable()
     {
         ControllerManager.spawner = this;
@@ -36,10 +38,10 @@ public class Spawner : MonoBehaviour
     {
         ControllerManager.spawner = null;
     }
-    
+
     private void Start()
     {
-        if(waves.Count > 0)
+        if (waves.Count > 0)
             ActivateNextWave(waves[0], 0);
     }
 
@@ -48,20 +50,24 @@ public class Spawner : MonoBehaviour
         for (int i = 0; i < waves.Count; i++)
         {
             Wave wave = waves[i];
-            
-            if (wave.active && !wave.done && Time.time > wave.GetNextSpawnTime && (wave.GetRemainingToSpawn > 0 || wave.waveSO.infinite))
+
+            if (wave.active && !wave.done && Time.time > wave.GetNextSpawnTime &&
+                (wave.GetRemainingToSpawn > 0 || wave.waveSO.infinite))
             {
                 wave.SetNextSpawnTime(Time.time + wave.waveSO.timeBetweenSpawn);
 
-                var powerEnemyChance = Helper.IsCritical(wave.waveSO.powerEnemyChance);
-                var enemy = GetEnemy(wave.waveSO.enemyList, wave, powerEnemyChance);
+                var enemy = GetEnemy(wave.waveSO.enemyList, wave);
+                var powerEnemyChance = Helper.IsCritical(enemy.ZombieType == ZombieType.FAST
+                                                         || enemy.ZombieType == ZombieType.FAT
+                    ? wave.waveSO.powerEnemyChance * 2
+                    : wave.waveSO.powerEnemyChance);
 
                 SpawnEnemy(enemy, powerEnemyChance, wave);
 
                 if (enemy.ZombieType == ZombieType.FAST)
                 {
                     SpawnEnemy(enemy, powerEnemyChance, wave);
-                    
+
                     if (powerEnemyChance)
                     {
                         SpawnEnemy(enemy, powerEnemyChance, wave);
@@ -70,7 +76,7 @@ public class Spawner : MonoBehaviour
                 }
             }
 
-            if(i < waves.Count - 1 && !waves[i + 1].done && CheckNextWave(waves[i], waves[i + 1]))
+            if (i < waves.Count - 1 && !waves[i + 1].done && CheckNextWave(waves[i], waves[i + 1]))
                 ActivateNextWave(waves[i + 1], i + 1);
 
             if (CheckWaveDone(wave))
@@ -100,14 +106,14 @@ public class Spawner : MonoBehaviour
     private void ActivateNextWave(Wave wave, int index)
     {
         //print($"Activate wave {index} with enemy count: {wave.waveSO.enemyCount}");
-        
+
         OnNewWave?.Invoke(index, wave.waveSO.enemyCount);
-        
+
         wave.active = true;
         wave.SetRemainingToSpawn(wave.waveSO.enemyCount);
     }
 
-    private Enemy GetEnemy(List<Enemy> prefabList, Wave wave, bool isPower = false)
+    private Enemy GetEnemy(List<Enemy> prefabList, Wave wave)
     {
         int count = 0;
         var found = false;
@@ -117,7 +123,7 @@ public class Spawner : MonoBehaviour
         {
             System.Random random = new System.Random();
             randomEnemy = prefabList[random.Next(prefabList.Count)];
-            
+
             //Array values = Enum.GetValues(typeof(ZombieType));
             //ZombieType zombieType = (ZombieType)values.GetValue(random.Next(values.Length));
 
@@ -126,16 +132,16 @@ public class Spawner : MonoBehaviour
                 case ZombieType.FAT:
                     if (wave.GetFatCount < wave.waveSO.fatMaxCount)
                     {
-                        wave.SetFatCount(wave.GetFatCount + 1);
                         found = true;
                     }
+
                     break;
                 case ZombieType.FAST:
                     if (wave.GetFastCount < wave.waveSO.fastMaxCount)
                     {
-                        wave.SetFastCount(wave.GetFastCount + (isPower ? 4 : 2));
                         found = true;
                     }
+
                     break;
                 case ZombieType.STANDARD:
                     found = true;
@@ -144,9 +150,9 @@ public class Spawner : MonoBehaviour
 
             count++;
         }
-        
+
         //print($"Враг заспавнен с {count} попытки");
-        
+
         return randomEnemy;
     }
 
@@ -156,7 +162,7 @@ public class Spawner : MonoBehaviour
         {
             if (spawnPoints.Count == 0)
                 throw new NotImplementedException("Нет точек спавна для врагов");
-            
+
             int count = 0;
             var index = -1;
 
@@ -174,44 +180,49 @@ public class Spawner : MonoBehaviour
 
             if (index == -1)
                 index = 0;
-            
+
             //print($"Точка спавна найдена с {count} попытки");
 
-            return spawnPoints[index].transform.position + new Vector3(UnityEngine.Random.Range(minSpawnDistance, maxSpawnDistance), 0, UnityEngine.Random.Range(minSpawnDistance, maxSpawnDistance));
+            return spawnPoints[index].transform.position + new Vector3(
+                UnityEngine.Random.Range(minSpawnDistance, maxSpawnDistance), 0,
+                UnityEngine.Random.Range(minSpawnDistance, maxSpawnDistance));
         }
-        
+
         void SetupEnemy(Enemy spawnedEnemy)
         {
             spawnedEnemy.IsPower = isPowerZombie;
             spawnedEnemy.Setup();
         }
-        
+
         void OnEnemyDeath(Enemy spawnedEnemy)
         {
             wave.SetRemainingAlive(wave.GetRemainingAlive - 1);
-        
-            if(ControllerManager.experienceSystem != null)
+
+            if (ControllerManager.experienceSystem != null)
                 ControllerManager.experienceSystem.AddXp(spawnedEnemy.XpOnDeath);
 
             switch (spawnedEnemy.ZombieType)
             {
                 case ZombieType.FAT:
-                    if (Helper.IsCritical(isPowerZombie? powerFatBusterSpawnChance : fatBusterSpawnChance))
+                    if (Helper.IsCritical(isPowerZombie ? powerFatBusterSpawnChance : fatBusterSpawnChance))
                     {
                         SpawnBuster(spawnedEnemy);
                     }
+
                     break;
                 case ZombieType.FAST:
-                    if (Helper.IsCritical(isPowerZombie? powerFastBusterSpawnChance : fastBusterSpawnChance))
+                    if (Helper.IsCritical(isPowerZombie ? powerFastBusterSpawnChance : fastBusterSpawnChance))
                     {
                         SpawnBuster(spawnedEnemy);
                     }
+
                     break;
                 case ZombieType.STANDARD:
-                    if (Helper.IsCritical(isPowerZombie? powerStandardBusterSpawnChance : standardBusterSpawnChance))
+                    if (Helper.IsCritical(isPowerZombie ? powerStandardBusterSpawnChance : standardBusterSpawnChance))
                     {
                         SpawnBuster(spawnedEnemy);
                     }
+
                     break;
             }
         }
@@ -220,32 +231,42 @@ public class Spawner : MonoBehaviour
         {
             if (ControllerManager.busterController == null)
                 throw new NotImplementedException("ControllerManager.busterController is null");
-            
+
             Array values = Enum.GetValues(typeof(BusterType));
             System.Random random = new System.Random();
             BusterType busterType = (BusterType)values.GetValue(random.Next(values.Length));
-            
+
             Instantiate(
-                ControllerManager.busterController.GetBusterPrefab(busterType), 
-                spawnedEnemy.transform.position, 
-                Quaternion.identity, 
+                ControllerManager.busterController.GetBusterPrefab(busterType),
+                spawnedEnemy.transform.position,
+                Quaternion.identity,
                 busterPool
             );
         }
-        
+
         Enemy spawnedEnemy = Instantiate(
-            enemy, 
-            GetRandomSpawnerPoint(), 
-            Quaternion.identity, 
+            enemy,
+            GetRandomSpawnerPoint(),
+            Quaternion.identity,
             enemyPool
-            );
+        );
+
+        switch (spawnedEnemy.ZombieType)
+        {
+            case ZombieType.FAT:
+                wave.SetFatCount(wave.GetFatCount + 1);
+                break;
+            case ZombieType.FAST:
+                wave.SetFastCount(wave.GetFastCount + (isPowerZombie ? 4 : 2));
+                break;
+        }
 
         wave.SetRemainingToSpawn(wave.GetRemainingToSpawn - 1);
         wave.SetRemainingAlive(wave.GetRemainingAlive + 1);
         wave.SetAlreadySpawned(wave.GetAlreadySpawned + 1);
-        
+
         SetupEnemy(spawnedEnemy);
-        
+
         if (spawnedEnemy.gameObject.TryGetComponent(out HealthSystem healthSystem))
         {
             healthSystem.OnDeath += (hitInfo) => OnEnemyDeath(spawnedEnemy);
