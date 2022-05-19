@@ -4,7 +4,7 @@ public class EnemyStandardController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 0.25f;
     [SerializeField] private float stuckMaxTimer = 1f;
-    [SerializeField] private float stuckMaxCount = 5f;
+    [SerializeField] private float stuckMaxCount = 6f;
     
     private EnemyController _enemyController;
     private HealthSystem _healthSystem;
