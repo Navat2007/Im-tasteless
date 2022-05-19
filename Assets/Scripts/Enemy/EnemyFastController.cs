@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class EnemyFastController : MonoBehaviour
 {
-    [SerializeField] private float movePercent = -50;
+    [SerializeField] private float movePercent = -60;
     [SerializeField] private float stuckMaxTimer = 2f;
-    [SerializeField] private float stuckPercent = 20f;
+    [SerializeField] private float stuckPercent = 10f;
     
     private Enemy _enemy;
     private EnemyController _enemyController;
