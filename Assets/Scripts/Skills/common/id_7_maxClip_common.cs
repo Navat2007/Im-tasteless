@@ -8,7 +8,6 @@ namespace Skills.common
         
         public override void Activate()
         {
-            currentLevel++;
             ControllerManager.weaponController.AddBonusMaxClip(bonusMaxClip);
         }
     }

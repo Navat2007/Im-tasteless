@@ -6,6 +6,17 @@ using Random = UnityEngine.Random;
 
 public class SkillController : MonoBehaviour
 {
+    public struct SkillStruct
+    {
+        public int id;
+        public string title;
+        public int level;
+        public Skill skill;
+    }
+
+    [Header("Скилы когда закончились остальные")] 
+    [SerializeField] private Skill lastSkill;
+    
     [Header("Обычные")]
     [SerializeField] private float commonSkillChance = 62;
     [SerializeField] private int commonSkillMaxCount = 100;
@@ -32,7 +43,7 @@ public class SkillController : MonoBehaviour
     private int _uniqueSkillCount;
 
     private List<Skill> _currentChoiceList = new ();
-    private List<Skill> _currentSkillsList = new ();
+    private List<SkillStruct> _currentSkillsList = new ();
 
     private void OnEnable()
     {
@@ -41,6 +52,8 @@ public class SkillController : MonoBehaviour
 
     private void OnDisable()
     {
+        _currentChoiceList.Clear();
+        _currentSkillsList.Clear();
         ControllerManager.skillController = null;
     }
 
@@ -50,30 +63,36 @@ public class SkillController : MonoBehaviour
     public List<Skill> GetUniqueSkills => uniqueSkills;
 
     public void ResetChoiceList() => _currentChoiceList.Clear();
+
+    public SkillStruct GetSkillByID(int id)
+    {
+        return _currentSkillsList.Find(skill => skill.skill.GetID == id);
+    }
     
     public Skill GetRandomSkill()
     {
         bool IsAvailableToAdd(Skill skill)
         {
             if (_currentChoiceList.Contains(skill)) return false;
-            if (_currentSkillsList.Contains(skill) && skill.GetCurrentLevel >= skill.GetMaxLevel) return false;
+            if (_currentSkillsList.Exists(item => item.skill.GetID == skill.GetID) 
+                && _currentSkillsList.Find(item => item.skill.GetID == skill.GetID).level >= skill.GetMaxLevel) return false;
             
             switch (skill.GetSkillRarity)
             {
                 case SkillRarity.COMMON:
-                    if (_commonSkillCount >= commonSkillMaxCount) return false;
+                    //if (_commonSkillCount >= commonSkillMaxCount) return false;
                     if (!Helper.IsCritical(commonSkillChance)) return false;
                     break;
                 case SkillRarity.UNCOMMON:
-                    if (_uncommonSkillCount >= uncommonSkillMaxCount) return false;
+                    //if (_uncommonSkillCount >= uncommonSkillMaxCount) return false;
                     if (!Helper.IsCritical(uncommonSkillChance)) return false;
                     break;
                 case SkillRarity.RARE:
-                    if (_rareSkillCount >= rareSkillMaxCount) return false;
+                    //if (_rareSkillCount >= rareSkillMaxCount) return false;
                     if (!Helper.IsCritical(rareSkillChance)) return false;
                     break;
                 case SkillRarity.UNIQUE:
-                    if (_uniqueSkillCount >= uniqueSkillMaxCount) return false;
+                    //if (_uniqueSkillCount >= uniqueSkillMaxCount) return false;
                     if (!Helper.IsCritical(uniqueSkillChance)) return false;
                     break;
             }
@@ -100,7 +119,7 @@ public class SkillController : MonoBehaviour
             count++;
         }
 
-        return null;
+        return lastSkill;
     }
 
     private Skill GetRandomSkill(SkillRarity skillRarity)
@@ -120,7 +139,7 @@ public class SkillController : MonoBehaviour
         }
     }
 
-    private bool IsInSkillsList(Skill skill) => _currentSkillsList.Contains(skill);
+    private bool IsInSkillsList(Skill skill) => _currentSkillsList.Exists(item => item.skill.GetID == skill.GetID);
 
     public void AddToSkillsList(Skill skill)
     {
@@ -142,12 +161,20 @@ public class SkillController : MonoBehaviour
 
         if (!IsInSkillsList(skill))
         {
-            _currentSkillsList.Add(skill);
+            _currentSkillsList.Add(new SkillStruct
+            {
+                id = skill.GetID,
+                title = skill.GetName,
+                level = 1,
+                skill = skill
+            });
             skill.Activate();
         }
         else
         {
-            _currentSkillsList.Find(item => item.GetID == skill.GetID).Activate();
+            var existSkillStruct = _currentSkillsList.Find(item => item.skill.GetID == skill.GetID);
+            existSkillStruct.level++;
+            existSkillStruct.skill.Activate();
         }
     }
 }

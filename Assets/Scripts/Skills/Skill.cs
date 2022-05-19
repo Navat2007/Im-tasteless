@@ -12,9 +12,6 @@ namespace Skills
         [SerializeField] protected string skillDescription;
         [SerializeField] protected SkillRarity skillRarity;
         [SerializeField] protected int maxLevel;
-
-        protected Action onActivate;
-        protected int currentLevel;
     
         public abstract void Activate();
 
@@ -23,7 +20,6 @@ namespace Skills
         public string GetName => skillName;
         public string GetDescription => skillDescription;
         public SkillRarity GetSkillRarity => skillRarity;
-        public int GetCurrentLevel => currentLevel;
         public int GetMaxLevel => maxLevel;
     }
 

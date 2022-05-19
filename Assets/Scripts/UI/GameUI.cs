@@ -571,11 +571,13 @@ public class GameUI : MonoBehaviour
 
                 void SetPanelStruct(int index, Skill skill)
                 {
+                    var skillStruct = ControllerManager.skillController.GetSkillByID(skill.GetID);
+                    
                     switch (index)
                     {
                         case 1:
                             skillPanelStruct.skill1Image.sprite = skill.GetImage;
-                            skillPanelStruct.skill1ImageText.SetText($"{skill.GetCurrentLevel}");
+                            skillPanelStruct.skill1ImageText.SetText($"{skillStruct.level + 1}");
                             skillPanelStruct.skill1Text.SetText(skill.GetName);
                             skillPanelStruct.skill1Description.SetText(skill.GetDescription);
                             skillPanelStruct.skill1Button.onClick.RemoveAllListeners();
@@ -587,7 +589,7 @@ public class GameUI : MonoBehaviour
                             break;
                         case 2:
                             skillPanelStruct.skill2Image.sprite = skill.GetImage;
-                            skillPanelStruct.skill2ImageText.SetText($"{skill.GetCurrentLevel}");
+                            skillPanelStruct.skill2ImageText.SetText($"{skillStruct.level + 1}");
                             skillPanelStruct.skill2Text.SetText(skill.GetName);
                             skillPanelStruct.skill2Description.SetText(skill.GetDescription);
                             skillPanelStruct.skill2Button.onClick.RemoveAllListeners();
@@ -599,7 +601,7 @@ public class GameUI : MonoBehaviour
                             break;
                         case 3:
                             skillPanelStruct.skill3Image.sprite = skill.GetImage;
-                            skillPanelStruct.skill3ImageText.SetText($"{skill.GetCurrentLevel}");
+                            skillPanelStruct.skill3ImageText.SetText($"{skillStruct.level + 1}");
                             skillPanelStruct.skill3Text.SetText(skill.GetName);
                             skillPanelStruct.skill3Description.SetText(skill.GetDescription);
                             skillPanelStruct.skill3Button.onClick.RemoveAllListeners();

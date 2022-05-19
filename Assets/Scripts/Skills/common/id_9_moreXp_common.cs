@@ -9,7 +9,6 @@ namespace Skills.common
         
         public override void Activate()
         {
-            currentLevel++;
             ControllerManager.experienceSystem.AddBonusXpPercent(bonusXpPercent);
             ControllerManager.experienceSystem.AddMaxLevel(bonusMaxLevel);
         }
