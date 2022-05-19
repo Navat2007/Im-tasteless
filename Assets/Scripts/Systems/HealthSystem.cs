@@ -27,6 +27,7 @@ public class HealthSystem : MonoBehaviour
     private Color _startColor;
     private const float DefaultHealth = 1;
     private bool _isOverTimeHealActive;
+    private bool _isDeath;
 
     private void Awake()
     {
@@ -121,6 +122,8 @@ public class HealthSystem : MonoBehaviour
     
     public void TakeDamage(ProjectileHitInfo projectileHitInfo)
     {
+        if(!_isDeath) return;
+        
         blinkTimer = blinkDuration;
         
         if(projectileHitInfo.isCritical)
@@ -156,6 +159,7 @@ public class HealthSystem : MonoBehaviour
     [ContextMenu("Убить себя")]
     private void Die(ProjectileHitInfo projectileHitInfo)
     {
+        _isDeath = true;
         OnDeath?.Invoke(projectileHitInfo);
     }
 

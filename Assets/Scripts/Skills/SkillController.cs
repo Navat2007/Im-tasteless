@@ -102,13 +102,15 @@ public class SkillController : MonoBehaviour
 
         int count = 0;
 
-        while (count < 2000)
+        while (count < 1000)
         {
             Array values = Enum.GetValues(typeof(SkillRarity));
             System.Random random = new System.Random();
             SkillRarity randomSkillRarity = (SkillRarity)values.GetValue(random.Next(values.Length));
             
             var skill = GetRandomSkill(randomSkillRarity);
+            
+            //print($"{skill.GetName} попытка {count}");
             
             if (skill != null && IsAvailableToAdd(skill))
             {
@@ -179,6 +181,8 @@ public class SkillController : MonoBehaviour
             existSkillStruct.level++;
             existSkillStruct.skill.Activate();
         }
+        
+        ResetChoiceList();
     }
 
     [ContextMenu("Получить maxClip скилл в списке обычных")]

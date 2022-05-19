@@ -138,6 +138,7 @@ public class GameUI : MonoBehaviour
     
     [Header("Skill choice panel")] 
     [SerializeField] private Transform skillChoicePanel;
+    [SerializeField] private TMP_Text skillChoiceLevelText;
     [SerializeField] private SkillPanelStruct skillPanelStruct;
     [Space(10)] 
     [SerializeField] private Sprite frameWhiteSprite;
@@ -568,6 +569,8 @@ public class GameUI : MonoBehaviour
                 break;
             case PanelType.SKILLS:
                 GameManager.StartPause();
+                
+                skillChoiceLevelText.SetText($"Вы получили {ControllerManager.experienceSystem.Level} уровень");
 
                 void SetPanelStruct(int index, Skill skill)
                 {
@@ -577,7 +580,7 @@ public class GameUI : MonoBehaviour
                     {
                         case 1:
                             skillPanelStruct.skill1Image.sprite = skill.GetImage;
-                            skillPanelStruct.skill1ImageText.SetText($"{skillStruct.level + 1}");
+                            skillPanelStruct.skill1ImageText.SetText($"{skillStruct.level + 1} уровень");
                             skillPanelStruct.skill1Text.SetText(skill.GetName);
                             skillPanelStruct.skill1Description.SetText(skill.GetDescription);
                             skillPanelStruct.skill1Button.onClick.RemoveAllListeners();
@@ -589,7 +592,7 @@ public class GameUI : MonoBehaviour
                             break;
                         case 2:
                             skillPanelStruct.skill2Image.sprite = skill.GetImage;
-                            skillPanelStruct.skill2ImageText.SetText($"{skillStruct.level + 1}");
+                            skillPanelStruct.skill2ImageText.SetText($"{skillStruct.level + 1} уровень");
                             skillPanelStruct.skill2Text.SetText(skill.GetName);
                             skillPanelStruct.skill2Description.SetText(skill.GetDescription);
                             skillPanelStruct.skill2Button.onClick.RemoveAllListeners();
@@ -601,7 +604,7 @@ public class GameUI : MonoBehaviour
                             break;
                         case 3:
                             skillPanelStruct.skill3Image.sprite = skill.GetImage;
-                            skillPanelStruct.skill3ImageText.SetText($"{skillStruct.level + 1}");
+                            skillPanelStruct.skill3ImageText.SetText($"{skillStruct.level + 1} уровень");
                             skillPanelStruct.skill3Text.SetText(skill.GetName);
                             skillPanelStruct.skill3Description.SetText(skill.GetDescription);
                             skillPanelStruct.skill3Button.onClick.RemoveAllListeners();

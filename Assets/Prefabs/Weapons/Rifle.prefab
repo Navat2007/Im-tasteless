@@ -9887,7 +9887,7 @@ MonoBehaviour:
     type: 3}
   <EmptyAmmoClip>k__BackingField: {fileID: 8300000, guid: a90de4d31107ea24fb5e4efef01dfee9,
     type: 3}
-  <infiniteProjectile>k__BackingField: 0
+  <infiniteProjectile>k__BackingField: 1
   <Projectile>k__BackingField: {fileID: 7583622359539837063, guid: 4ec0a547a72f0aa4591069b4660e65b0,
     type: 3}
   <ProjectileSpawnPoint>k__BackingField:
