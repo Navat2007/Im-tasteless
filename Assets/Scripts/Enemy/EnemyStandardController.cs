@@ -17,7 +17,7 @@ public class EnemyStandardController : MonoBehaviour
         _enemyController = GetComponent<EnemyController>();
         _healthSystem = GetComponent<HealthSystem>();
         
-        _healthSystem.OnHealthChange += OnHealthChange;
+        _healthSystem.OnTakeDamage += OnTakeDamage;
     }
 
     private void Update()
@@ -29,7 +29,7 @@ public class EnemyStandardController : MonoBehaviour
         }
     }
 
-    private void OnHealthChange(float health, float maxHealth)
+    private void OnTakeDamage(float damage, float health, float maxHealth)
     {
         if (_stuckCount < stuckMaxCount)
         {

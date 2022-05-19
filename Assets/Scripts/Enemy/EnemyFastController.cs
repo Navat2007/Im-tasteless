@@ -23,7 +23,7 @@ public class EnemyFastController : MonoBehaviour
         _enemyController = GetComponent<EnemyController>();
         _healthSystem = GetComponent<HealthSystem>();
         
-        _healthSystem.OnHealthChange += OnHealthChange;
+        _healthSystem.OnTakeDamage += OnTakeDamage;
 
         _bonusSpeed = _enemy.MoveSpeed / 100 * movePercent;
     }
@@ -37,7 +37,7 @@ public class EnemyFastController : MonoBehaviour
         }
     }
 
-    private void OnHealthChange(float health, float maxHealth)
+    private void OnTakeDamage(float damage, float health, float maxHealth)
     {
         var percent = 100 - (health * 100 / maxHealth);
         var count = Mathf.Round(percent / stuckPercent);

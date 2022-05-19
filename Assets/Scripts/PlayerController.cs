@@ -93,7 +93,7 @@ public class PlayerController : MonoBehaviour
     
     private void OnEscape(InputAction.CallbackContext context)
     {
-        GameUI.instance.ClosePanel();
+        GameUI.instance.ClosePanel(true);
     }
     
     

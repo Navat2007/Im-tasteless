@@ -27,7 +27,33 @@ public struct BuffIconStruct
 public struct PanelUIStruct
 {
     public Transform panel;
+    public PanelType panelType;
     public Action callback;
+}
+
+[Serializable]
+public struct SkillPanelStruct
+{
+    [Header("Первый скилл для выбора")]
+    public Button skill1Button;
+    public Image skill1Image;
+    public TMP_Text skill1Text;
+    public TMP_Text skill1Text2;
+    public Action skill1Callback;
+    
+    [Header("Второй скилл для выбора")]
+    public Button skill2Button;
+    public Image skill2Image;
+    public TMP_Text skill2Text;
+    public TMP_Text skill2Text2;
+    public Action skill2Callback;
+    
+    [Header("Третий скилл для выбора")]
+    public Button skill3Button;
+    public Image skill3Image;
+    public TMP_Text skill3Text;
+    public TMP_Text skill3Text2;
+    public Action skill3Callback;
 }
 
 public class GameUI : MonoBehaviour
@@ -90,10 +116,13 @@ public class GameUI : MonoBehaviour
     [SerializeField] private SlotStruct slot3Struct;
     [SerializeField] private SlotStruct slot4Struct;
 
-    [Header("GAME OVER SECTION")] [SerializeField]
-    private GameObject gameOverUI;
-
+    [Header("Game over panel")] 
+    [SerializeField] private GameObject gameOverUI;
     [SerializeField] private Button gameOverRestartButton;
+    
+    [Header("Skill choice panel")] 
+    [SerializeField] private Transform skillChoicePanel;
+    [SerializeField] private SkillPanelStruct skillPanelStruct;
 
     private float _maximumFade = 0.75f;
 
@@ -120,7 +149,7 @@ public class GameUI : MonoBehaviour
             openPausePanelButton.onClick.AddListener(() =>
             {
                 StartPause();
-                OpenPanel(Panels.PAUSE);
+                OpenPanel(PanelType.PAUSE);
             });
         }
 
@@ -317,6 +346,37 @@ public class GameUI : MonoBehaviour
         {
             levelText.SetText($"{level}");
         }
+        else
+        {
+            throw new NotImplementedException("UI: текст уровня на панели персонажа не назначен");
+        }
+
+        if (skillChoicePanel != null)
+        {
+            skillPanelStruct.skill1Button.onClick.RemoveAllListeners();
+            skillPanelStruct.skill1Button.onClick.AddListener(() =>
+            {
+                ClosePanel();
+            });
+            
+            skillPanelStruct.skill2Button.onClick.RemoveAllListeners();
+            skillPanelStruct.skill2Button.onClick.AddListener(() =>
+            {
+                ClosePanel();
+            });
+            
+            skillPanelStruct.skill3Button.onClick.RemoveAllListeners();
+            skillPanelStruct.skill3Button.onClick.AddListener(() =>
+            {
+                ClosePanel();
+            });
+            
+            OpenPanel(PanelType.SKILLS);
+        }
+        else
+        {
+            throw new NotImplementedException("UI: панель выбора скила не назначена");
+        }
     }
 
     private void OnGameOver(ProjectileHitInfo projectileHitInfo)
@@ -451,42 +511,58 @@ public class GameUI : MonoBehaviour
         }
     }
     
-    public void OpenPanel(Panels panel)
+    public void OpenPanel(PanelType panelType)
     {
-        switch (panel)
+        switch (panelType)
         {
-            case Panels.RESULT:
+            case PanelType.RESULT:
                 _panelStack.Push(new PanelUIStruct
                 {
                     panel = resultPanel,
+                    panelType = PanelType.RESULT,
                     callback = GameManager.FinishLevel
                 });
                 resultPanel.gameObject.SetActive(true);
                 break;
-            case Panels.PAUSE:
+            case PanelType.PAUSE:
                 _panelStack.Push(new PanelUIStruct
                 {
                     panel = pausePanel,
+                    panelType = PanelType.PAUSE,
                     callback = () => {}
                 });
                 pausePanel.gameObject.SetActive(true);
                 break;
-            case Panels.SETTINGS:
+            case PanelType.SETTINGS:
                 _panelStack.Push(new PanelUIStruct
                 {
                     panel = settingsPanel,
+                    panelType = PanelType.SETTINGS,
                     callback = () => {}
                 });
                 settingsPanel.gameObject.SetActive(true);
                 break;
+            case PanelType.SKILLS:
+                StartPause();
+                _panelStack.Push(new PanelUIStruct
+                {
+                    panel = skillChoicePanel,
+                    panelType = PanelType.SKILLS,
+                    callback = () => {}
+                });
+                skillChoicePanel.gameObject.SetActive(true);
+                break;
         }
     }
     
-    public void ClosePanel()
+    public void ClosePanel(bool isPlayerInput = false)
     {
+        if(isPlayerInput && _panelStack.Count > 0 && _panelStack.Peek().panelType == PanelType.SKILLS)
+            return;
+        
         if (_panelStack.Count == 0)
         {
-            OpenPanel(Panels.PAUSE);
+            OpenPanel(PanelType.PAUSE);
             StartPause();
         }
         else
@@ -518,10 +594,11 @@ public class GameUI : MonoBehaviour
 
 }
 
-public enum Panels
+public enum PanelType
 {
     GAME,
     RESULT,
     PAUSE,
-    SETTINGS
+    SETTINGS,
+    SKILLS
 }

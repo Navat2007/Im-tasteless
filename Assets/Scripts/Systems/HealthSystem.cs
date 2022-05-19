@@ -7,6 +7,7 @@ public class HealthSystem : MonoBehaviour
 {
     public event Action<ProjectileHitInfo> OnDeath;
     public event Action<float, float> OnHealthChange;
+    public event Action<float, float, float> OnTakeDamage;
     public event Action<int> OnArmorChange;
     
     [field: Header("Настройки здоровья")] 
@@ -147,6 +148,7 @@ public class HealthSystem : MonoBehaviour
             CurrentHealth = 0;
         
         OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
+        OnTakeDamage?.Invoke(projectileHitInfo.damage, CurrentHealth, MaxHealth);
 
         if (CurrentHealth <= 0) Die(projectileHitInfo);
     }
