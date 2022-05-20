@@ -299,7 +299,7 @@ MonoBehaviour:
   collisionMask:
     serializedVersion: 2
     m_Bits: 0
-  damage: 100
+  damage: 150
   delay: 2
   radius: 5
   force: 700

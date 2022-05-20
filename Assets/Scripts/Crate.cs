@@ -102,6 +102,7 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
             if (ControllerManager.crateSpawner.IsDoublePowerCrate)
                 AddWeaponAmmo();
             
+            ControllerManager.crateSpawner.SetPowerCrate(false, false);
         }
         else
         {
