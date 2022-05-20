@@ -13,6 +13,7 @@ public class HealthSystem : MonoBehaviour
     [field: Header("Настройки здоровья")] 
     [field: SerializeField] public float CurrentHealth { get; private set; }
     [field: SerializeField] public float MaxHealth { get; private set; }
+    [field: SerializeField] public float HealthInSecond { get; private set; }
     [field: SerializeField] public int Armor { get; private set; }
     [field: SerializeField] public float InvulnerabilityTime { get; private set; }
 
@@ -31,6 +32,7 @@ public class HealthSystem : MonoBehaviour
     private bool _isDeath;
     private bool _isPlayer;
     private float _nextInvulnerabilityTime;
+    private float _nextHealthInSecondTickTime;
 
     private void Awake()
     {
@@ -71,22 +73,34 @@ public class HealthSystem : MonoBehaviour
         {
             _meshRenderer.material.color = _startColor;
         }
+
+        if (Time.time > _nextHealthInSecondTickTime)
+        {
+            _nextHealthInSecondTickTime = Time.time + 1;
+            
+            if(ControllerManager.playerController.GetMoveVelocity == Vector3.zero)
+                AddHealth(HealthInSecond);
+        }
     }
 
     public void Init(float value)
     {
         MaxHealth = value;
         AddHealth(MaxHealth);
+        OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
     }
 
     public void AddHealth(float amount)
     {
+        var prevHealth = CurrentHealth;
+        
         CurrentHealth += amount;
 
         if (CurrentHealth > MaxHealth)
             CurrentHealth = MaxHealth;
         
-        OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
+        if(prevHealth < MaxHealth)
+            OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
     }
 
     public void AddHealth(float amount, float tickTimePeriod, int tickAmount)
@@ -122,6 +136,11 @@ public class HealthSystem : MonoBehaviour
             Armor = 1;
         
         OnArmorChange?.Invoke(Armor);
+    }
+    
+    public void AddHealthInSecond(float amount)
+    {
+        HealthInSecond += amount;
     }
 
     public void AddNextInvulnerabilityTime(float time)

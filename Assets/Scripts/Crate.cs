@@ -75,12 +75,8 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
         
             return grenadePrefab;
         }
-        
-        if(_spawned) return;
 
-        _spawned = true;
-
-        if (ControllerManager.crateSpawner.IsNextPowerCrate)
+        void AddWeaponAmmo()
         {
             List<WeaponType> activeWeapon = new() { WeaponType.GRENADE };
 
@@ -93,6 +89,19 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
             System.Random random = new System.Random();
             var weapon = activeWeapon[random.Next(activeWeapon.Count)];
             ControllerManager.weaponController.AddAmmo(ControllerManager.weaponController.GetWeaponInfo(weapon).ammoMax, weapon, false);
+        }
+        
+        if(_spawned) return;
+
+        _spawned = true;
+
+        if (ControllerManager.crateSpawner.IsNextPowerCrate)
+        {
+            AddWeaponAmmo();
+            
+            if (ControllerManager.crateSpawner.IsDoublePowerCrate)
+                AddWeaponAmmo();
+            
         }
         else
         {

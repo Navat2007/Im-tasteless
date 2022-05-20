@@ -20,10 +20,14 @@ public class WeaponController : MonoBehaviour
 
     public Transform GetWeaponHold => weaponHold;
     
-    [SerializeField] private Transform weaponHold;
-    [SerializeField] private Transform leftHandHold;
+    [field: SerializeField] public float KillChance { get; private set; }
+    [field: SerializeField] public int PenetrateCount { get; private set; }
     [SerializeField] private WeaponType startingWeapon;
     
+    [Header("Hold")]
+    [SerializeField] private Transform weaponHold;
+    [SerializeField] private Transform leftHandHold;
+
     [Header("Weapons List")] 
     [SerializeField] private Weapon pistol;
     [SerializeField] private Weapon shotgun;
@@ -489,8 +493,15 @@ public class WeaponController : MonoBehaviour
                 return new WeaponInfo();
         }
     }
+
+    public WeaponType GetRandomWeaponType()
+    {
+        Array values = Enum.GetValues(typeof(WeaponType));
+        System.Random random = new System.Random();
+        return (WeaponType)values.GetValue(random.Next(values.Length));
+    }
     
-    public void AddAmmo(int count, WeaponType weaponType, bool activateWeapon)
+    public void AddAmmo(int count, WeaponType weaponType, bool activateWeapon, bool isCountPercent = false)
     {
         switch (weaponType)
         {
@@ -501,8 +512,9 @@ public class WeaponController : MonoBehaviour
                     _gameUI.SetSlot(2, true);
                 }
                 
-                shotgun.CurrentProjectileAmount += count;
-
+                var percentShotgunCount = Convert.ToInt32(Math.Round((double)shotgun.MaxProjectileAmount / 100 * (double)count, 0));
+                shotgun.CurrentProjectileAmount += isCountPercent ? percentShotgunCount : count;
+                
                 if (shotgun.CurrentProjectileAmount > shotgun.MaxProjectileAmount)
                     shotgun.CurrentProjectileAmount = shotgun.MaxProjectileAmount;
                 
@@ -515,7 +527,8 @@ public class WeaponController : MonoBehaviour
                     _gameUI.SetSlot(3, true);
                 }
                 
-                rifle.CurrentProjectileAmount += count;
+                var percentRifleCount = Convert.ToInt32(Math.Round((double)rifle.MaxProjectileAmount / 100 * (double)count, 0));
+                rifle.CurrentProjectileAmount += isCountPercent ? percentRifleCount : count;
                 
                 if (rifle.CurrentProjectileAmount > rifle.MaxProjectileAmount)
                     rifle.CurrentProjectileAmount = rifle.MaxProjectileAmount;
@@ -528,8 +541,9 @@ public class WeaponController : MonoBehaviour
                     _isGrenadeActive = true;
                     _gameUI.SetSlot(4, true);
                 }
-                
-                grenadeCount += count;
+
+                var percentCount = Convert.ToInt32(Math.Round((double)grenadeMaxCount / 100 * (double)count, 0));
+                grenadeCount += isCountPercent ? percentCount : count;
 
                 if (grenadeCount > grenadeMaxCount)
                     grenadeCount = grenadeMaxCount;
@@ -575,6 +589,16 @@ public class WeaponController : MonoBehaviour
     public void AddBonusTakeClip(int value)
     {
         _bonusTakeClip += value;
+    }
+    
+    public void AddPenetrateCount(int value)
+    {
+        PenetrateCount += value;
+    }
+    
+    public void AddKillChance(float value)
+    {
+        KillChance += value;
     }
 }
 

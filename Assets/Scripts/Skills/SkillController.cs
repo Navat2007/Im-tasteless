@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Skills;
+using Skills.uncommon;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public struct SkillStruct
 {
@@ -14,6 +14,8 @@ public struct SkillStruct
 
 public class SkillController : MonoBehaviour
 {
+    [field: SerializeField] public bool IsNextDouble { get; private set; }
+    
     [Header("Скилы когда закончились остальные")] 
     [SerializeField] private Skill lastSkill;
     
@@ -37,13 +39,8 @@ public class SkillController : MonoBehaviour
     [SerializeField] private int uniqueSkillMaxCount = 1;
     [SerializeField] private List<Skill> uniqueSkills = new();
 
-    private int _commonSkillCount;
-    private int _uncommonSkillCount;
-    private int _rareSkillCount;
-    private int _uniqueSkillCount;
-
     private List<Skill> _currentChoiceList = new ();
-    public List<SkillStruct> _currentSkillsList = new ();
+    private List<SkillStruct> _currentSkillsList = new ();
 
     private void OnEnable()
     {
@@ -148,22 +145,6 @@ public class SkillController : MonoBehaviour
 
     public void AddToSkillsList(Skill skill)
     {
-        switch (skill.GetSkillRarity)
-        {
-            case SkillRarity.COMMON:
-                _commonSkillCount++;
-                break;
-            case SkillRarity.UNCOMMON:
-                _uncommonSkillCount++;
-                break;
-            case SkillRarity.RARE:
-                _rareSkillCount++;
-                break;
-            case SkillRarity.UNIQUE:
-                _uniqueSkillCount++;
-                break;
-        }
-
         if (!IsInSkillsList(skill))
         {
             _currentSkillsList.Add(new SkillStruct
@@ -182,7 +163,15 @@ public class SkillController : MonoBehaviour
             existSkillStruct.skill.Activate();
         }
         
+        if(skill is not id_1003_skillDouble_uncommon)
+            SetNextSkillDouble(false);
+        
         ResetChoiceList();
+    }
+
+    public void SetNextSkillDouble(bool value)
+    {
+        IsNextDouble = value;
     }
 
     [ContextMenu("Получить maxClip скилл в списке обычных")]
@@ -191,9 +180,15 @@ public class SkillController : MonoBehaviour
         AddToSkillsList(commonSkills[6]);
     }
     
-    [ContextMenu("Получить nextCrate скилл в списке необычных")]
+    [ContextMenu("Получить skillDouble скилл в списке необычных")]
     private void Get2Skill()
     {
-        AddToSkillsList(uncommonSkills[0]);
+        AddToSkillsList(uncommonSkills[2]);
+    }
+    
+    [ContextMenu("Получить health скилл в списке необычных")]
+    private void Get3Skill()
+    {
+        AddToSkillsList(uncommonSkills[4]);
     }
 }

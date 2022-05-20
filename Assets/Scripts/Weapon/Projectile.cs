@@ -9,10 +9,11 @@ public class Projectile : MonoBehaviour
     [SerializeField] private float criticalBonus = 100;
 
     private float _timeToDestroy = 3;
-    private float _skinWidth = .1f;
+    private int _currentPenetrate;
 
     private void Start()
     {
+        _currentPenetrate = ControllerManager.weaponController.PenetrateCount;
         Destroy(gameObject, _timeToDestroy);
     }
 
@@ -30,9 +31,11 @@ public class Projectile : MonoBehaviour
         {
             if (healthSystem.enabled)
             {
+                var damageToAdd = enemy.GetComponent<Enemy>() != null && Helper.IsCritical(ControllerManager.weaponController.KillChance) ? healthSystem.MaxHealth : damage;
+                
                 healthSystem.TakeDamage(new ProjectileHitInfo
                 {
-                    damage = damage,
+                    damage =  damageToAdd,
                     isCritical = Helper.IsCritical(criticalChance),
                     criticalBonus = criticalBonus,
                     hitPoint = other.ClosestPoint(transform.position),
@@ -40,8 +43,11 @@ public class Projectile : MonoBehaviour
                 });
             }
         }
+
+        _currentPenetrate--;
         
-        Destroy(gameObject);
+        if(_currentPenetrate == 0)
+            Destroy(gameObject);
     }
 
     public void SetSpeed(float value)

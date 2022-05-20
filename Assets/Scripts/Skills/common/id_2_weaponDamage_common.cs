@@ -8,7 +8,8 @@ namespace Skills.common
         
         public override void Activate()
         {
-            ControllerManager.weaponController.AddBonusDamagePercent(bonusWeaponDamagePercent);
+            ControllerManager.weaponController.AddBonusDamagePercent(ControllerManager.skillController.IsNextDouble 
+                ? bonusWeaponDamagePercent * 2 : bonusWeaponDamagePercent);
         }
     }
 }

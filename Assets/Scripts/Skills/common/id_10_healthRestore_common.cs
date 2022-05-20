@@ -18,13 +18,18 @@ namespace Skills.common
                 {
                     if (nearbyObjects.TryGetComponent(out Rigidbody rigidbody))
                     {
-                        rigidbody.AddExplosionForce(force, transform.position, radius);
+                        rigidbody.AddExplosionForce(ControllerManager.skillController.IsNextDouble 
+                            ? force * 2 : force, 
+                            transform.position, 
+                            ControllerManager.skillController.IsNextDouble 
+                            ? radius * 2 : radius);
                     }
                 }
             }
             
             ControllerManager.healthSystem.AddHealth(ControllerManager.healthSystem.MaxHealth);
-            ControllerManager.healthSystem.AddNextInvulnerabilityTime(invulnerabilityTime);
+            ControllerManager.healthSystem.AddNextInvulnerabilityTime(ControllerManager.skillController.IsNextDouble 
+                ? invulnerabilityTime * 2 : invulnerabilityTime);
             AddForce();
         }
     }

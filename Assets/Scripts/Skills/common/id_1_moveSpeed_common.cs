@@ -9,7 +9,8 @@ namespace Skills.common
         public override void Activate()
         {
             var percentToAdd = ControllerManager.player.MoveSpeed / 100 * bonusMoveSpeedPercent;
-            ControllerManager.player.AddBonusMoveSpeed(percentToAdd);
+            ControllerManager.player.AddBonusMoveSpeed(ControllerManager.skillController.IsNextDouble 
+                ? percentToAdd * 2 : percentToAdd);
         }
     }
 }

@@ -4,7 +4,7 @@ namespace Skills.uncommon
     {
         public override void Activate()
         {
-            ControllerManager.crateSpawner.SetPowerCrate(true);
+            ControllerManager.crateSpawner.SetPowerCrate(true, ControllerManager.skillController.IsNextDouble);
         }
     }
 }

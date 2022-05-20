@@ -8,7 +8,8 @@ namespace Skills.common
         
         public override void Activate()
         {
-            ControllerManager.weaponController.AddBonusTakeClip(bonusTakeClip);
+            ControllerManager.weaponController.AddBonusTakeClip(ControllerManager.skillController.IsNextDouble 
+                ? bonusTakeClip * 2 : bonusTakeClip);
         }
     }
 }

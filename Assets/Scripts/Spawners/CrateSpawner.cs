@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 public class CrateSpawner : MonoBehaviour
 {
     public bool IsNextPowerCrate { get; private set; }
+    public bool IsDoublePowerCrate { get; private set; }
     
     [SerializeField] private List<SpawnPoint> spawnPoints = new ();
     [SerializeField] private Crate cratePrefab;
@@ -96,9 +97,10 @@ public class CrateSpawner : MonoBehaviour
         _isStartSpawn = false;
     }
 
-    public void SetPowerCrate(bool value)
+    public void SetPowerCrate(bool powerCrate, bool doublePower)
     {
-        IsNextPowerCrate = value;
+        IsNextPowerCrate = powerCrate;
+        IsDoublePowerCrate = doublePower;
     }
 
     public void RemoveSpawnPoint(SpawnPoint point)

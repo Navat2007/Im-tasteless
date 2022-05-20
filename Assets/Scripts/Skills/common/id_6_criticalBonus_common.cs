@@ -8,7 +8,8 @@ namespace Skills.common
         
         public override void Activate()
         {
-            ControllerManager.weaponController.AddBonusCriticalBonus(bonusCriticalBonus);
+            ControllerManager.weaponController.AddBonusCriticalBonus(ControllerManager.skillController.IsNextDouble 
+                ? bonusCriticalBonus * 2 : bonusCriticalBonus);
         }
     }
 }
