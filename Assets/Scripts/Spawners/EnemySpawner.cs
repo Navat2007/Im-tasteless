@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Spawner : MonoBehaviour
+public class EnemySpawner : MonoBehaviour
 {
     public event Action<int, int> OnNewWave;
 
@@ -32,12 +32,12 @@ public class Spawner : MonoBehaviour
 
     private void OnEnable()
     {
-        ControllerManager.spawner = this;
+        ControllerManager.enemySpawner = this;
     }
 
     private void OnDisable()
     {
-        ControllerManager.spawner = null;
+        ControllerManager.enemySpawner = null;
     }
 
     private void Start()
@@ -92,10 +92,20 @@ public class Spawner : MonoBehaviour
 
     private bool CheckNextWave(Wave currentWave, Wave nextWave)
     {
+        bool FindPowerEnemyInWave()
+        {
+            foreach (var enemy in currentWave.enemies)
+            {
+                if (enemy.IsPower) return true;
+            }
+            
+            return false;
+        }
+        
         var percentAlreadySpawned = currentWave.GetAlreadySpawned * 100 / currentWave.waveSO.enemyCount;
         var percentRemainingAlive = currentWave.GetRemainingAlive * 100 / currentWave.waveSO.enemyCount;
 
-        return percentAlreadySpawned >= 80 && percentRemainingAlive <= 20 && !nextWave.active;
+        return percentAlreadySpawned >= 80 && percentRemainingAlive <= 20 && !nextWave.active && !FindPowerEnemyInWave();
     }
 
     private bool CheckWaveDone(Wave wave)
@@ -200,6 +210,7 @@ public class Spawner : MonoBehaviour
         void OnEnemyDeath(Enemy spawnedEnemy)
         {
             wave.SetRemainingAlive(wave.GetRemainingAlive - 1);
+            wave.RemoveEnemyFromList(spawnedEnemy);
 
             if (ControllerManager.experienceSystem != null)
                 ControllerManager.experienceSystem.AddXp(spawnedEnemy.XpOnDeath);
@@ -258,6 +269,7 @@ public class Spawner : MonoBehaviour
         wave.SetRemainingToSpawn(wave.GetRemainingToSpawn - 1);
         wave.SetRemainingAlive(wave.GetRemainingAlive + 1);
         wave.SetAlreadySpawned(wave.GetAlreadySpawned + 1);
+        wave.AddEnemyToList(spawnedEnemy);
 
         SetupEnemy(spawnedEnemy);
 

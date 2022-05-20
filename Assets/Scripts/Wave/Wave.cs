@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 [Serializable]
 public class Wave
@@ -6,6 +7,7 @@ public class Wave
     public bool active;
     public bool done;
     public WaveSO waveSO;
+    public List<Enemy> enemies = new();
 
     private float _nextSpawnTime;
     private int _currentFatCount;
@@ -13,6 +15,8 @@ public class Wave
     private int _enemyRemainingToSpawn;
     private int _enemiesRemainingAlive;
     private int _enemiesAlreadySpawned;
+
+    
 
     public float GetNextSpawnTime => _nextSpawnTime;
     public void SetNextSpawnTime (float value) => _nextSpawnTime = value;
@@ -31,4 +35,14 @@ public class Wave
         
     public int GetFastCount => _currentFastCount;
     public void SetFastCount (int value) => _currentFastCount = value;
+
+    public void AddEnemyToList(Enemy enemy)
+    {
+        enemies.Add(enemy);
+    }
+    
+    public void RemoveEnemyFromList(Enemy enemy)
+    {
+        enemies.Remove(enemy);
+    }
 }

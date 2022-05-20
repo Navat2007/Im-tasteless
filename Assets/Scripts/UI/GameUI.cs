@@ -96,7 +96,7 @@ public class GameUI : MonoBehaviour
     [SerializeField] private Transform resultPanel;
     
     [Header("Wave banner")] 
-    [SerializeField] private Spawner spawner;
+    [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private Transform waveBannerPanel;
     [SerializeField] private RectTransform waveBannerPanelRectTransform;
     [SerializeField] private TMP_Text waveBannerIndexText;
@@ -199,9 +199,9 @@ public class GameUI : MonoBehaviour
             };
         }
 
-        if (spawner != null)
+        if (enemySpawner != null)
         {
-            spawner.OnNewWave += (waveIndex, enemyCount) =>
+            enemySpawner.OnNewWave += (waveIndex, enemyCount) =>
             {
                 IEnumerator AnimateBanner()
                 {

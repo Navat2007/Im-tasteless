@@ -8,7 +8,7 @@ namespace Skills.uncommon
         
         public override void Activate()
         {
-            ControllerManager.spawner.AddPowerEnemySpawnChance(ControllerManager.skillController.IsNextDouble
+            ControllerManager.enemySpawner.AddPowerEnemySpawnChance(ControllerManager.skillController.IsNextDouble
                 ? chance * 2 : chance);
         }
     }

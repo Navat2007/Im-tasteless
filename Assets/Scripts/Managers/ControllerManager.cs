@@ -8,6 +8,6 @@
     public static ExperienceSystem experienceSystem;
     public static HealthSystem healthSystem;
 
-    public static Spawner spawner;
+    public static EnemySpawner enemySpawner;
     public static CrateSpawner crateSpawner;
 }
