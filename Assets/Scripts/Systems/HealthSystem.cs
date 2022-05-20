@@ -111,6 +111,18 @@ public class HealthSystem : MonoBehaviour
         StartCoroutine(HealOverTime(amount, tickTimePeriod, tickAmount));
     }
 
+    public void AddMaxHealth(float value)
+    {
+        MaxHealth += value;
+        OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
+    }
+    
+    public void AddMaxHealthPercent(float percent)
+    {
+        MaxHealth += MaxHealth / 100 * percent;
+        OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
+    }
+
     private IEnumerator HealOverTime(float amount, float tickTimePeriod, int tickAmount)
     {
         _isOverTimeHealActive = true;

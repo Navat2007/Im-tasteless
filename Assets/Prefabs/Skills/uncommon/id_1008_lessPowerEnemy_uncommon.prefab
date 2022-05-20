@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7607396152749461780
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1843005290073089898}
+  - component: {fileID: -6577209300040055411}
+  m_Layer: 0
+  m_Name: id_1008_lessPowerEnemy_uncommon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1843005290073089898
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7607396152749461780}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-6577209300040055411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7607396152749461780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbc184f341c74ea395b7df62703b80f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 1008
+  skillImage: {fileID: 21300000, guid: fff17967ed7a8db4ba80aab0d1ea34a4, type: 3}
+  skillName: "\u0418 \u0437\u0430\u0447\u0435\u043C \u043C\u043D\u0435 \u0432\u0441\u0451
+    \u044D\u0442\u043E"
+  skillDescription: "- 10% \u043A \u043F\u043E\u044F\u0432\u043B\u0435\u043D\u0438\u044E
+    \u0443\u0441\u0438\u043B\u0435\u043D\u043D\u043E\u0433\u043E \u0437\u043E\u043C\u0431\u0438"
+  skillRarity: 1
+  maxLevel: 1
+  chance: -10

@@ -28,6 +28,8 @@ public class Spawner : MonoBehaviour
     [SerializeField] private float fatBusterSpawnChance = 15.0f;
     [SerializeField] private float powerFatBusterSpawnChance = 100.0f;
 
+    private float _bonusPowerEnemySpawnChance;
+
     private void OnEnable()
     {
         ControllerManager.spawner = this;
@@ -55,11 +57,13 @@ public class Spawner : MonoBehaviour
             {
                 wave.SetNextSpawnTime(Time.time + wave.waveSO.timeBetweenSpawn);
 
+                var powerEnemyChanceSO = wave.waveSO.powerEnemyChance + (wave.waveSO.powerEnemyChance / 100 * _bonusPowerEnemySpawnChance);
+
                 var enemy = GetEnemy(wave.waveSO.enemyList, wave);
                 var powerEnemyChance = Helper.IsCritical(enemy.ZombieType == ZombieType.FAST
                                                          || enemy.ZombieType == ZombieType.FAT
-                    ? wave.waveSO.powerEnemyChance * 2
-                    : wave.waveSO.powerEnemyChance);
+                    ? powerEnemyChanceSO * 2
+                    : powerEnemyChanceSO);
 
                 SpawnEnemy(enemy, powerEnemyChance, wave);
 
@@ -263,5 +267,10 @@ public class Spawner : MonoBehaviour
         }
 
         return spawnedEnemy;
+    }
+
+    public void AddPowerEnemySpawnChance(float value)
+    {
+        _bonusPowerEnemySpawnChance += value;
     }
 }

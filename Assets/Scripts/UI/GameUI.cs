@@ -625,7 +625,7 @@ public class GameUI : MonoBehaviour
                             image.sprite = frameWhiteSprite;
                             break;
                         case SkillRarity.UNCOMMON:
-                            image.sprite = frameGraySprite;
+                            image.sprite = frameGreenSprite;
                             break;
                         case SkillRarity.RARE:
                             image.sprite = frameBlueSprite;
