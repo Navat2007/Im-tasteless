@@ -10,7 +10,8 @@ public class CratePointer : MonoBehaviour
     [SerializeField] private float fadeTimer = 10;
     
     private Camera _camera;
-    private bool _isShow = true;
+    public bool IsShow { get; private set; } = true;
+    public bool IsFade { get; private set; }
 
     private void Awake()
     {
@@ -21,10 +22,10 @@ public class CratePointer : MonoBehaviour
 
     private void Update()
     {
-        if (ControllerManager.player != null && _isShow)
+        if (ControllerManager.player != null && IsShow)
         {
-            Vector3 fromPlayerToEnemy = transform.position - ControllerManager.player.transform.position;
-            Ray ray = new Ray(ControllerManager.player.transform.position, fromPlayerToEnemy);
+            Vector3 fromPlayerToCrate = transform.position - ControllerManager.player.transform.position;
+            Ray ray = new Ray(ControllerManager.player.transform.position, fromPlayerToCrate);
             //Debug.DrawRay(ControllerManager.player.transform.position, fromPlayerToEnemy);
 
             // Ordering: [0] = Left, [1] = Right, [2] = Down, [3] = Up, [4] = Near, [5] = Far
@@ -41,7 +42,7 @@ public class CratePointer : MonoBehaviour
                 }
             }
 
-            minDistance = Mathf.Clamp(minDistance, 0, fromPlayerToEnemy.magnitude);
+            minDistance = Mathf.Clamp(minDistance, 0, fromPlayerToCrate.magnitude);
 
             Vector3 worldPosition = ray.GetPoint(minDistance - 1);
             worldPointer.position = _camera.WorldToScreenPoint(worldPosition);
@@ -60,7 +61,22 @@ public class CratePointer : MonoBehaviour
             backImage.color = Color.Lerp(to, from, percent);
             yield return null;
         }
-        
-        Destroy(this);
+
+        IsShow = false;
+        IsFade = true;
+    }
+
+    public void SetInvisible()
+    {
+        IsShow = false;
+        image.color = new Color(1, 1, 1, 0);
+        backImage.color = new Color(1, 1, 1, 0);
+    }
+    
+    public void SetVisible()
+    {
+        IsShow = true;
+        image.color = new Color(1, 1, 1, 0.4f);
+        backImage.color = new Color(1, 1, 1, 0.4f);
     }
 }

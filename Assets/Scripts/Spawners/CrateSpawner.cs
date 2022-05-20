@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -16,7 +17,10 @@ public class CrateSpawner : MonoBehaviour
     [SerializeField] private float minTimeBetweenSpawn = 5; 
     [SerializeField] private float maxTimeBetweenSpawn = 15;
 
+    private List<Crate> _crateList = new();
     private List<SpawnPoint> _currentSpawnPoints = new();
+
+    private float _nextScanTime;
     private bool _isStartSpawn;
 
     private void OnEnable()
@@ -27,6 +31,44 @@ public class CrateSpawner : MonoBehaviour
     private void OnDisable()
     {
         ControllerManager.crateSpawner = null;
+    }
+
+    private void Update()
+    {
+        if (Time.time > _nextScanTime)
+        {
+            if (_crateList.Count == 0) return;
+            
+            _nextScanTime = Time.time + 1;
+
+            float minDistance = Mathf.Infinity;
+            int index = -1;
+
+            for (int i = 0; i < _crateList.Count; i++)
+            {
+                var cratePointer = _crateList[i].gameObject.GetComponentInChildren<CratePointer>();
+                
+                if (cratePointer != null)
+                {
+                    if(cratePointer.IsFade && cratePointer.IsShow)
+                        cratePointer.SetInvisible();
+                    
+                    float distance = Vector3.Distance(_crateList[i].transform.position, ControllerManager.player.transform.position);
+                    
+                    if (distance < minDistance)
+                    {
+                        index = i;
+                        minDistance = distance;
+                    }
+                }
+            }
+
+            var pointer = _crateList[index].gameObject.GetComponentInChildren<CratePointer>();
+            if (pointer != null && index >= 0)
+            {
+                pointer.SetVisible();
+            }
+        }
     }
 
     public IEnumerator SpawnCrate(int count, float spawnYPosition, float spawnDelaySeconds, bool airSpawn)
@@ -61,8 +103,9 @@ public class CrateSpawner : MonoBehaviour
             return spawnPoints[index];
         }
         
-        void OnCrateDeath(ProjectileHitInfo projectileHitInfo)
+        void OnCrateDeath(ProjectileHitInfo projectileHitInfo, Crate spawnedCrate)
         {
+            _crateList.Remove(spawnedCrate);
             StartCoroutine(SpawnCrate(1, 0.4f, Random.Range(minTimeBetweenSpawn, maxTimeBetweenSpawn), false));
         }
 
@@ -85,12 +128,13 @@ public class CrateSpawner : MonoBehaviour
                 cratePool
             );
             
+            _crateList.Add(spawnedCrate);
             _currentSpawnPoints.Add(point);
             spawnedCrate.SetSpawnPoint(point);
             
             if (spawnedCrate.gameObject.TryGetComponent(out HealthSystem healthSystem))
             {
-                healthSystem.OnDeath += OnCrateDeath;
+                healthSystem.OnDeath += (projectileHitInfo) => OnCrateDeath(projectileHitInfo, spawnedCrate);
             }
         }
         

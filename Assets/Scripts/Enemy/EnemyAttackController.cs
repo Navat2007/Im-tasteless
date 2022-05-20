@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Enemy))]
@@ -5,6 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class EnemyAttackController : MonoBehaviour
 {
+    [SerializeField] private GameObject attackSector;
+    
     private Enemy _enemy;
     private TargetSystem _targetSystem;
     private Animator _animator;
@@ -27,9 +30,21 @@ public class EnemyAttackController : MonoBehaviour
     {
         _targetSystem.OnTargetPositionChange -= OnTargetPositionChange;
     }
-    
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            if (Time.time > _nextAttackTime)
+            {
+                Attack(other.gameObject); 
+            }
+        }
+    }
+
     private void OnTargetPositionChange(Vector3 position, GameObject target)
     {
+        /*
         if (Time.time > _nextAttackTime)
         {
             float sqrDistanceToTarget = (position - transform.position).sqrMagnitude;
@@ -37,6 +52,7 @@ public class EnemyAttackController : MonoBehaviour
             if (target.activeSelf && sqrDistanceToTarget < Mathf.Pow(_enemy.AttackDistance, 2))
                 Attack(target);
         }
+        */
     }
 
     private void Attack(GameObject target)

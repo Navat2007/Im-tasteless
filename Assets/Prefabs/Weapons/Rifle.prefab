@@ -9877,7 +9877,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <CurrentWeaponType>k__BackingField: 2
-  <Damage>k__BackingField: 14
+  <Damage>k__BackingField: 15
   <CriticalChance>k__BackingField: 10
   <CriticalBonus>k__BackingField: 100
   <ReloadSpeed>k__BackingField: 2.5
