@@ -123,6 +123,11 @@ public class HealthSystem : MonoBehaviour
         
         OnArmorChange?.Invoke(Armor);
     }
+
+    public void AddNextInvulnerabilityTime(float time)
+    {
+        _nextInvulnerabilityTime = Time.time + time;
+    }
     
     public void TakeDamage(ProjectileHitInfo projectileHitInfo)
     {
@@ -158,7 +163,7 @@ public class HealthSystem : MonoBehaviour
         OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
         OnTakeDamage?.Invoke(projectileHitInfo.damage, CurrentHealth, MaxHealth);
 
-        _nextInvulnerabilityTime = Time.time + InvulnerabilityTime;
+        AddNextInvulnerabilityTime(InvulnerabilityTime);
 
         if (CurrentHealth <= 0) Die(projectileHitInfo);
     }

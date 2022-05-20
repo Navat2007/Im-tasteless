@@ -447,6 +447,7 @@ public class WeaponController : MonoBehaviour
             case WeaponType.PISTOL:
                 return new WeaponInfo
                 {
+                    isActive = _isPistolActive,
                     ammoInClip = pistol.ProjectileInClip,
                     ammoPerClip = pistol.ProjectilePerClip,
                     ammoCurrent = pistol.CurrentProjectileAmount,
@@ -457,6 +458,7 @@ public class WeaponController : MonoBehaviour
             case WeaponType.SHOTGUN:
                 return new WeaponInfo
                 {
+                    isActive = _isShogunActive,
                     ammoInClip = shotgun.ProjectileInClip,
                     ammoPerClip = shotgun.ProjectilePerClip,
                     ammoCurrent = shotgun.CurrentProjectileAmount,
@@ -467,6 +469,7 @@ public class WeaponController : MonoBehaviour
             case WeaponType.RIFLE:
                 return new WeaponInfo
                 {
+                    isActive = _isRifleActive,
                     ammoInClip = rifle.ProjectileInClip,
                     ammoPerClip = rifle.ProjectilePerClip,
                     ammoCurrent = rifle.CurrentProjectileAmount,
@@ -577,6 +580,7 @@ public class WeaponController : MonoBehaviour
 
 public struct WeaponInfo
 {
+    public bool isActive;
     public int ammoInClip;
     public int ammoPerClip;
     public int ammoCurrent;

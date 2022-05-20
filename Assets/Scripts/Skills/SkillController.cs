@@ -190,4 +190,10 @@ public class SkillController : MonoBehaviour
     {
         AddToSkillsList(commonSkills[6]);
     }
+    
+    [ContextMenu("Получить nextCrate скилл в списке необычных")]
+    private void Get2Skill()
+    {
+        AddToSkillsList(uncommonSkills[0]);
+    }
 }

@@ -6,8 +6,6 @@ public class AirplaneManager : MonoBehaviour
 {
     [SerializeField] private TransportPlane airplane;
     [Space(10)] 
-    [SerializeField] private CrateSpawner crateSpawner;
-    [Space(10)] 
     [SerializeField] private int crateToSpawnCount = 3;
     [SerializeField] private int crateToSpawnTime = 180;
 
@@ -38,9 +36,6 @@ public class AirplaneManager : MonoBehaviour
     [ContextMenu("Spawn crate")]
     private void AirplaneOnSpawnGoods()
     {
-        if (crateSpawner != null)
-        {
-            StartCoroutine(crateSpawner.SpawnCrate(crateToSpawnCount, 40, 0, true));
-        }
+        StartCoroutine(ControllerManager.crateSpawner.SpawnCrate(crateToSpawnCount, 40, 0, true));
     }
 }

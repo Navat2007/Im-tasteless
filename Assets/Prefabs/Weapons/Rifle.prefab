@@ -9879,7 +9879,7 @@ MonoBehaviour:
   <CurrentWeaponType>k__BackingField: 2
   <Damage>k__BackingField: 14
   <CriticalChance>k__BackingField: 10
-  <CriticalBonus>k__BackingField: 2
+  <CriticalBonus>k__BackingField: 100
   <ReloadSpeed>k__BackingField: 2.5
   <MsBetweenShots>k__BackingField: 150
   <RecoilPower>k__BackingField: 0.2

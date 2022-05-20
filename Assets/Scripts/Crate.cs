@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Interface;
 using UnityEngine;
 
@@ -20,9 +21,11 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
     [Header("Гранаты")]
     [SerializeField] private GameObject grenadePrefab;
     [SerializeField] private float grenadeSpawnChance = 20;
+    [SerializeField] private float grenadePowerCrateCount = 10;
 
     private HealthSystem _healthSystem;
     private bool _spawned;
+    private SpawnPoint _spawnPoint;
 
     private void Awake()
     {
@@ -76,14 +79,38 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
         if(_spawned) return;
 
         _spawned = true;
+
+        if (ControllerManager.crateSpawner.IsNextPowerCrate)
+        {
+            List<WeaponType> activeWeapon = new() { WeaponType.GRENADE };
+
+            var shotgun = ControllerManager.weaponController.GetWeaponInfo(WeaponType.SHOTGUN);
+            var rifle = ControllerManager.weaponController.GetWeaponInfo(WeaponType.RIFLE);
+
+            if (shotgun.isActive && shotgun.ammoPerClip < shotgun.ammoMax) activeWeapon.Add(WeaponType.SHOTGUN);
+            if (rifle.isActive && rifle.ammoPerClip < rifle.ammoMax) activeWeapon.Add(WeaponType.RIFLE);
+
+            System.Random random = new System.Random();
+            var weapon = activeWeapon[random.Next(activeWeapon.Count)];
+            ControllerManager.weaponController.AddAmmo(ControllerManager.weaponController.GetWeaponInfo(weapon).ammoMax, weapon, false);
+        }
+        else
+        {
+            Instantiate(
+                GetWeaponToSpawn(), 
+                new Vector3(transform.position.x, spawnHeight, transform.position.z), 
+                Quaternion.identity, 
+                GameObject.FindGameObjectWithTag("WeaponPool").transform
+            );
+        }
         
-        Instantiate(
-            GetWeaponToSpawn(), 
-            new Vector3(transform.position.x, spawnHeight, transform.position.z), 
-            Quaternion.identity, 
-            GameObject.FindGameObjectWithTag("WeaponPool").transform
-        );
-        
+        ControllerManager.crateSpawner.RemoveSpawnPoint(_spawnPoint);
+
         Destroy(gameObject);
+    }
+
+    public void SetSpawnPoint(SpawnPoint spawnPoint)
+    {
+        _spawnPoint = spawnPoint;
     }
 }

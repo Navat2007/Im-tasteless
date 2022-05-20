@@ -6,6 +6,8 @@ using Random = UnityEngine.Random;
 
 public class CrateSpawner : MonoBehaviour
 {
+    public bool IsNextPowerCrate { get; private set; }
+    
     [SerializeField] private List<SpawnPoint> spawnPoints = new ();
     [SerializeField] private Crate cratePrefab;
     [SerializeField] private Transform cratePool;
@@ -13,8 +15,9 @@ public class CrateSpawner : MonoBehaviour
     [SerializeField] private float minTimeBetweenSpawn = 5; 
     [SerializeField] private float maxTimeBetweenSpawn = 15;
 
+    private List<SpawnPoint> _currentSpawnPoints = new();
     private bool _isStartSpawn;
-    
+
     private void OnEnable()
     {
         ControllerManager.crateSpawner = this;
@@ -27,7 +30,7 @@ public class CrateSpawner : MonoBehaviour
 
     public IEnumerator SpawnCrate(int count, float spawnYPosition, float spawnDelaySeconds, bool airSpawn)
     {
-        Vector3 GetRandomSpawnerPoint()
+        SpawnPoint GetRandomSpawnerPoint()
         {
             if (spawnPoints.Count == 0)
                 throw new NotImplementedException("Нет точек спавна для ящиков");
@@ -41,7 +44,7 @@ public class CrateSpawner : MonoBehaviour
                 var randomIndex = random.Next(spawnPoints.Count);
                 var randomPoint = spawnPoints[randomIndex];
 
-                if (randomPoint.available)
+                if (randomPoint.available && !_currentSpawnPoints.Contains(randomPoint))
                     index = randomIndex;
 
                 count++;
@@ -52,9 +55,9 @@ public class CrateSpawner : MonoBehaviour
             
             //print($"Точка спавна найдена с {count} попытки");
 
-            Vector3 position = new Vector3(spawnPoints[index].transform.position.x, spawnYPosition, spawnPoints[index].transform.position.z);
+            
 
-            return position;
+            return spawnPoints[index];
         }
         
         void OnCrateDeath(ProjectileHitInfo projectileHitInfo)
@@ -71,12 +74,18 @@ public class CrateSpawner : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
+            SpawnPoint point = GetRandomSpawnerPoint();
+            Vector3 position = new Vector3(point.transform.position.x, spawnYPosition, point.transform.position.z);
+            
             Crate spawnedCrate = Instantiate(
                 cratePrefab, 
-                GetRandomSpawnerPoint(), 
+                position, 
                 Quaternion.identity, 
                 cratePool
             );
+            
+            _currentSpawnPoints.Add(point);
+            spawnedCrate.SetSpawnPoint(point);
             
             if (spawnedCrate.gameObject.TryGetComponent(out HealthSystem healthSystem))
             {
@@ -85,5 +94,16 @@ public class CrateSpawner : MonoBehaviour
         }
         
         _isStartSpawn = false;
+    }
+
+    public void SetPowerCrate(bool value)
+    {
+        IsNextPowerCrate = value;
+    }
+
+    public void RemoveSpawnPoint(SpawnPoint point)
+    {
+        var index = _currentSpawnPoints.IndexOf(point);
+        _currentSpawnPoints.RemoveAt(index);
     }
 }

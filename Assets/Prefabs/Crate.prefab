@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 119587858}
-  m_Layer: 5
+  m_Layer: 13
   m_Name: GameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49,7 +49,7 @@ GameObject:
   - component: {fileID: 1533337364}
   - component: {fileID: 1533337366}
   - component: {fileID: 1533337365}
-  m_Layer: 5
+  m_Layer: 13
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -126,7 +126,7 @@ GameObject:
   - component: {fileID: 1649058759}
   - component: {fileID: 1649058758}
   - component: {fileID: 1649058757}
-  m_Layer: 5
+  m_Layer: 13
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -230,7 +230,7 @@ GameObject:
   - component: {fileID: 6179953407319125960}
   - component: {fileID: 6797595723618857598}
   - component: {fileID: 7519217171206607873}
-  m_Layer: 7
+  m_Layer: 13
   m_Name: Crate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -376,6 +376,7 @@ MonoBehaviour:
   grenadePrefab: {fileID: 3071243612666804271, guid: 300266b0d6bd78f4b9aac6b8504c6601,
     type: 3}
   grenadeSpawnChance: 20
+  grenadePowerCrateCount: 10
 --- !u!1 &2350233432640332628
 GameObject:
   m_ObjectHideFlags: 0
@@ -386,7 +387,7 @@ GameObject:
   m_Component:
   - component: {fileID: 138471284310169689}
   - component: {fileID: 5782953704986529340}
-  m_Layer: 7
+  m_Layer: 13
   m_Name: CratePointer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -436,7 +437,7 @@ GameObject:
   - component: {fileID: 7365060000932089090}
   - component: {fileID: 2393487238931967181}
   - component: {fileID: 2566030400445743265}
-  m_Layer: 5
+  m_Layer: 13
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}

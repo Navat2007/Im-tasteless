@@ -6,7 +6,7 @@ public class Projectile : MonoBehaviour
     [SerializeField] private float speed = 10;
     [SerializeField] private float damage = 1;
     [SerializeField] private float criticalChance = 10;
-    [SerializeField] private float criticalBonus = 2;
+    [SerializeField] private float criticalBonus = 100;
 
     private float _timeToDestroy = 3;
     private float _skinWidth = .1f;
@@ -75,6 +75,6 @@ public struct ProjectileHitInfo
 
     public void MakeDamageCritical()
     {
-        damage *= criticalBonus;
+        damage += damage / 100 * criticalBonus;
     }
 }
