@@ -14,6 +14,7 @@ public class HealthSystem : MonoBehaviour
     [field: SerializeField] public float CurrentHealth { get; private set; }
     [field: SerializeField] public float MaxHealth { get; private set; }
     [field: SerializeField] public int Armor { get; private set; }
+    [field: SerializeField] public float InvulnerabilityTime { get; private set; }
 
     [Header("Настройки эффекта вспышки при получении урона")]
     [SerializeField] private float blinkIntensity = 10;
@@ -28,10 +29,13 @@ public class HealthSystem : MonoBehaviour
     private const float DefaultHealth = 1;
     private bool _isOverTimeHealActive;
     private bool _isDeath;
+    private bool _isPlayer;
+    private float _nextInvulnerabilityTime;
 
     private void Awake()
     {
         _meshRenderer = GetComponent<MeshRenderer>();
+        _isPlayer = GetComponent<Player>() != null;
     }
     
     private void OnEnable()
@@ -123,6 +127,7 @@ public class HealthSystem : MonoBehaviour
     public void TakeDamage(ProjectileHitInfo projectileHitInfo)
     {
         if(_isDeath) return;
+        if(Time.time < _nextInvulnerabilityTime && _isPlayer) return;
         
         blinkTimer = blinkDuration;
         
@@ -152,6 +157,8 @@ public class HealthSystem : MonoBehaviour
         
         OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
         OnTakeDamage?.Invoke(projectileHitInfo.damage, CurrentHealth, MaxHealth);
+
+        _nextInvulnerabilityTime = Time.time + InvulnerabilityTime;
 
         if (CurrentHealth <= 0) Die(projectileHitInfo);
     }

@@ -6,6 +6,7 @@ public class CratePointer : MonoBehaviour
 {
     [SerializeField] private Transform worldPointer;
     [SerializeField] private Image image;
+    [SerializeField] private Image backImage;
     [SerializeField] private float fadeTimer = 10;
     
     private Camera _camera;
@@ -42,7 +43,7 @@ public class CratePointer : MonoBehaviour
 
             minDistance = Mathf.Clamp(minDistance, 0, fromPlayerToEnemy.magnitude);
 
-            Vector3 worldPosition = ray.GetPoint(minDistance);
+            Vector3 worldPosition = ray.GetPoint(minDistance - 1);
             worldPointer.position = _camera.WorldToScreenPoint(worldPosition);
         }
     }
@@ -56,6 +57,7 @@ public class CratePointer : MonoBehaviour
         {
             percent -= Time.deltaTime * speed;
             image.color = Color.Lerp(to, from, percent);
+            backImage.color = Color.Lerp(to, from, percent);
             yield return null;
         }
         
