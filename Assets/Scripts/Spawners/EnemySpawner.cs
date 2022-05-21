@@ -5,6 +5,7 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     public event Action<int, int> OnNewWave;
+    public event Action<int> OnEnemyCountChange;
 
     [SerializeField] private List<Wave> waves = new();
     
@@ -90,6 +91,11 @@ public class EnemySpawner : MonoBehaviour
             {
                 wave.done = true;
                 wave.active = false;
+
+                if (wave.finalWave)
+                {
+                    GameUI.instance.OpenPanel(PanelType.RESULT);
+                }
             }
         }
     }
@@ -122,8 +128,6 @@ public class EnemySpawner : MonoBehaviour
 
     private void ActivateNextWave(Wave wave, int index)
     {
-        //print($"Activate wave {index} with enemy count: {wave.waveSO.enemyCount}");
-
         OnNewWave?.Invoke(index, wave.waveStruct.enemyCount);
 
         wave.active = true;
@@ -140,9 +144,6 @@ public class EnemySpawner : MonoBehaviour
         {
             System.Random random = new System.Random();
             randomEnemy = prefabList[random.Next(prefabList.Count)];
-
-            //Array values = Enum.GetValues(typeof(ZombieType));
-            //ZombieType zombieType = (ZombieType)values.GetValue(random.Next(values.Length));
 
             switch (randomEnemy.ZombieType)
             {
@@ -167,8 +168,6 @@ public class EnemySpawner : MonoBehaviour
 
             count++;
         }
-
-        //print($"Враг заспавнен с {count} попытки");
 
         return randomEnemy;
     }
@@ -198,8 +197,6 @@ public class EnemySpawner : MonoBehaviour
             if (index == -1)
                 index = 0;
 
-            //print($"Точка спавна найдена с {count} попытки");
-
             return spawnPoints[index].transform.position + new Vector3(
                 UnityEngine.Random.Range(minSpawnDistance, maxSpawnDistance), 0,
                 UnityEngine.Random.Range(minSpawnDistance, maxSpawnDistance));
@@ -215,6 +212,9 @@ public class EnemySpawner : MonoBehaviour
         {
             wave.SetRemainingAlive(wave.GetRemainingAlive - 1);
             wave.RemoveEnemyFromList(spawnedEnemy);
+            OnEnemyCountChange?.Invoke(enemyPool.childCount);
+
+            spawnedEnemy.GetEnemyAttackController.enabled = false;
 
             if (ControllerManager.experienceSystem != null)
                 ControllerManager.experienceSystem.AddXp(spawnedEnemy.XpOnDeath);
@@ -250,7 +250,8 @@ public class EnemySpawner : MonoBehaviour
             if (ControllerManager.busterController == null)
                 throw new NotImplementedException("ControllerManager.busterController is null");
 
-            ControllerManager.busterController.SpawnBuster(spawnedEnemy.transform.position);
+            if(ControllerManager.busterController != null)
+                ControllerManager.busterController.SpawnBuster(spawnedEnemy.transform.position);
         }
 
         Enemy spawnedEnemy = Instantiate(
@@ -274,6 +275,7 @@ public class EnemySpawner : MonoBehaviour
         wave.SetRemainingAlive(wave.GetRemainingAlive + 1);
         wave.SetAlreadySpawned(wave.GetAlreadySpawned + 1);
         wave.AddEnemyToList(spawnedEnemy);
+        OnEnemyCountChange?.Invoke(enemyPool.childCount);
 
         SetupEnemy(spawnedEnemy);
 

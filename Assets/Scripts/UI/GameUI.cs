@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Managers;
 using Skills;
 using TMPro;
 using UnityEngine;
@@ -24,12 +25,21 @@ public struct BuffIconStruct
     public TMP_Text timerText;
 }
 
+// Структура для Stack очереди панелей
 [Serializable]
 public struct PanelUIStruct
 {
     public Transform panel;
     public PanelType panelType;
     public Action callback;
+}
+
+[Serializable]
+public struct ResultPanelStruct
+{
+    public TMP_Text rewardGoldText;
+    public Button rewardClaimButton;
+    public Button reward2XClaimButton;
 }
 
 [Serializable]
@@ -94,9 +104,11 @@ public class GameUI : MonoBehaviour
     
     [Header("Result")] 
     [SerializeField] private Transform resultPanel;
+    [SerializeField] private ResultPanelStruct resultPanelStruct;
     
     [Header("Wave banner")] 
-    [SerializeField] private EnemySpawner enemySpawner;
+    [SerializeField] private Transform enemyCounterPanel;
+    [SerializeField] private TMP_Text enemyCounterText;
     [SerializeField] private Transform waveBannerPanel;
     [SerializeField] private RectTransform waveBannerPanelRectTransform;
     [SerializeField] private TMP_Text waveBannerIndexText;
@@ -150,13 +162,6 @@ public class GameUI : MonoBehaviour
     [SerializeField] private Sprite frameGreenSprite;
 
     private float _maximumFade = 0.75f;
-
-    private GameObject _player;
-    private PlayerInput _playerInput;
-    private HealthSystem _healthSystem;
-    private ExperienceSystem _experienceSystem;
-    private WeaponController _weaponController;
-    private BusterController _busterController;
     
     private Stack<PanelUIStruct> _panelStack = new ();
 
@@ -198,46 +203,6 @@ public class GameUI : MonoBehaviour
                 timerText.text = $"{timeSpan:m\\:ss}";
             };
         }
-
-        if (enemySpawner != null)
-        {
-            enemySpawner.OnNewWave += (waveIndex, enemyCount) =>
-            {
-                IEnumerator AnimateBanner()
-                {
-                    float delayTime = 2f;
-                    float speed = 0.7f;
-                    float animatePercent = 0;
-                    int direction = 1;
-                    float endDelayTime = Time.time + 1 / speed + delayTime;
-
-                    while (animatePercent >= 0)
-                    {
-                        animatePercent += Time.deltaTime * speed * direction;
-
-                        if (animatePercent >= 1)
-                        {
-                            animatePercent = 1;
-                            if (Time.time > endDelayTime)
-                            {
-                                direction = -1;
-                            }
-                        }
-                        
-                        waveBannerPanelRectTransform.anchoredPosition = Vector2.up * Mathf.Lerp(-200, 180, animatePercent);
-                        yield return null;
-                    }
-                    
-                    waveBannerPanel.gameObject.SetActive(false);
-                }
-                
-                if(waveBannerPanel != null) waveBannerPanel.gameObject.SetActive(true);
-                if(waveBannerIndexText != null) waveBannerIndexText.SetText($"- Волна {waveIndex + 1} -");
-                if(waveBannerEnemyCountText != null) waveBannerEnemyCountText.SetText($"Количество зомби: {enemyCount}");
-
-                StartCoroutine(AnimateBanner());
-            };
-        }
     }
 
     private void OnEnable()
@@ -258,56 +223,55 @@ public class GameUI : MonoBehaviour
     private void Restart()
     {
         GameManager.LevelRestart();
-        GameManager.StopPause();
+        ControllerManager.pauseManager.StopPause(false);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void Subscribe()
     {
-        _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>().gameObject;
+        ControllerManager.enemySpawner.OnNewWave += OnNewWave;
+        ControllerManager.enemySpawner.OnEnemyCountChange += EnemySpawnerOnEnemyCountChange;
         
-        _playerInput = _player.GetComponent<PlayerInput>();
-        _healthSystem = _player.GetComponent<HealthSystem>();
-        _experienceSystem = _player.GetComponent<ExperienceSystem>();
-        _weaponController = _player.GetComponent<WeaponController>();
-        _busterController = _player.GetComponent<BusterController>();
+        ControllerManager.healthSystem.OnDeath += OnGameOver;
+        ControllerManager.healthSystem.OnHealthChange += OnHealthChange;
+        ControllerManager.healthSystem.OnArmorChange += OnArmorChange;
+        
+        ControllerManager.experienceSystem.OnXpChange += OnXpChange;
+        ControllerManager.experienceSystem.OnLevelChange += OnLevelChange;
 
-        _healthSystem.OnDeath += OnGameOver;
-        _healthSystem.OnHealthChange += OnHealthChange;
-        _healthSystem.OnArmorChange += OnArmorChange;
+        ControllerManager.weaponController.OnReloadStart += OnWeaponReloadStart;
+        ControllerManager.weaponController.OnReloadEnd += OnWeaponReloadEnd;
+        ControllerManager.weaponController.OnReloadPercent += OnWeaponReloadPercent;
+        ControllerManager.weaponController.OnAmmoChange += OnWeaponAmmoChange;
+        ControllerManager.weaponController.OnEquipWeapon += OnEquipWeapon;
         
-        _experienceSystem.OnXpChange += OnXpChange;
-        _experienceSystem.OnLevelChange += OnLevelChange;
-
-        _weaponController.OnReloadStart += OnWeaponReloadStart;
-        _weaponController.OnReloadEnd += OnWeaponReloadEnd;
-        _weaponController.OnReloadPercent += OnWeaponReloadPercent;
-        _weaponController.OnAmmoChange += OnWeaponAmmoChange;
-        _weaponController.OnEquipWeapon += OnEquipWeapon;
-        
-        _busterController.OnMoveSpeedChange += OnMoveSpeedBusterChange;
-        _busterController.OnDamageChange += OnDamageBusterChange;
-        _busterController.OnAttackSpeedChange += OnAttackSpeedBusterChange;
+        ControllerManager.busterController.OnMoveSpeedChange += OnMoveSpeedBusterChange;
+        ControllerManager.busterController.OnDamageChange += OnDamageBusterChange;
+        ControllerManager.busterController.OnAttackSpeedChange += OnAttackSpeedBusterChange;
     }
+
 
     private void Unsubscribe()
     {
-        _healthSystem.OnDeath -= OnGameOver;
-        _healthSystem.OnHealthChange -= OnHealthChange;
-        _healthSystem.OnArmorChange -= OnArmorChange;
+        ControllerManager.enemySpawner.OnNewWave -= OnNewWave;
+        ControllerManager.enemySpawner.OnEnemyCountChange -= EnemySpawnerOnEnemyCountChange;
         
-        _experienceSystem.OnXpChange -= OnXpChange;
-        _experienceSystem.OnLevelChange -= OnLevelChange;
+        ControllerManager.healthSystem.OnDeath -= OnGameOver;
+        ControllerManager.healthSystem.OnHealthChange -= OnHealthChange;
+        ControllerManager.healthSystem.OnArmorChange -= OnArmorChange;
         
-        _weaponController.OnReloadStart -= OnWeaponReloadStart;
-        _weaponController.OnReloadEnd -= OnWeaponReloadEnd;
-        _weaponController.OnReloadPercent -= OnWeaponReloadPercent;
-        _weaponController.OnAmmoChange -= OnWeaponAmmoChange;
-        _weaponController.OnEquipWeapon -= OnEquipWeapon;
+        ControllerManager.experienceSystem.OnXpChange -= OnXpChange;
+        ControllerManager.experienceSystem.OnLevelChange -= OnLevelChange;
+
+        ControllerManager.weaponController.OnReloadStart -= OnWeaponReloadStart;
+        ControllerManager.weaponController.OnReloadEnd -= OnWeaponReloadEnd;
+        ControllerManager.weaponController.OnReloadPercent -= OnWeaponReloadPercent;
+        ControllerManager.weaponController.OnAmmoChange -= OnWeaponAmmoChange;
+        ControllerManager.weaponController.OnEquipWeapon -= OnEquipWeapon;
         
-        _busterController.OnMoveSpeedChange -= OnMoveSpeedBusterChange;
-        _busterController.OnDamageChange -= OnDamageBusterChange;
-        _busterController.OnAttackSpeedChange -= OnAttackSpeedBusterChange;
+        ControllerManager.busterController.OnMoveSpeedChange -= OnMoveSpeedBusterChange;
+        ControllerManager.busterController.OnDamageChange -= OnDamageBusterChange;
+        ControllerManager.busterController.OnAttackSpeedChange -= OnAttackSpeedBusterChange;
     }
 
     private void OnEquipWeapon(WeaponType weaponType)
@@ -329,6 +293,56 @@ public class GameUI : MonoBehaviour
                 slot3Struct.focusTab.gameObject.SetActive(true);
                 break;
         }
+    }
+    
+    private void OnNewWave(int waveIndex, int enemyCount)
+    {
+        IEnumerator AnimateBanner()
+        {
+            enemyCounterPanel.gameObject.SetActive(false);
+                    
+            float delayTime = 2f;
+            float speed = 0.7f;
+            float animatePercent = 0;
+            int direction = 1;
+            float endDelayTime = Time.time + 1 / speed + delayTime;
+
+            while (animatePercent >= 0)
+            {
+                animatePercent += Time.deltaTime * speed * direction;
+
+                if (animatePercent >= 1)
+                {
+                    animatePercent = 1;
+                    if (Time.time > endDelayTime)
+                    {
+                        direction = -1;
+                    }
+                }
+                        
+                waveBannerPanelRectTransform.anchoredPosition = Vector2.up * Mathf.Lerp(-200, 180, animatePercent);
+                yield return null;
+            }
+                    
+            waveBannerPanel.gameObject.SetActive(false);
+            enemyCounterPanel.gameObject.SetActive(true);
+        }
+
+        if (enemyCounterPanel == null) throw new NotImplementedException("GameUI enemyCounterPanel: Не назначен счетчик врагов");
+        if (waveBannerPanel == null) throw new NotImplementedException("GameUI waveBannerPanel: Не назначен баннер волны");
+                
+        if(waveBannerPanel != null) waveBannerPanel.gameObject.SetActive(true);
+        if(waveBannerIndexText != null) waveBannerIndexText.SetText($"- Волна {waveIndex + 1} -");
+        if(waveBannerEnemyCountText != null) waveBannerEnemyCountText.SetText($"Количество зомби: {enemyCount}");
+
+        StartCoroutine(AnimateBanner());
+    }
+    
+    private void EnemySpawnerOnEnemyCountChange(int enemyCount)
+    {
+        if (enemyCounterText == null) throw new NotImplementedException("GameUI enemyCounterText: Не назначен текст счетчика врагов");
+        
+        enemyCounterText.SetText($"Зомби: {enemyCount}");
     }
 
     private void OnHealthChange(float currentHealth, float maxHealth)
@@ -430,7 +444,7 @@ public class GameUI : MonoBehaviour
         string infiniteSymbol = "∞";
         string totalString = infinite ? infiniteSymbol : totalAmmo.ToString();
             
-        if (ammoText != null && _weaponController.GetEquippedWeapon.CurrentWeaponType == weapon) 
+        if (ammoText != null && ControllerManager.weaponController.GetEquippedWeapon.CurrentWeaponType == weapon) 
             ammoText.SetText($"{currentAmmo} / {totalString}");
 
         switch (weapon)
@@ -540,6 +554,33 @@ public class GameUI : MonoBehaviour
         switch (panelType)
         {
             case PanelType.RESULT:
+                if (resultPanel == null) throw new NotImplementedException("Панель результата не назначена");
+
+                ControllerManager.pauseManager.StartPause();
+                
+                resultPanelStruct.rewardClaimButton.onClick.RemoveAllListeners();
+                resultPanelStruct.reward2XClaimButton.onClick.RemoveAllListeners();
+                
+                resultPanelStruct.rewardGoldText.SetText($"{CurrencyManager.GetCurrency(CurrencyType.LEVEL_GOLD)}");
+                
+                resultPanelStruct.rewardClaimButton.onClick.AddListener(() =>
+                {
+                    CurrencyManager.AddCurrency(CurrencyType.GOLD, CurrencyManager.GetCurrency(CurrencyType.LEVEL_GOLD)); 
+                    CurrencyManager.SetCurrency(CurrencyType.LEVEL_GOLD, 0); 
+                    
+                    //TODO выход назад на глобальную сцену
+                    Restart();
+                });
+                
+                resultPanelStruct.reward2XClaimButton.onClick.AddListener(() =>
+                {
+                    CurrencyManager.AddCurrency(CurrencyType.GOLD, CurrencyManager.GetCurrency(CurrencyType.LEVEL_GOLD) * 2); 
+                    CurrencyManager.SetCurrency(CurrencyType.LEVEL_GOLD, 0); 
+                    
+                    //TODO выход назад на глобальную сцену
+                    Restart();
+                });
+                
                 _panelStack.Push(new PanelUIStruct
                 {
                     panel = resultPanel,
@@ -549,7 +590,9 @@ public class GameUI : MonoBehaviour
                 resultPanel.gameObject.SetActive(true);
                 break;
             case PanelType.PAUSE:
-                GameManager.StartPause();
+                if (pausePanel == null) throw new NotImplementedException("Панель паузы не назначена");
+                
+                ControllerManager.pauseManager.StartPause();
                 _panelStack.Push(new PanelUIStruct
                 {
                     panel = pausePanel,
@@ -559,6 +602,8 @@ public class GameUI : MonoBehaviour
                 pausePanel.gameObject.SetActive(true);
                 break;
             case PanelType.SETTINGS:
+                if (settingsPanel == null) throw new NotImplementedException("Панель настроек не назначена");
+                
                 _panelStack.Push(new PanelUIStruct
                 {
                     panel = settingsPanel,
@@ -568,7 +613,9 @@ public class GameUI : MonoBehaviour
                 settingsPanel.gameObject.SetActive(true);
                 break;
             case PanelType.SKILLS:
-                GameManager.StartPause();
+                if (skillChoicePanel == null) throw new NotImplementedException("Панель выбора навыков не назначена");
+                
+                ControllerManager.pauseManager.StartPause();
                 
                 skillChoiceLevelText.SetText($"Вы получили {ControllerManager.experienceSystem.Level} уровень");
 
@@ -586,8 +633,8 @@ public class GameUI : MonoBehaviour
                             skillPanelStruct.skill1Button.onClick.RemoveAllListeners();
                             skillPanelStruct.skill1Button.onClick.AddListener(() =>
                             {
-                                ControllerManager.skillController.AddToSkillsList(skill);
                                 ClosePanel();
+                                ControllerManager.skillController.AddToSkillsList(skill);
                             });
                             break;
                         case 2:
@@ -598,8 +645,8 @@ public class GameUI : MonoBehaviour
                             skillPanelStruct.skill2Button.onClick.RemoveAllListeners();
                             skillPanelStruct.skill2Button.onClick.AddListener(() =>
                             {
-                                ControllerManager.skillController.AddToSkillsList(skill);
                                 ClosePanel();
+                                ControllerManager.skillController.AddToSkillsList(skill);
                             });
                             break;
                         case 3:
@@ -610,8 +657,8 @@ public class GameUI : MonoBehaviour
                             skillPanelStruct.skill3Button.onClick.RemoveAllListeners();
                             skillPanelStruct.skill3Button.onClick.AddListener(() =>
                             {
-                                ControllerManager.skillController.AddToSkillsList(skill);
                                 ClosePanel();
+                                ControllerManager.skillController.AddToSkillsList(skill);
                             });
                             break;
                     }
@@ -667,7 +714,7 @@ public class GameUI : MonoBehaviour
         if (_panelStack.Count == 0)
         {
             OpenPanel(PanelType.PAUSE);
-            GameManager.StartPause();
+            ControllerManager.pauseManager.StartPause();
         }
         else
         {
@@ -677,7 +724,7 @@ public class GameUI : MonoBehaviour
             
             if (_panelStack.Count == 0)
             {
-                GameManager.StopPause();
+                ControllerManager.pauseManager.StopPause();
             }
         }
     }

@@ -1,0 +1,49 @@
+using System;
+using System.Collections;
+using UnityEngine;
+
+public class PauseManager : MonoBehaviour
+{
+    private void OnEnable()
+    {
+        ControllerManager.pauseManager = this;
+    }
+
+    private void OnDisable()
+    {
+        ControllerManager.pauseManager = null;
+    }
+
+    public void StartPause()
+    {
+        StopCoroutine(SmoothPause());
+        Time.timeScale = 0;
+        Cursor.visible = true;
+        GameManager.SetGameState(GameManager.GameState.PAUSE);
+    }
+    
+    public void StopPause(bool smooth = true)
+    {
+        if(smooth)
+            StartCoroutine(SmoothPause());
+        else
+        {
+            Time.timeScale = 1;
+            GameManager.SetGameState(GameManager.GameState.PLAY); 
+        }
+        
+        Cursor.visible = false;
+    }
+
+    private IEnumerator SmoothPause()
+    {
+        while (Time.timeScale < 1)
+        {
+            print(Time.timeScale);
+            Time.timeScale += 0.015f;
+            yield return null;
+        }
+
+        GameManager.SetGameState(GameManager.GameState.PLAY); 
+    }
+}

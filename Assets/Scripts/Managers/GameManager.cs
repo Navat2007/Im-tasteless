@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public static class GameManager
@@ -33,19 +34,5 @@ public static class GameManager
     public static void FinishLevel()
     {
         
-    }
-    
-    public static void StartPause()
-    {
-        Time.timeScale = 0;
-        Cursor.visible = true;
-        SetGameState(GameState.PAUSE);
-    }
-    
-    public static void StopPause()
-    {
-        Time.timeScale = 1;
-        Cursor.visible = false;
-        SetGameState(GameState.PLAY); 
     }
 }

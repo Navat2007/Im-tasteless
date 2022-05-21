@@ -29,6 +29,7 @@ public class Wave
 {
     public bool active;
     public bool done;
+    public bool finalWave;
     public WaveStruct waveStruct;
     public List<Enemy> enemies = new();
 

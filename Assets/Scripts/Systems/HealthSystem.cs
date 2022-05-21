@@ -70,15 +70,13 @@ public class HealthSystem : MonoBehaviour
             _meshRenderer.material.color = Color.white * intensity;
         }
         else
-        {
             _meshRenderer.material.color = _startColor;
-        }
 
         if (Time.time > _nextHealthInSecondTickTime)
         {
             _nextHealthInSecondTickTime = Time.time + 1;
             
-            if(ControllerManager.playerController.GetMoveVelocity == Vector3.zero)
+            if(ControllerManager.playerController != null && ControllerManager.playerController.GetMoveVelocity == Vector3.zero)
                 AddHealth(HealthInSecond);
         }
     }
@@ -203,6 +201,10 @@ public class HealthSystem : MonoBehaviour
     private void Die(ProjectileHitInfo projectileHitInfo)
     {
         _isDeath = true;
+        
+        blinkTimer = 0;
+        _meshRenderer.material.color = _startColor;
+        
         OnDeath?.Invoke(projectileHitInfo);
     }
 

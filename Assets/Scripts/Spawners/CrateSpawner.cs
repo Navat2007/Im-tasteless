@@ -35,7 +35,7 @@ public class CrateSpawner : MonoBehaviour
 
     private void Update()
     {
-        if (Time.time > _nextScanTime)
+        if (Time.time > _nextScanTime && ControllerManager.player != null)
         {
             if (_crateList.Count == 0) return;
             

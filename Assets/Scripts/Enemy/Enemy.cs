@@ -36,10 +36,12 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
     [field: SerializeField] public Vector3 PowerSize { get; private set; }
 
     private HealthSystem _healthSystem;
+    private EnemyAttackController _attackController;
 
     private void Awake()
     {
         _healthSystem = GetComponent<HealthSystem>();
+        _attackController = GetComponent<EnemyAttackController>();
     }
 
     private void Start()
@@ -97,6 +99,8 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
 
         _healthSystem.Init(Health);
     }
+
+    public EnemyAttackController GetEnemyAttackController => _attackController;
 
     [ContextMenu("Сделать усиленным")]
     private void MakePower()

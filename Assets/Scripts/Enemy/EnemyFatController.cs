@@ -4,7 +4,7 @@ using UnityEngine;
 public class EnemyFatController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 0.1f;
-    [SerializeField] private float turnSpeed = -2.7f;
+    [SerializeField] private float turnSpeed = -0.5f;
     
     private EnemyController _enemyController;
     private HealthSystem _healthSystem;
