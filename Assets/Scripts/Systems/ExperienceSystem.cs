@@ -3,14 +3,15 @@ using UnityEngine;
 
 public class ExperienceSystem : MonoBehaviour
 {
-    public event Action<float, int> OnXpChange;
+    public event Action<float> OnXpChange;
+    public event Action<float> OnNextLevelXpChange;
     public event Action<int> OnLevelChange;
     
     [field:Header("XP")]
     [field: SerializeField] public int Level { get; private set; }
     [field: SerializeField] public int MaxLevel { get; private set; }
     [field: SerializeField] public float Xp { get; private set; }
-    [field: SerializeField] public int NextLevelXp { get; private set; }
+    [field: SerializeField] public float NextLevelXp { get; private set; }
 
     private float _bonusExperiencePercent;
     
@@ -26,7 +27,8 @@ public class ExperienceSystem : MonoBehaviour
 
     private void Start()
     {
-        OnXpChange?.Invoke(Xp, NextLevelXp);
+        OnNextLevelXpChange?.Invoke(NextLevelXp);
+        OnXpChange?.Invoke(Xp);
     }
 
     public void AddXp(float amount)
@@ -38,7 +40,7 @@ public class ExperienceSystem : MonoBehaviour
             LevelUp();
         }
         
-        OnXpChange?.Invoke(Xp, NextLevelXp);
+        OnXpChange?.Invoke(Xp);
     }
 
     public void AddBonusXpPercent(float value)
@@ -60,5 +62,7 @@ public class ExperienceSystem : MonoBehaviour
         NextLevelXp += 1000;
         
         OnLevelChange?.Invoke(Level);
+        OnNextLevelXpChange?.Invoke(NextLevelXp);
+        OnXpChange?.Invoke(Xp);
     }
 }

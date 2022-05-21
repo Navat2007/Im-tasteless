@@ -6,7 +6,8 @@ using UnityEngine;
 public class HealthSystem : MonoBehaviour
 {
     public event Action<ProjectileHitInfo> OnDeath;
-    public event Action<float, float> OnHealthChange;
+    public event Action<float> OnHealthChange;
+    public event Action<float> OnMaxHealthChange;
     public event Action<float, float, float> OnTakeDamage;
     public event Action<int> OnArmorChange;
     
@@ -85,7 +86,8 @@ public class HealthSystem : MonoBehaviour
     {
         MaxHealth = value;
         AddHealth(MaxHealth);
-        OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
+        OnMaxHealthChange?.Invoke(MaxHealth);
+        OnHealthChange?.Invoke(CurrentHealth);
     }
 
     public void AddHealth(float amount)
@@ -98,7 +100,7 @@ public class HealthSystem : MonoBehaviour
             CurrentHealth = MaxHealth;
         
         if(prevHealth < MaxHealth)
-            OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
+            OnHealthChange?.Invoke(CurrentHealth);
     }
 
     public void AddHealth(float amount, float tickTimePeriod, int tickAmount)
@@ -112,13 +114,13 @@ public class HealthSystem : MonoBehaviour
     public void AddMaxHealth(float value)
     {
         MaxHealth += value;
-        OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
+        OnMaxHealthChange?.Invoke(MaxHealth);
     }
     
     public void AddMaxHealthPercent(float percent)
     {
         MaxHealth += MaxHealth / 100 * percent;
-        OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
+        OnMaxHealthChange?.Invoke(MaxHealth);
     }
 
     private IEnumerator HealOverTime(float amount, float tickTimePeriod, int tickAmount)
@@ -189,7 +191,7 @@ public class HealthSystem : MonoBehaviour
         if (CurrentHealth < 0)
             CurrentHealth = 0;
         
-        OnHealthChange?.Invoke(CurrentHealth, MaxHealth);
+        OnHealthChange?.Invoke(CurrentHealth);
         OnTakeDamage?.Invoke(projectileHitInfo.damage, CurrentHealth, MaxHealth);
 
         AddNextInvulnerabilityTime(InvulnerabilityTime);

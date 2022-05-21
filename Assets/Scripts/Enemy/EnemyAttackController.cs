@@ -37,7 +37,6 @@ public class EnemyAttackController : MonoBehaviour
         {
             if (Time.time > _nextAttackTime)
             {
-                print("attack");
                 Attack(other.gameObject); 
             }
         }

@@ -234,9 +234,11 @@ public class GameUI : MonoBehaviour
         
         ControllerManager.healthSystem.OnDeath += OnGameOver;
         ControllerManager.healthSystem.OnHealthChange += OnHealthChange;
+        ControllerManager.healthSystem.OnMaxHealthChange += OnMaxHealthChange;
         ControllerManager.healthSystem.OnArmorChange += OnArmorChange;
         
         ControllerManager.experienceSystem.OnXpChange += OnXpChange;
+        ControllerManager.experienceSystem.OnNextLevelXpChange += OnNextLevelXpChange;
         ControllerManager.experienceSystem.OnLevelChange += OnLevelChange;
 
         ControllerManager.weaponController.OnReloadStart += OnWeaponReloadStart;
@@ -258,9 +260,11 @@ public class GameUI : MonoBehaviour
         
         ControllerManager.healthSystem.OnDeath -= OnGameOver;
         ControllerManager.healthSystem.OnHealthChange -= OnHealthChange;
+        ControllerManager.healthSystem.OnMaxHealthChange -= OnMaxHealthChange;
         ControllerManager.healthSystem.OnArmorChange -= OnArmorChange;
         
         ControllerManager.experienceSystem.OnXpChange -= OnXpChange;
+        ControllerManager.experienceSystem.OnNextLevelXpChange -= OnNextLevelXpChange;
         ControllerManager.experienceSystem.OnLevelChange -= OnLevelChange;
 
         ControllerManager.weaponController.OnReloadStart -= OnWeaponReloadStart;
@@ -345,17 +349,33 @@ public class GameUI : MonoBehaviour
         enemyCounterText.SetText($"Зомби: {enemyCount}");
     }
 
-    private void OnHealthChange(float currentHealth, float maxHealth)
+    private void OnHealthChange(float currentHealth)
     {
+        print($"Health: {currentHealth}");
+        
         if (healthText != null)
         {
-            healthText.SetText($"{currentHealth} / {maxHealth}");
+            healthText.SetText($"{currentHealth} / {ControllerManager.healthSystem.MaxHealth}");
+        }
+
+        if (healthSlider != null)
+        {
+            healthSlider.value = currentHealth;
+        }
+    }
+    
+    private void OnMaxHealthChange(float maxHealth)
+    {
+        print($"MaxHealth: {maxHealth}");
+        
+        if (healthText != null)
+        {
+            healthText.SetText($"{ControllerManager.healthSystem.CurrentHealth} / {maxHealth}");
         }
 
         if (healthSlider != null)
         {
             healthSlider.maxValue = maxHealth;
-            healthSlider.value = currentHealth;
         }
     }
     
@@ -364,17 +384,33 @@ public class GameUI : MonoBehaviour
         armorBuffIconStruct.icon.gameObject.SetActive(currentArmor > 0);
     }
 
-    private void OnXpChange(float currentXp, int nextLevelXp)
+    private void OnXpChange(float currentXp)
     {
+        print($"Xp: {currentXp}");
+        
         if (xpText != null)
         {
-            xpText.SetText($"{currentXp} / {nextLevelXp}");
+            xpText.SetText($"{currentXp} / {ControllerManager.experienceSystem.NextLevelXp}");
+        }
+
+        if (xpSlider != null)
+        {
+            xpSlider.value = currentXp;
+        }
+    }
+    
+    private void OnNextLevelXpChange(float nextLevelXp)
+    {
+        print($"NextLevelXp: {nextLevelXp}");
+        
+        if (xpText != null)
+        {
+            xpText.SetText($"{ControllerManager.experienceSystem.Xp} / {nextLevelXp}");
         }
 
         if (xpSlider != null)
         {
             xpSlider.maxValue = nextLevelXp;
-            xpSlider.value = currentXp;
         }
     }
 
