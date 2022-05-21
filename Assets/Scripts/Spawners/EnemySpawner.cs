@@ -7,19 +7,23 @@ public class EnemySpawner : MonoBehaviour
     public event Action<int, int> OnNewWave;
 
     [SerializeField] private List<Wave> waves = new();
+    
+    [Header("Точки спавна на карте")]
     [SerializeField] private List<SpawnPoint> spawnPoints = new();
+    
+    [Header("Стандартный враг, если не найдены остальные")]
     [SerializeField] private Enemy standardEnemyPrefab;
 
-    [Space(10)] 
-    [Header("Spawn distance")] 
+    [Space(10)]
+    [Header("Дистанция спавна")]
     [SerializeField] private float minSpawnDistance = -5;
 
     [SerializeField] private float maxSpawnDistance = 5;
 
-    [Header("Pools")] 
+    [Header("Хранилище объектов")]
     [SerializeField] private Transform enemyPool;
 
-    [Header("Buster spawn chance")] 
+    [Header("Шанс спавна бустеров")]
     [SerializeField] private float standardBusterSpawnChance = 5.0f;
 
     [SerializeField] private float powerStandardBusterSpawnChance = 100.0f;
@@ -53,13 +57,13 @@ public class EnemySpawner : MonoBehaviour
             Wave wave = waves[i];
 
             if (wave.active && !wave.done && Time.time > wave.GetNextSpawnTime &&
-                (wave.GetRemainingToSpawn > 0 || wave.waveSO.infinite))
+                (wave.GetRemainingToSpawn > 0 || wave.waveStruct.infinite))
             {
-                wave.SetNextSpawnTime(Time.time + wave.waveSO.timeBetweenSpawn);
+                wave.SetNextSpawnTime(Time.time + wave.waveStruct.timeBetweenSpawn);
 
-                var powerEnemyChanceSO = wave.waveSO.powerEnemyChance + (wave.waveSO.powerEnemyChance / 100 * _bonusPowerEnemySpawnChance);
+                var powerEnemyChanceSO = wave.waveStruct.powerEnemyChance + (wave.waveStruct.powerEnemyChance / 100 * _bonusPowerEnemySpawnChance);
 
-                var enemy = GetEnemy(wave.waveSO.enemyList, wave);
+                var enemy = GetEnemy(wave.waveStruct.enemyList, wave);
                 var powerEnemyChance = Helper.IsCritical(enemy.ZombieType == ZombieType.FAST
                                                          || enemy.ZombieType == ZombieType.FAT
                     ? powerEnemyChanceSO * 2
@@ -102,15 +106,15 @@ public class EnemySpawner : MonoBehaviour
             return false;
         }
         
-        var percentAlreadySpawned = currentWave.GetAlreadySpawned * 100 / currentWave.waveSO.enemyCount;
-        var percentRemainingAlive = currentWave.GetRemainingAlive * 100 / currentWave.waveSO.enemyCount;
+        var percentAlreadySpawned = currentWave.GetAlreadySpawned * 100 / currentWave.waveStruct.enemyCount;
+        var percentRemainingAlive = currentWave.GetRemainingAlive * 100 / currentWave.waveStruct.enemyCount;
 
         return percentAlreadySpawned >= 80 && percentRemainingAlive <= 20 && !nextWave.active && !FindPowerEnemyInWave();
     }
 
     private bool CheckWaveDone(Wave wave)
     {
-        if (wave.GetAlreadySpawned >= wave.waveSO.enemyCount && !wave.waveSO.infinite)
+        if (wave.GetAlreadySpawned >= wave.waveStruct.enemyCount && !wave.waveStruct.infinite)
             return true;
 
         return false;
@@ -120,10 +124,10 @@ public class EnemySpawner : MonoBehaviour
     {
         //print($"Activate wave {index} with enemy count: {wave.waveSO.enemyCount}");
 
-        OnNewWave?.Invoke(index, wave.waveSO.enemyCount);
+        OnNewWave?.Invoke(index, wave.waveStruct.enemyCount);
 
         wave.active = true;
-        wave.SetRemainingToSpawn(wave.waveSO.enemyCount);
+        wave.SetRemainingToSpawn(wave.waveStruct.enemyCount);
     }
 
     private Enemy GetEnemy(List<Enemy> prefabList, Wave wave)
@@ -143,14 +147,14 @@ public class EnemySpawner : MonoBehaviour
             switch (randomEnemy.ZombieType)
             {
                 case ZombieType.FAT:
-                    if (wave.GetFatCount < wave.waveSO.fatMaxCount)
+                    if (wave.GetFatCount < wave.waveStruct.fatMaxCount)
                     {
                         found = true;
                     }
 
                     break;
                 case ZombieType.FAST:
-                    if (wave.GetFastCount < wave.waveSO.fastMaxCount)
+                    if (wave.GetFastCount < wave.waveStruct.fastMaxCount)
                     {
                         found = true;
                     }

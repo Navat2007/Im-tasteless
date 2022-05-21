@@ -26,7 +26,6 @@ public class CratePointer : MonoBehaviour
         {
             Vector3 fromPlayerToCrate = transform.position - ControllerManager.player.transform.position;
             Ray ray = new Ray(ControllerManager.player.transform.position, fromPlayerToCrate);
-            //Debug.DrawRay(ControllerManager.player.transform.position, fromPlayerToEnemy);
 
             // Ordering: [0] = Left, [1] = Right, [2] = Down, [3] = Up, [4] = Near, [5] = Far
             Plane[] planes = GeometryUtility.CalculateFrustumPlanes(_camera);

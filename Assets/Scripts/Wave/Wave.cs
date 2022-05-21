@@ -1,12 +1,35 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
+
+[Serializable]
+public struct WaveStruct
+{
+    [Header("Параметры волны")]
+    public bool infinite;
+    public int enemyCount;
+    public float timeBetweenSpawn ;
+        
+    [Header("Варианты врагов")]
+    public List<Enemy> enemyList;
+    [Space]
+    public float powerEnemyChance;
+    public int fatMaxCount;
+    public int fastMaxCount;
+
+    [Header("Дополнительная прибавка к параметрам каждого врага")]
+    public int xpOnDeath;
+    public float damage;
+    public float moveSpeed;
+    public float health;
+}
 
 [Serializable]
 public class Wave
 {
     public bool active;
     public bool done;
-    public WaveSO waveSO;
+    public WaveStruct waveStruct;
     public List<Enemy> enemies = new();
 
     private float _nextSpawnTime;
@@ -15,8 +38,6 @@ public class Wave
     private int _enemyRemainingToSpawn;
     private int _enemiesRemainingAlive;
     private int _enemiesAlreadySpawned;
-
-    
 
     public float GetNextSpawnTime => _nextSpawnTime;
     public void SetNextSpawnTime (float value) => _nextSpawnTime = value;
