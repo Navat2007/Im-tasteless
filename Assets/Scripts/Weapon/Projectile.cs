@@ -31,7 +31,7 @@ public class Projectile : MonoBehaviour
         {
             if (healthSystem.enabled)
             {
-                var damageToAdd = enemy.GetComponent<Enemy>() != null && Helper.IsCritical(ControllerManager.weaponController.KillChance) ? healthSystem.MaxHealth : damage;
+                var damageToAdd = enemy.GetComponent<Enemy>() != null && ControllerManager.weaponController != null && Helper.IsCritical(ControllerManager.weaponController.KillChance) ? healthSystem.MaxHealth : damage;
                 
                 healthSystem.TakeDamage(new ProjectileHitInfo
                 {
@@ -41,13 +41,13 @@ public class Projectile : MonoBehaviour
                     hitPoint = other.ClosestPoint(transform.position),
                     hitDirection = transform.forward
                 });
+                
+                _currentPenetrate--;
+        
+                if(_currentPenetrate == 0)
+                    Destroy(gameObject);
             }
         }
-
-        _currentPenetrate--;
-        
-        if(_currentPenetrate == 0)
-            Destroy(gameObject);
     }
 
     public void SetSpeed(float value)

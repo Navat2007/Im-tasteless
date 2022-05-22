@@ -23,6 +23,7 @@ public class EnemySpawner : MonoBehaviour
 
     [Header("Хранилище объектов")]
     [SerializeField] private Transform enemyPool;
+    [SerializeField] private List<Enemy> enemyList;
 
     [Header("Шанс спавна бустеров")]
     [SerializeField] private float standardBusterSpawnChance = 5.0f;
@@ -92,7 +93,7 @@ public class EnemySpawner : MonoBehaviour
                 wave.done = true;
                 wave.active = false;
 
-                if (wave.finalWave)
+                if (wave.finalWave && enemyPool.childCount <= 0)
                 {
                     GameUI.instance.OpenPanel(PanelType.RESULT);
                 }
@@ -205,13 +206,14 @@ public class EnemySpawner : MonoBehaviour
         void SetupEnemy(Enemy spawnedEnemy)
         {
             spawnedEnemy.IsPower = isPowerZombie;
-            spawnedEnemy.Setup();
+            spawnedEnemy.Setup(wave);
         }
 
         void OnEnemyDeath(Enemy spawnedEnemy)
         {
             wave.SetRemainingAlive(wave.GetRemainingAlive - 1);
             wave.RemoveEnemyFromList(spawnedEnemy);
+            enemyList.Remove(spawnedEnemy);
             OnEnemyCountChange?.Invoke(enemyPool.childCount);
 
             spawnedEnemy.GetEnemyAttackController.enabled = false;
@@ -275,6 +277,7 @@ public class EnemySpawner : MonoBehaviour
         wave.SetRemainingAlive(wave.GetRemainingAlive + 1);
         wave.SetAlreadySpawned(wave.GetAlreadySpawned + 1);
         wave.AddEnemyToList(spawnedEnemy);
+        enemyList.Add(spawnedEnemy);
         OnEnemyCountChange?.Invoke(enemyPool.childCount);
 
         SetupEnemy(spawnedEnemy);
@@ -290,5 +293,10 @@ public class EnemySpawner : MonoBehaviour
     public void AddPowerEnemySpawnChance(float value)
     {
         _bonusPowerEnemySpawnChance += value;
+    }
+
+    public List<Enemy> GetEnemyList()
+    {
+        return enemyList;
     }
 }

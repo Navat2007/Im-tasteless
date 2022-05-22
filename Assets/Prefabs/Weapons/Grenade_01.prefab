@@ -302,7 +302,10 @@ MonoBehaviour:
   damage: 150
   delay: 2
   radius: 5
-  force: 700
+  force: 500
+  upwardsModifier: 0
+  forceMode: 0
+  stunTime: 1
   explodeEffect: {fileID: 198656289721292014, guid: 64891a0eb28db934898420d80ca07cb3,
     type: 3}
   explodeClip: {fileID: 8300000, guid: f453f326ff5a6ab4994d3d49af54c84e, type: 3}

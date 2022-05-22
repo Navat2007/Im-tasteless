@@ -3,6 +3,7 @@ using System.Collections;
 using Interface;
 using UnityEngine;
 
+[RequireComponent(typeof(AnimationController))]
 public class HealthSystem : MonoBehaviour
 {
     public event Action<ProjectileHitInfo> OnDeath;
@@ -26,19 +27,19 @@ public class HealthSystem : MonoBehaviour
     [Header("Настройки всплывающий текст")] 
     [SerializeField] private GameObject floatingTextPrefab;
 
-    private MeshRenderer _meshRenderer;
+    private AnimationController _animationController;
+    
+    private Renderer _renderer;
     private Color _startColor;
     private const float DefaultHealth = 1;
     private bool _isOverTimeHealActive;
     private bool _isDeath;
-    private bool _isPlayer;
     private float _nextInvulnerabilityTime;
     private float _nextHealthInSecondTickTime;
 
     private void Awake()
     {
-        _meshRenderer = GetComponent<MeshRenderer>();
-        _isPlayer = GetComponent<Player>() != null;
+        _animationController = GetComponent<AnimationController>();
     }
     
     private void OnEnable()
@@ -48,8 +49,6 @@ public class HealthSystem : MonoBehaviour
 
     private void Start()
     {
-        _startColor = _meshRenderer.material.color;
-        
         IHealth health = GetComponent<IHealth>();
         if (health != null)
         {
@@ -63,15 +62,17 @@ public class HealthSystem : MonoBehaviour
 
     private void Update()
     {
+        /*
         if (blinkTimer > 0)
         {
             blinkTimer -= Time.deltaTime;
             float lerp = Mathf.Clamp01(blinkTimer / blinkDuration);
             float intensity = (lerp * blinkIntensity) + 1;
-            _meshRenderer.material.color = Color.white * intensity;
+            _renderer.material.color = Color.white * intensity;
         }
-        else
-            _meshRenderer.material.color = _startColor;
+        else if(enabled)
+            _renderer.material.color = _startColor;
+            */
 
         if (Time.time > _nextHealthInSecondTickTime)
         {
@@ -88,6 +89,12 @@ public class HealthSystem : MonoBehaviour
         AddHealth(MaxHealth);
         OnMaxHealthChange?.Invoke(MaxHealth);
         OnHealthChange?.Invoke(CurrentHealth);
+    }
+
+    public void SetRender(Renderer newRenderer)
+    {
+        _renderer = newRenderer;
+        _startColor = _renderer.material.color;
     }
 
     public void AddHealth(float amount)
@@ -162,10 +169,22 @@ public class HealthSystem : MonoBehaviour
     
     public void TakeDamage(ProjectileHitInfo projectileHitInfo)
     {
-        if(_isDeath) return;
-        if(Time.time < _nextInvulnerabilityTime && _isPlayer) return;
+        IEnumerator Blink(float time)
+        {
+            _renderer.material.color = Color.white * 10;
+            yield return new WaitForSeconds(time);
+            _renderer.material.color = _startColor * 1;
+        }
         
-        blinkTimer = blinkDuration;
+        if(_isDeath) return;
+        if(Time.time < _nextInvulnerabilityTime) return;
+        
+        StopCoroutine(Blink(blinkDuration));
+
+        _animationController.SetState(AnimationState.HIT);
+        
+        //blinkTimer = blinkDuration;
+        StartCoroutine(Blink(blinkDuration));
         
         if(projectileHitInfo.isCritical)
             projectileHitInfo.MakeDamageCritical();
@@ -205,10 +224,12 @@ public class HealthSystem : MonoBehaviour
         _isDeath = true;
         
         blinkTimer = 0;
-        _meshRenderer.material.color = _startColor;
-        
+        _renderer.material.color = _startColor;
+
         OnDeath?.Invoke(projectileHitInfo);
     }
+
+    #region Test
 
     [ContextMenu("Получить 10 урона")]
     private void Take10Damage()
@@ -227,4 +248,6 @@ public class HealthSystem : MonoBehaviour
             damage = 50
         });
     }
+
+    #endregion
 }

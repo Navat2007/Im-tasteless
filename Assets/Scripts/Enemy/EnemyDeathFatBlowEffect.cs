@@ -9,8 +9,12 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
     [SerializeField] private float radius = 5;
     [SerializeField] private float force = 600;
     [SerializeField] private float damage = 10;
+    [SerializeField] private float upwardsModifier = 0;
+    [SerializeField] private ForceMode forceMode;
+    [SerializeField] private float stunTime = 1;
     [SerializeField] private AudioClip explodeClip;
 
+    private float _growSpeed = 7f;
     private bool _isExploded;
 
     protected override void OnDeath(ProjectileHitInfo projectileHitInfo)
@@ -35,28 +39,30 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
         {
             timer += 1;
             radius += 3;
-            force *= 3;
-            damage *= 4;
+            force *= 2;
+            damage *= 3;
         }
         
         IEnumerator Timer()
         {
+            Color startColor = material.color;
             float timeToExplode = Time.time + timer;
-
+            
             while (Time.time < timeToExplode)
             {
-                transform.localScale += new Vector3(0.01f, 0.01f, 0.01f);
+                transform.localScale += Vector3.one * Time.deltaTime * _growSpeed;
                 
-                float intensity = Mathf.PingPong (Time.time, .1f) / .1f;
-                meshRenderer.material.EnableKeyword("_EMISSION");
-                meshRenderer.material.SetColor("_EmissionColor", Color.red * intensity);
-                yield return new WaitForSeconds(.1f);
+                material.color = Color.red * 2;
+                yield return new WaitForSeconds(0.1f);
+                material.color = startColor * 1;
+                yield return new WaitForSeconds(0.1f);
             }
 
             ShowEffect();
             AddForce();
             ExplodeSound();
             
+            enemy.GetEnemyController.OnDeath();
             Destroy(gameObject);
         }
 
@@ -123,7 +129,12 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
             {
                 if (nearbyObjects.TryGetComponent(out Rigidbody rigidbody))
                 {
-                    rigidbody.AddExplosionForce(force, transform.position, radius);
+                    if (nearbyObjects.TryGetComponent(out EnemyController controller))
+                    {
+                        controller.StopNavMeshAgent();
+                        controller.StartNavMeshAgent(stunTime);
+                    }
+                    rigidbody.AddExplosionForce(force, transform.position, radius, upwardsModifier, forceMode);
                 }
 
                 if (nearbyObjects.GetComponent<IDamageable>() != null &&

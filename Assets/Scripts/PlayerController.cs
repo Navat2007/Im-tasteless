@@ -24,11 +24,28 @@ public class PlayerController : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
         _camera = Camera.main;
+        
+        ControllerManager.playerController = this;
+        ControllerManager.playerInput = _playerInput;
     }
 
     private void Start()
     {
         Cursor.visible = false;
+
+        _playerInput.actions["Move"].performed += OnMove;
+        _playerInput.actions["Move"].canceled += OnMove;
+        _playerInput.actions["Escape"].performed += OnEscape;
+    }
+    
+    private void OnDestroy()
+    {
+        ControllerManager.playerController = null;
+        ControllerManager.playerInput = null;
+        
+        _playerInput.actions["Move"].performed -= OnMove;
+        _playerInput.actions["Move"].canceled -= OnMove;
+        _playerInput.actions["Escape"].performed -= OnEscape;
     }
 
     private void Update()
@@ -59,24 +76,6 @@ public class PlayerController : MonoBehaviour
         _animator.SetFloat("Turn", _moveVelocity.x);
     }
 
-    private void OnEnable()
-    {
-        ControllerManager.playerController = this;
-        
-        _playerInput.actions["Move"].performed += OnMove;
-        _playerInput.actions["Move"].canceled += OnMove;
-        _playerInput.actions["Escape"].performed += OnEscape;
-    }
-
-    private void OnDisable()
-    {
-        ControllerManager.playerController = null;
-        
-        _playerInput.actions["Move"].performed -= OnMove;
-        _playerInput.actions["Move"].canceled -= OnMove;
-        _playerInput.actions["Escape"].performed -= OnEscape;
-    }
-    
     private void OnMove (InputAction.CallbackContext context)
     {
         var inputValue = context.ReadValue<Vector2>();

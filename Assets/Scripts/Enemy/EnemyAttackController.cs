@@ -3,37 +3,48 @@ using UnityEngine;
 
 [RequireComponent(typeof(Enemy))]
 [RequireComponent(typeof(TargetSystem))]
-[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(AnimationController))]
 public class EnemyAttackController : MonoBehaviour
 {
     [SerializeField] private GameObject attackSector;
     
     private Enemy _enemy;
-    private TargetSystem _targetSystem;
-    private Animator _animator;
+    private AnimationController _animationController;
 
     private float _nextAttackTime;
     
     private void Awake()
     {
         _enemy = GetComponent<Enemy>();
-        _targetSystem = GetComponent<TargetSystem>();
-        _animator = GetComponent<Animator>();
+        _animationController = GetComponent<AnimationController>();
     }
     
-    private void OnEnable()
+    private void Start()
     {
-        _targetSystem.OnTargetPositionChange += OnTargetPositionChange;
+        _enemy.GetEnemyTargetSystem.OnTargetPositionChange += OnTargetPositionChange;
+        _enemy.GetEnemyHealthSystem.OnDeath += HealthSystemOnOnDeath;
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
-        _targetSystem.OnTargetPositionChange -= OnTargetPositionChange;
+        _enemy.GetEnemyTargetSystem.OnTargetPositionChange -= OnTargetPositionChange;
+        _enemy.GetEnemyHealthSystem.OnDeath -= HealthSystemOnOnDeath;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (enabled && other.CompareTag("Player"))
+        {
+            if (Time.time > _nextAttackTime)
+            {
+                Attack(other.gameObject); 
+            }
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (enabled && other.CompareTag("Player"))
         {
             if (Time.time > _nextAttackTime)
             {
@@ -54,6 +65,11 @@ public class EnemyAttackController : MonoBehaviour
         }
         */
     }
+    
+    private void HealthSystemOnOnDeath(ProjectileHitInfo obj)
+    {
+        enabled = false;
+    }
 
     private void Attack(GameObject target)
     {
@@ -70,8 +86,7 @@ public class EnemyAttackController : MonoBehaviour
                 hitDirection = transform.forward
             });
         }
-        
-        _animator?.SetTrigger("Attack");
-        
+
+        _animationController.SetState(AnimationState.ATTACK);
     }
 }

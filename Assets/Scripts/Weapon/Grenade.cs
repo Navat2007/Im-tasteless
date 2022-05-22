@@ -7,7 +7,12 @@ public class Grenade : MonoBehaviour
     [SerializeField] private float damage = 150f;
     [SerializeField] private float delay = 2f;
     [SerializeField] private float radius = 5f;
-    [SerializeField] private float force = 300f;
+    [SerializeField] private float force = 20f;
+    [SerializeField] private float upwardsModifier = 0;
+    [SerializeField] private ForceMode forceMode;
+    [SerializeField] private float stunTime = 1;
+    
+    [Space(10)]
     [SerializeField] private ParticleSystem explodeEffect;
     [SerializeField] private AudioClip explodeClip;
 
@@ -69,7 +74,12 @@ public class Grenade : MonoBehaviour
             {
                 if (nearbyObjects.TryGetComponent(out Rigidbody rigidbody))
                 {
-                    rigidbody.AddExplosionForce(force, transform.position, radius);
+                    if (nearbyObjects.TryGetComponent(out EnemyController controller))
+                    {
+                        controller.StopNavMeshAgent();
+                        controller.StartNavMeshAgent(stunTime);
+                    }
+                    rigidbody.AddExplosionForce(force, transform.position, radius, upwardsModifier, forceMode);
                 }
                 
                 if (nearbyObjects.GetComponent<IDamageable>() != null && nearbyObjects.TryGetComponent(out HealthSystem healthSystem))

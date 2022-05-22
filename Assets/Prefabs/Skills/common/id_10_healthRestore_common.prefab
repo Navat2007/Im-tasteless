@@ -56,5 +56,7 @@ MonoBehaviour:
   skillRarity: 0
   maxLevel: 3
   invulnerabilityTime: 5
-  radius: 5
+  radius: 15
   force: 700
+  upwardsModifier: 0
+  forceMode: 0

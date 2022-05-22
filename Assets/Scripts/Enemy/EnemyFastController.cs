@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyFastController : MonoBehaviour
 {
@@ -22,7 +21,7 @@ public class EnemyFastController : MonoBehaviour
         _enemy = GetComponent<Enemy>();
         _enemyController = GetComponent<EnemyController>();
         _healthSystem = GetComponent<HealthSystem>();
-        
+
         _healthSystem.OnTakeDamage += OnTakeDamage;
 
         _bonusSpeed = _enemy.MoveSpeed / 100 * movePercent;
@@ -42,7 +41,7 @@ public class EnemyFastController : MonoBehaviour
         var percent = 100 - (health * 100 / maxHealth);
         var count = Mathf.Round(percent / stuckPercent);
 
-        if (count > _prevCount && !_isSlowed)
+        if (!_isSlowed && count > _prevCount)
         {
             _isSlowed = true;
             _enemyController.AddSpeed(-_bonusSpeed);
@@ -54,6 +53,5 @@ public class EnemyFastController : MonoBehaviour
             _stuckTimer = Time.time + stuckMaxTimer;
             _prevCount = count;
         }
-
     }
 }

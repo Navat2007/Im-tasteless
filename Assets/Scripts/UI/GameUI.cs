@@ -229,53 +229,83 @@ public class GameUI : MonoBehaviour
 
     private void Subscribe()
     {
-        ControllerManager.enemySpawner.OnNewWave += OnNewWave;
-        ControllerManager.enemySpawner.OnEnemyCountChange += EnemySpawnerOnEnemyCountChange;
-        
-        ControllerManager.healthSystem.OnDeath += OnGameOver;
-        ControllerManager.healthSystem.OnHealthChange += OnHealthChange;
-        ControllerManager.healthSystem.OnMaxHealthChange += OnMaxHealthChange;
-        ControllerManager.healthSystem.OnArmorChange += OnArmorChange;
-        
-        ControllerManager.experienceSystem.OnXpChange += OnXpChange;
-        ControllerManager.experienceSystem.OnNextLevelXpChange += OnNextLevelXpChange;
-        ControllerManager.experienceSystem.OnLevelChange += OnLevelChange;
+        if (ControllerManager.enemySpawner != null)
+        {
+            ControllerManager.enemySpawner.OnNewWave += OnNewWave;
+            ControllerManager.enemySpawner.OnEnemyCountChange += EnemySpawnerOnEnemyCountChange;
+        }
 
-        ControllerManager.weaponController.OnReloadStart += OnWeaponReloadStart;
-        ControllerManager.weaponController.OnReloadEnd += OnWeaponReloadEnd;
-        ControllerManager.weaponController.OnReloadPercent += OnWeaponReloadPercent;
-        ControllerManager.weaponController.OnAmmoChange += OnWeaponAmmoChange;
-        ControllerManager.weaponController.OnEquipWeapon += OnEquipWeapon;
+        if (ControllerManager.healthSystem != null)
+        {
+            ControllerManager.healthSystem.OnDeath += OnGameOver;
+            ControllerManager.healthSystem.OnHealthChange += OnHealthChange;
+            ControllerManager.healthSystem.OnMaxHealthChange += OnMaxHealthChange;
+            ControllerManager.healthSystem.OnArmorChange += OnArmorChange;
+        }
         
-        ControllerManager.busterController.OnMoveSpeedChange += OnMoveSpeedBusterChange;
-        ControllerManager.busterController.OnDamageChange += OnDamageBusterChange;
-        ControllerManager.busterController.OnAttackSpeedChange += OnAttackSpeedBusterChange;
+        if (ControllerManager.experienceSystem != null)
+        {
+            ControllerManager.experienceSystem.OnXpChange += OnXpChange;
+            ControllerManager.experienceSystem.OnNextLevelXpChange += OnNextLevelXpChange;
+            ControllerManager.experienceSystem.OnLevelChange += OnLevelChange;
+        }
+        
+        if (ControllerManager.weaponController != null)
+        {
+            ControllerManager.weaponController.OnReloadStart += OnWeaponReloadStart;
+            ControllerManager.weaponController.OnReloadEnd += OnWeaponReloadEnd;
+            ControllerManager.weaponController.OnReloadPercent += OnWeaponReloadPercent;
+            ControllerManager.weaponController.OnAmmoChange += OnWeaponAmmoChange;
+            ControllerManager.weaponController.OnEquipWeapon += OnEquipWeapon;
+        }
+        
+        if (ControllerManager.busterController != null)
+        {
+            ControllerManager.busterController.OnMoveSpeedChange += OnMoveSpeedBusterChange;
+            ControllerManager.busterController.OnDamageChange += OnDamageBusterChange;
+            ControllerManager.busterController.OnAttackSpeedChange += OnAttackSpeedBusterChange;
+        }
     }
 
 
     private void Unsubscribe()
     {
-        ControllerManager.enemySpawner.OnNewWave -= OnNewWave;
-        ControllerManager.enemySpawner.OnEnemyCountChange -= EnemySpawnerOnEnemyCountChange;
-        
-        ControllerManager.healthSystem.OnDeath -= OnGameOver;
-        ControllerManager.healthSystem.OnHealthChange -= OnHealthChange;
-        ControllerManager.healthSystem.OnMaxHealthChange -= OnMaxHealthChange;
-        ControllerManager.healthSystem.OnArmorChange -= OnArmorChange;
-        
-        ControllerManager.experienceSystem.OnXpChange -= OnXpChange;
-        ControllerManager.experienceSystem.OnNextLevelXpChange -= OnNextLevelXpChange;
-        ControllerManager.experienceSystem.OnLevelChange -= OnLevelChange;
+        if (ControllerManager.enemySpawner != null)
+        {
+            ControllerManager.enemySpawner.OnNewWave -= OnNewWave;
+            ControllerManager.enemySpawner.OnEnemyCountChange -= EnemySpawnerOnEnemyCountChange;
+        }
 
-        ControllerManager.weaponController.OnReloadStart -= OnWeaponReloadStart;
-        ControllerManager.weaponController.OnReloadEnd -= OnWeaponReloadEnd;
-        ControllerManager.weaponController.OnReloadPercent -= OnWeaponReloadPercent;
-        ControllerManager.weaponController.OnAmmoChange -= OnWeaponAmmoChange;
-        ControllerManager.weaponController.OnEquipWeapon -= OnEquipWeapon;
-        
-        ControllerManager.busterController.OnMoveSpeedChange -= OnMoveSpeedBusterChange;
-        ControllerManager.busterController.OnDamageChange -= OnDamageBusterChange;
-        ControllerManager.busterController.OnAttackSpeedChange -= OnAttackSpeedBusterChange;
+        if (ControllerManager.healthSystem != null)
+        {
+            ControllerManager.healthSystem.OnDeath -= OnGameOver;
+            ControllerManager.healthSystem.OnHealthChange -= OnHealthChange;
+            ControllerManager.healthSystem.OnMaxHealthChange -= OnMaxHealthChange;
+            ControllerManager.healthSystem.OnArmorChange -= OnArmorChange;
+        }
+
+        if (ControllerManager.experienceSystem != null)
+        {
+            ControllerManager.experienceSystem.OnXpChange -= OnXpChange;
+            ControllerManager.experienceSystem.OnNextLevelXpChange -= OnNextLevelXpChange;
+            ControllerManager.experienceSystem.OnLevelChange -= OnLevelChange;
+        }
+
+        if (ControllerManager.weaponController != null)
+        {
+            ControllerManager.weaponController.OnReloadStart -= OnWeaponReloadStart;
+            ControllerManager.weaponController.OnReloadEnd -= OnWeaponReloadEnd;
+            ControllerManager.weaponController.OnReloadPercent -= OnWeaponReloadPercent;
+            ControllerManager.weaponController.OnAmmoChange -= OnWeaponAmmoChange;
+            ControllerManager.weaponController.OnEquipWeapon -= OnEquipWeapon;
+        }
+
+        if (ControllerManager.busterController != null)
+        {
+            ControllerManager.busterController.OnMoveSpeedChange -= OnMoveSpeedBusterChange;
+            ControllerManager.busterController.OnDamageChange -= OnDamageBusterChange;
+            ControllerManager.busterController.OnAttackSpeedChange -= OnAttackSpeedBusterChange;
+        }
     }
 
     private void OnEquipWeapon(WeaponType weaponType)
@@ -351,8 +381,6 @@ public class GameUI : MonoBehaviour
 
     private void OnHealthChange(float currentHealth)
     {
-        print($"Health: {currentHealth}");
-        
         if (healthText != null)
         {
             healthText.SetText($"{currentHealth} / {ControllerManager.healthSystem.MaxHealth}");
@@ -366,8 +394,6 @@ public class GameUI : MonoBehaviour
     
     private void OnMaxHealthChange(float maxHealth)
     {
-        print($"MaxHealth: {maxHealth}");
-        
         if (healthText != null)
         {
             healthText.SetText($"{ControllerManager.healthSystem.CurrentHealth} / {maxHealth}");
@@ -386,8 +412,6 @@ public class GameUI : MonoBehaviour
 
     private void OnXpChange(float currentXp)
     {
-        print($"Xp: {currentXp}");
-        
         if (xpText != null)
         {
             xpText.SetText($"{currentXp} / {ControllerManager.experienceSystem.NextLevelXp}");
@@ -401,8 +425,6 @@ public class GameUI : MonoBehaviour
     
     private void OnNextLevelXpChange(float nextLevelXp)
     {
-        print($"NextLevelXp: {nextLevelXp}");
-        
         if (xpText != null)
         {
             xpText.SetText($"{ControllerManager.experienceSystem.Xp} / {nextLevelXp}");

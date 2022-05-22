@@ -1,12 +1,15 @@
 using System;
 using Interface;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(HealthSystem))]
 public class Enemy : MonoBehaviour, IHealth, IDamageable
 {
+    public event Action OnDeath;
+    
     [field: SerializeField] public ZombieType ZombieType { get; private set; }
+    [field: SerializeField] public Renderer Renderer { get; private set; }
+    [field: SerializeField] public Renderer[] SkinRendererList { get; private set; }
     
     [field: Header("Стандартные параметры")]
     [field: SerializeField] public float Health { get; set; }
@@ -35,26 +38,40 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
     [field: SerializeField] public Color PowerColor { get; private set; }
     [field: SerializeField] public Vector3 PowerSize { get; private set; }
 
+    private TargetSystem _targetSystem;
     private HealthSystem _healthSystem;
     private EnemyAttackController _attackController;
+    private EnemyController _enemyController;
+    private EnemyDeathEffect _enemyDeathEffect;
 
     private void Awake()
     {
         _healthSystem = GetComponent<HealthSystem>();
+        _targetSystem = GetComponent<TargetSystem>();
         _attackController = GetComponent<EnemyAttackController>();
+        _enemyController = GetComponent<EnemyController>();
+        _enemyDeathEffect = GetComponent<EnemyDeathEffect>();
+
+        if (SkinRendererList.Length > 0)
+        {
+            System.Random random = new System.Random();
+            Renderer = SkinRendererList[random.Next(SkinRendererList.Length)];
+        }
+        
+        Renderer.gameObject.SetActive(true);
     }
 
     private void Start()
     {
         Setup();
+        
+        _healthSystem.SetRender(Renderer);
+        _enemyDeathEffect.SerRenderer(Renderer);
     }
 
-    public void Setup(WaveSO waveSo = null)
+    public void Setup(Wave wave = null)
     {
-        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
-        
         transform.localScale = Size;
-        meshRenderer.material.color = Color;
 
         if (IsPower)
         {
@@ -69,11 +86,12 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
             XpOnDeath = PowerXpOnDeath;
             
             transform.localScale = PowerSize;
-            meshRenderer.material.color = PowerColor;
             
             gameObject
                 .AddComponent<EnemyPowerSkin>()
-                .SetColor(meshRenderer.material.color);
+                .SetZombieType(ZombieType)
+                .SetRenderer(Renderer)
+                .SetColor(Renderer.material.color);
 
             switch (ZombieType)
             {
@@ -89,18 +107,21 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
             }
         }
 
-        if (waveSo != null)
+        if (wave != null)
         {
-            Health += waveSo.health;
-            Damage += waveSo.damage;
-            MoveSpeed += waveSo.moveSpeed;
-            XpOnDeath += waveSo.xpOnDeath;
+            Health += wave.waveStruct.health;
+            Damage += wave.waveStruct.damage;
+            MoveSpeed += wave.waveStruct.moveSpeed;
+            XpOnDeath += wave.waveStruct.xpOnDeath;
         }
 
         _healthSystem.Init(Health);
     }
 
+    public TargetSystem GetEnemyTargetSystem => _targetSystem;
+    public HealthSystem GetEnemyHealthSystem => _healthSystem;
     public EnemyAttackController GetEnemyAttackController => _attackController;
+    public EnemyController GetEnemyController => _enemyController;
 
     [ContextMenu("Сделать усиленным")]
     private void MakePower()

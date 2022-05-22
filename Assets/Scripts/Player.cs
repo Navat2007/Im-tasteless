@@ -10,6 +10,7 @@ public class Player : MonoBehaviour, IHealth, IDamageable
     [field: SerializeField] public float Health { get; set; } = 20;
     [field: SerializeField] public float MoveSpeed { get; private set; } = 5;
     [field: SerializeField] public float BonusMoveSpeed { get; private set; }
+    [field: SerializeField] public Renderer Renderer { get; private set; }
     
     private AudioListener _cameraAudioListener;
     private HealthSystem _healthSystem;
@@ -18,6 +19,8 @@ public class Player : MonoBehaviour, IHealth, IDamageable
     {
         _cameraAudioListener = Camera.main.GetComponent<AudioListener>();
         _healthSystem = GetComponent<HealthSystem>();
+        
+        _healthSystem.SetRender(Renderer);
     }
 
     private void OnEnable()

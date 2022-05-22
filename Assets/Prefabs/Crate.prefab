@@ -230,6 +230,8 @@ GameObject:
   - component: {fileID: 6179953407319125960}
   - component: {fileID: 6797595723618857598}
   - component: {fileID: 7519217171206607873}
+  - component: {fileID: 2312344243210397305}
+  - component: {fileID: 8129954241624033609}
   m_Layer: 13
   m_Name: Crate
   m_TagString: Untagged
@@ -324,14 +326,14 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1674779952516064}
   serializedVersion: 2
-  m_Mass: 1
+  m_Mass: 5
   m_Drag: 0.5
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &6797595723618857598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -346,6 +348,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <CurrentHealth>k__BackingField: 0
   <MaxHealth>k__BackingField: 0
+  <HealthInSecond>k__BackingField: 0
   <Armor>k__BackingField: 0
   <InvulnerabilityTime>k__BackingField: 0
   blinkIntensity: 10
@@ -366,6 +369,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Health>k__BackingField: 30
+  <Renderer>k__BackingField: {fileID: 23567075391077120}
   spawnHeight: 1
   shotgunPrefab: {fileID: 3071243612666804271, guid: d2fb4c2c0344f8a4fa64d1b0868c772c,
     type: 3}
@@ -377,6 +381,39 @@ MonoBehaviour:
     type: 3}
   grenadeSpawnChance: 20
   grenadePowerCrateCount: 10
+--- !u!95 &2312344243210397305
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674779952516064}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &8129954241624033609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674779952516064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30771920f7976d240b6b8f284ca045cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animatorControllers: []
 --- !u!1 &2350233432640332628
 GameObject:
   m_ObjectHideFlags: 0

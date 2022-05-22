@@ -15,6 +15,8 @@ public class EnemyDeathStandardBlowEffect : EnemyDeathEffect
             Quaternion.FromToRotation(Vector3.forward, projectileHitInfo.hitDirection));
             
         Destroy(deathEffectGameObject, deathEffectParticlePrefab.main.startLifetime.constantMax);
-        Destroy(gameObject);
+        
+        enemy.GetEnemyController.OnDeath();
+        StartCoroutine(Fade(materialColor, Color.grey, 10));
     }
 }

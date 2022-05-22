@@ -8,6 +8,7 @@ using UnityEngine;
 public class Crate : MonoBehaviour, IDamageable, IHealth
 {
     [field: SerializeField] public float Health { get; set; }
+    [field: SerializeField] public Renderer Renderer { get; private set; }
     [SerializeField] private float spawnHeight = 0.5f;
 
     [Header("Дробовик")]
@@ -31,6 +32,7 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
     {
         _healthSystem = GetComponent<HealthSystem>();
         
+        _healthSystem.SetRender(Renderer);
         _healthSystem.OnDeath += OnDeath;
     }
 

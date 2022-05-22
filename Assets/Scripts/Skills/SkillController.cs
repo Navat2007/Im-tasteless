@@ -54,6 +54,14 @@ public class SkillController : MonoBehaviour
         ControllerManager.skillController = null;
     }
 
+    private void Start()
+    {
+        ControllerManager.playerInput.actions["Ability"].performed += context =>
+        {
+            AddToSkillsList(commonSkills[9]);
+        };
+    }
+
     public List<Skill> GetCommonSkills => commonSkills;
     public List<Skill> GetUncommonSkills => uncommonSkills;
     public List<Skill> GetRareSkills => rareSkills;
@@ -174,6 +182,12 @@ public class SkillController : MonoBehaviour
         IsNextDouble = value;
     }
 
+    [ContextMenu("Получить healthRestore скилл в списке обычных")]
+    private void Get11Skill()
+    {
+        AddToSkillsList(commonSkills[9]);
+    }
+    
     [ContextMenu("Получить maxClip скилл в списке обычных")]
     private void Get1Skill()
     {
