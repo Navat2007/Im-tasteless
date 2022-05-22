@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Skills;
 using Skills.uncommon;
 using UnityEngine;
@@ -153,6 +154,7 @@ public class SkillController : MonoBehaviour
 
     public void AddToSkillsList(Skill skill)
     {
+        Debug.ClearDeveloperConsole();
         if (!IsInSkillsList(skill))
         {
             _currentSkillsList.Add(new SkillStruct
@@ -167,8 +169,12 @@ public class SkillController : MonoBehaviour
         else
         {
             var existSkillStruct = _currentSkillsList.Find(item => item.skill.GetID == skill.GetID);
+            var index = _currentSkillsList.IndexOf(existSkillStruct);
+            
             existSkillStruct.level++;
             existSkillStruct.skill.Activate();
+
+            _currentSkillsList[index] = existSkillStruct;
         }
         
         if(skill is not id_1003_skillDouble_uncommon)
@@ -181,6 +187,8 @@ public class SkillController : MonoBehaviour
     {
         IsNextDouble = value;
     }
+
+    #region Test
 
     [ContextMenu("Получить healthRestore скилл в списке обычных")]
     private void Get11Skill()
@@ -205,4 +213,6 @@ public class SkillController : MonoBehaviour
     {
         AddToSkillsList(uncommonSkills[4]);
     }
+
+    #endregion
 }

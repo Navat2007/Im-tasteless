@@ -267,7 +267,6 @@ public class GameUI : MonoBehaviour
         }
     }
 
-
     private void Unsubscribe()
     {
         if (ControllerManager.enemySpawner != null)
@@ -383,12 +382,12 @@ public class GameUI : MonoBehaviour
     {
         if (healthText != null)
         {
-            healthText.SetText($"{currentHealth} / {ControllerManager.healthSystem.MaxHealth}");
+            healthText.SetText($"{Math.Round(currentHealth)} / {Math.Round(ControllerManager.healthSystem.MaxHealth)}");
         }
 
         if (healthSlider != null)
         {
-            healthSlider.value = currentHealth;
+            healthSlider.value = Mathf.Round(currentHealth);
         }
     }
     
@@ -396,12 +395,12 @@ public class GameUI : MonoBehaviour
     {
         if (healthText != null)
         {
-            healthText.SetText($"{ControllerManager.healthSystem.CurrentHealth} / {maxHealth}");
+            healthText.SetText($"{Math.Round(ControllerManager.healthSystem.CurrentHealth)} / {Math.Round(maxHealth)}");
         }
 
         if (healthSlider != null)
         {
-            healthSlider.maxValue = maxHealth;
+            healthSlider.maxValue = Mathf.Round(maxHealth);
         }
     }
     
@@ -414,12 +413,12 @@ public class GameUI : MonoBehaviour
     {
         if (xpText != null)
         {
-            xpText.SetText($"{currentXp} / {ControllerManager.experienceSystem.NextLevelXp}");
+            xpText.SetText($"{Math.Round(currentXp)} / {Math.Round(ControllerManager.experienceSystem.NextLevelXp)}");
         }
 
         if (xpSlider != null)
         {
-            xpSlider.value = currentXp;
+            xpSlider.value = Mathf.Round(currentXp);
         }
     }
     
@@ -427,12 +426,12 @@ public class GameUI : MonoBehaviour
     {
         if (xpText != null)
         {
-            xpText.SetText($"{ControllerManager.experienceSystem.Xp} / {nextLevelXp}");
+            xpText.SetText($"{Math.Round(ControllerManager.experienceSystem.Xp)} / {Math.Round(nextLevelXp)}");
         }
 
         if (xpSlider != null)
         {
-            xpSlider.maxValue = nextLevelXp;
+            xpSlider.maxValue = Mathf.Round(nextLevelXp);
         }
     }
 
@@ -449,24 +448,6 @@ public class GameUI : MonoBehaviour
 
         if (skillChoicePanel != null)
         {
-            skillPanelStruct.skill1Button.onClick.RemoveAllListeners();
-            skillPanelStruct.skill1Button.onClick.AddListener(() =>
-            {
-                ClosePanel();
-            });
-            
-            skillPanelStruct.skill2Button.onClick.RemoveAllListeners();
-            skillPanelStruct.skill2Button.onClick.AddListener(() =>
-            {
-                ClosePanel();
-            });
-            
-            skillPanelStruct.skill3Button.onClick.RemoveAllListeners();
-            skillPanelStruct.skill3Button.onClick.AddListener(() =>
-            {
-                ClosePanel();
-            });
-            
             OpenPanel(PanelType.SKILLS);
         }
         else
@@ -609,6 +590,22 @@ public class GameUI : MonoBehaviour
     
     public void OpenPanel(PanelType panelType)
     {
+        IEnumerator MakeButtonsInteractable()
+        {
+            yield return new WaitForSecondsRealtime(2);
+            
+            skillPanelStruct.skill1Button.interactable = true;
+            skillPanelStruct.skill2Button.interactable = true;
+            skillPanelStruct.skill3Button.interactable = true;
+        }
+
+        void MakeButtonsNotInteractable()
+        {
+            skillPanelStruct.skill1Button.interactable = false;
+            skillPanelStruct.skill2Button.interactable = false;
+            skillPanelStruct.skill3Button.interactable = false;
+        }
+
         switch (panelType)
         {
             case PanelType.RESULT:
@@ -693,6 +690,7 @@ public class GameUI : MonoBehaviour
                             {
                                 ClosePanel();
                                 ControllerManager.skillController.AddToSkillsList(skill);
+                                MakeButtonsNotInteractable();
                             });
                             break;
                         case 2:
@@ -705,6 +703,7 @@ public class GameUI : MonoBehaviour
                             {
                                 ClosePanel();
                                 ControllerManager.skillController.AddToSkillsList(skill);
+                                MakeButtonsNotInteractable();
                             });
                             break;
                         case 3:
@@ -717,6 +716,7 @@ public class GameUI : MonoBehaviour
                             {
                                 ClosePanel();
                                 ControllerManager.skillController.AddToSkillsList(skill);
+                                MakeButtonsNotInteractable();
                             });
                             break;
                     }
@@ -760,6 +760,9 @@ public class GameUI : MonoBehaviour
                     callback = () => {}
                 });
                 skillChoicePanel.gameObject.SetActive(true);
+                
+                StartCoroutine(MakeButtonsInteractable());
+                
                 break;
         }
     }

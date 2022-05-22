@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
@@ -51,23 +52,31 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
-        if (Time.time > _nextTimeUpdateSpeed && _navMeshAgent.enabled)
+        try
         {
-            _nextTimeUpdateSpeed = Time.time + timeUpdateSpeed;
-            _navMeshAgent.angularSpeed = _enemy.TurnSpeed + _bonusTurnSpeed;
-            _navMeshAgent.speed = _enemy.MoveSpeed + _bonusSpeed;
+            if (Time.time > _nextTimeUpdateSpeed && _navMeshAgent.enabled)
+            {
+                _nextTimeUpdateSpeed = Time.time + timeUpdateSpeed;
+                _navMeshAgent.angularSpeed = _enemy.TurnSpeed + _bonusTurnSpeed;
+                _navMeshAgent.speed = _enemy.MoveSpeed + _bonusSpeed;
 
-            if (_target != null && Vector3.Distance(_target.transform.position, _enemy.transform.position) <=
-                _navMeshAgent.stoppingDistance)
-            {
-                _navMeshAgent.isStopped = true;
-                _animationController.SetState(AnimationState.IDLE);
+                if (_target != null && Vector3.Distance(_target.transform.position, _enemy.transform.position) <=
+                    _navMeshAgent.stoppingDistance)
+                {
+                    _navMeshAgent.isStopped = true;
+                    _animationController.SetState(AnimationState.IDLE);
+                }
+                else
+                {
+                    _navMeshAgent.isStopped = false;
+                    _animationController.SetState(AnimationState.RUN);
+                }
             }
-            else
-            {
-                _navMeshAgent.isStopped = false;
-                _animationController.SetState(AnimationState.RUN);
-            }
+        }
+        catch (Exception e)
+        {
+            _navMeshAgent.enabled = false;
+            _navMeshAgent.enabled = true;
         }
     }
 

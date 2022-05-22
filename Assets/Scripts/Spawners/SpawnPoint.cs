@@ -5,6 +5,7 @@ public class SpawnPoint : MonoBehaviour
 {
     public bool available;
 
+    [SerializeField] private float scanTime = 1;
     [SerializeField] private float minDistance = 35;
     [SerializeField] private float maxDistance = 90;
     [SerializeField] private float distance;
@@ -13,7 +14,7 @@ public class SpawnPoint : MonoBehaviour
 
     private void Start()
     {
-        _player = GameObject.FindGameObjectWithTag("Player").transform;
+        _player = ControllerManager.player.transform;
         StartCoroutine(CheckDistance());
     }
 
@@ -28,7 +29,7 @@ public class SpawnPoint : MonoBehaviour
             else
                 available = false;
 
-            yield return new WaitForSeconds(.5f);
+            yield return new WaitForSeconds(scanTime);
         }
     }
 }

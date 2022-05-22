@@ -54,5 +54,5 @@ MonoBehaviour:
     \u0442\u043E +50% \u0431\u043E\u0435\u0437\u0430\u043F\u0430\u0441) \u0438\u043B\u0438
     +5 \u0433\u0440\u0430\u043D\u0430\u0442"
   skillRarity: 1
-  maxLevel: 50
+  maxLevel: 1
   addPercent: 50

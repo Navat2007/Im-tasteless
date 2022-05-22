@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 985283574603547333}
   - component: {fileID: 1902504369814592601}
   - component: {fileID: 8682569575275528541}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Enemy Death Effect Particle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3844,11 +3844,11 @@ ParticleSystem:
     collidesWith:
       serializedVersion: 2
       m_Bits: 7
-    maxCollisionShapes: 256
-    quality: 0
+    maxCollisionShapes: 25
+    quality: 2
     voxelSize: 0.5
     collisionMessages: 0
-    collidesWithDynamic: 1
+    collidesWithDynamic: 0
     interiorCollisions: 0
   TriggerModule:
     enabled: 0

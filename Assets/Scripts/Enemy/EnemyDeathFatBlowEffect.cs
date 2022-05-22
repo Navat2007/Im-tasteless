@@ -14,7 +14,7 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
     [SerializeField] private float stunTime = 1;
     [SerializeField] private AudioClip explodeClip;
 
-    private float _growSpeed = 7f;
+    private float _growSpeed = 0.1f;
     private bool _isExploded;
 
     protected override void OnDeath(ProjectileHitInfo projectileHitInfo)
@@ -50,7 +50,7 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
             
             while (Time.time < timeToExplode)
             {
-                transform.localScale += Vector3.one * Time.deltaTime * _growSpeed;
+                transform.localScale += Vector3.one * _growSpeed;
                 
                 material.color = Color.red * 2;
                 yield return new WaitForSeconds(0.1f);
