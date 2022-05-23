@@ -89,6 +89,7 @@ public class GameUI : MonoBehaviour
     [SerializeField] private Image fadePanel;
 
     [Header("Timer")] 
+    [SerializeField] private Transform timerPanel;
     [SerializeField] private Timer timer;
     [SerializeField] private TMP_Text timerText;
 
@@ -115,6 +116,7 @@ public class GameUI : MonoBehaviour
     [SerializeField] private TMP_Text waveBannerEnemyCountText;
 
     [Header("Player")] 
+    [SerializeField] private Transform playerPanel;
     [SerializeField] private TMP_Text healthText;
     [SerializeField] private Slider healthSlider;
     [SerializeField] private TMP_Text xpText;
@@ -128,6 +130,7 @@ public class GameUI : MonoBehaviour
     [SerializeField] private BuffIconStruct armorBuffIconStruct;
 
     [Header("Weapon")] 
+    [SerializeField] private Transform bulletsPanel;
     [SerializeField] private TMP_Text ammoText;
     [SerializeField] private TMP_Text pistolAmmoText;
     [SerializeField] private TMP_Text shotgunAmmoText;
@@ -139,6 +142,7 @@ public class GameUI : MonoBehaviour
     [SerializeField] private Slider reloadSlider;
 
     [Header("Inventory")] 
+    [SerializeField] private Transform slotPanel;
     [SerializeField] private SlotStruct slot1Struct;
     [SerializeField] private SlotStruct slot2Struct;
     [SerializeField] private SlotStruct slot3Struct;
@@ -458,8 +462,28 @@ public class GameUI : MonoBehaviour
 
     private void OnGameOver(ProjectileHitInfo projectileHitInfo)
     {
+        IEnumerator MoveEnemyCounterPanel()
+        {
+            float newY = enemyCounterPanel.position.y;
+            float speed = 15;
+            
+            while (newY > 45)
+            {
+                newY -= Time.time / speed;
+                enemyCounterPanel.position = new Vector2(enemyCounterPanel.position.x, newY);
+                yield return null;
+            }
+        }
+
+        StartCoroutine(MoveEnemyCounterPanel());
         StartCoroutine(Fade(Color.clear, Color.black, 1));
+        
         gameOverUI.SetActive(true);
+        playerPanel.gameObject.SetActive(false);
+        slotPanel.gameObject.SetActive(false);
+        bulletsPanel.gameObject.SetActive(false);
+        timerPanel.gameObject.SetActive(false);
+
         Cursor.visible = true;
     }
 
