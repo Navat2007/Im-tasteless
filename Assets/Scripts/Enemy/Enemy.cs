@@ -66,7 +66,7 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
         Setup();
         
         _healthSystem.SetRender(Renderer);
-        _enemyDeathEffect.SerRenderer(Renderer);
+        _enemyDeathEffect.SetRenderer(Renderer);
     }
 
     public void Setup(Wave wave = null)

@@ -9883,13 +9883,12 @@ MonoBehaviour:
   <ReloadSpeed>k__BackingField: 1.5
   <MsBetweenShots>k__BackingField: 500
   <RecoilPower>k__BackingField: 0.2
-  <ShootClip>k__BackingField: {fileID: 8300000, guid: 40bf19b7fd1d11944a353cfafb1e57de,
+  <ShootClip>k__BackingField: {fileID: 8300000, guid: b22e7d24abe95bd439e4fa70ce194ec9,
     type: 3}
   <EmptyAmmoClip>k__BackingField: {fileID: 8300000, guid: 50737f391152e2c489084469d5bab5e7,
     type: 3}
   <infiniteProjectile>k__BackingField: 1
-  <Projectile>k__BackingField: {fileID: 7583622359539837063, guid: 4ec0a547a72f0aa4591069b4660e65b0,
-    type: 3}
+  <ProjectileType>k__BackingField: 0
   <ProjectileSpawnPoint>k__BackingField:
   - {fileID: 6452119763916350822}
   <ProjectilePerClip>k__BackingField: 8

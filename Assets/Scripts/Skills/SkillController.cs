@@ -55,14 +55,6 @@ public class SkillController : MonoBehaviour
         ControllerManager.skillController = null;
     }
 
-    private void Start()
-    {
-        ControllerManager.playerInput.actions["Ability"].performed += context =>
-        {
-            AddToSkillsList(commonSkills[9]);
-        };
-    }
-
     public List<Skill> GetCommonSkills => commonSkills;
     public List<Skill> GetUncommonSkills => uncommonSkills;
     public List<Skill> GetRareSkills => rareSkills;
@@ -77,6 +69,25 @@ public class SkillController : MonoBehaviour
     
     public Skill GetRandomSkill()
     {
+        Skill GetSkill(SkillRarity skillRarity)
+        {
+            System.Random random = new System.Random();
+        
+            switch (skillRarity)
+            {
+                case SkillRarity.COMMON:
+                    return commonSkills.Count == 0 ? null : commonSkills[random.Next(commonSkills.Count)];
+                case SkillRarity.UNCOMMON:
+                    return uncommonSkills.Count == 0 ? null :  uncommonSkills[random.Next(uncommonSkills.Count)];
+                case SkillRarity.RARE:
+                    return rareSkills.Count == 0 ? null :  rareSkills[random.Next(rareSkills.Count)];
+                case SkillRarity.UNIQUE:
+                    return uniqueSkills.Count == 0 ? null :  uniqueSkills[random.Next(uniqueSkills.Count)];
+                default:
+                    return commonSkills.Count == 0 ? null :  commonSkills[random.Next(commonSkills.Count)];
+            }
+        }
+        
         bool IsAvailableToAdd(Skill skill)
         {
             if (_currentChoiceList.Contains(skill)) return false;
@@ -114,7 +125,7 @@ public class SkillController : MonoBehaviour
             System.Random random = new System.Random();
             SkillRarity randomSkillRarity = (SkillRarity)values.GetValue(random.Next(values.Length));
             
-            var skill = GetRandomSkill(randomSkillRarity);
+            var skill = GetSkill(randomSkillRarity);
             
             //print($"{skill.GetName} попытка {count}");
             
@@ -131,31 +142,15 @@ public class SkillController : MonoBehaviour
         return lastSkill;
     }
 
-    private Skill GetRandomSkill(SkillRarity skillRarity)
-    {
-        System.Random random = new System.Random();
-        
-        switch (skillRarity)
-        {
-            case SkillRarity.COMMON:
-                return commonSkills.Count == 0 ? null : commonSkills[random.Next(commonSkills.Count)];
-            case SkillRarity.UNCOMMON:
-                return uncommonSkills.Count == 0 ? null :  uncommonSkills[random.Next(uncommonSkills.Count)];
-            case SkillRarity.RARE:
-                return rareSkills.Count == 0 ? null :  rareSkills[random.Next(rareSkills.Count)];
-            case SkillRarity.UNIQUE:
-                return uniqueSkills.Count == 0 ? null :  uniqueSkills[random.Next(uniqueSkills.Count)];
-            default:
-                return commonSkills.Count == 0 ? null :  commonSkills[random.Next(commonSkills.Count)];
-        }
-    }
-
-    private bool IsInSkillsList(Skill skill) => _currentSkillsList.Exists(item => item.skill.GetID == skill.GetID);
-
     public void AddToSkillsList(Skill skill)
     {
-        Debug.ClearDeveloperConsole();
-        if (!IsInSkillsList(skill))
+
+        bool IsInSkillsList()
+        {
+            return _currentSkillsList.Exists(item => item.skill.GetID == skill.GetID);
+        }
+        
+        if (!IsInSkillsList())
         {
             _currentSkillsList.Add(new SkillStruct
             {

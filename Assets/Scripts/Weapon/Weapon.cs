@@ -16,7 +16,7 @@ public class Weapon : MonoBehaviour
     
     [field: Header("Projectile")]
     [field: SerializeField] public bool infiniteProjectile { get; private set; }
-    [field: SerializeField] public Projectile Projectile { get; private set; }
+    [field: SerializeField] public ProjectileType ProjectileType { get; private set; }
     [field: SerializeField] public Transform[] ProjectileSpawnPoint { get; private set; }
     [field: SerializeField] public int ProjectilePerClip { get; private set; }
     [field: SerializeField] public int ProjectileInClip { get; set; }
@@ -24,7 +24,7 @@ public class Weapon : MonoBehaviour
     [field: SerializeField] public int MaxProjectileAmount { get; set; }
     
     [field: Header("Shell")]
-    [field: SerializeField] public Shell Shell { get; private set; }
+    [field: SerializeField] public ShellType ShellType { get; private set; }
     [field: SerializeField] public Transform ShellSpawnPoint { get; private set; }
 
     [field: Header("Muzzle")]

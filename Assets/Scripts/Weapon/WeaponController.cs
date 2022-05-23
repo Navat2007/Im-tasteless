@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Pools;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -269,13 +270,17 @@ public class WeaponController : MonoBehaviour
     {
         void EjectProjectile()
         {
-            for (int i = 0; i <  _equippedWeapon.ProjectileSpawnPoint.Length; i++)
+            foreach (var point in _equippedWeapon.ProjectileSpawnPoint)
             {
-                Projectile projectile = Instantiate(_equippedWeapon.Projectile, _equippedWeapon.ProjectileSpawnPoint[i].position, _equippedWeapon.ProjectileSpawnPoint[i].rotation);
-                projectile.SetSpeed(_equippedWeapon.MuzzleVelocity);
-                projectile.SetDamage(_equippedWeapon.Damage + (_equippedWeapon.Damage / 100 * _bonusDamagePercent));
-                projectile.SetCriticalChance(_equippedWeapon.CriticalChance + _bonusCriticalChance);
-                projectile.SetCriticalBonus(_equippedWeapon.CriticalBonus + _bonusCriticalBonus);
+                var projectile = BulletPool.Instance.Get(_equippedWeapon.ProjectileType)
+                    .SetPosition(point.position)
+                    .SetRotation(point.rotation)
+                    .SetSpeed(_equippedWeapon.MuzzleVelocity)
+                    .SetDamage(_equippedWeapon.Damage + (_equippedWeapon.Damage / 100 * _bonusDamagePercent))
+                    .SetCriticalChance(_equippedWeapon.CriticalChance + _bonusCriticalChance)
+                    .SetCriticalBonus(_equippedWeapon.CriticalBonus + _bonusCriticalBonus);
+                
+                projectile.gameObject.SetActive(true);
             }
 
             _equippedWeapon.ProjectileInClip--;
@@ -285,7 +290,11 @@ public class WeaponController : MonoBehaviour
         
         void EjectShellCase()
         {
-            Shell shell = Instantiate(_equippedWeapon.Shell, _equippedWeapon.ShellSpawnPoint.position, _equippedWeapon.ShellSpawnPoint.rotation);
+            var shell = ShellPool.Instance.Get(_equippedWeapon.ShellType)
+                .SetPosition(_equippedWeapon.ShellSpawnPoint.position)
+                .SetRotation(_equippedWeapon.ShellSpawnPoint.rotation);
+                
+            shell.gameObject.SetActive(true);
         }
 
         void Recoil()

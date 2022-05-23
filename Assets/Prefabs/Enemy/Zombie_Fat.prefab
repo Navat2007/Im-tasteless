@@ -558,7 +558,7 @@ NavMeshAgent:
   m_Acceleration: 4
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 3
+  m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 0
   m_AutoRepath: 1
@@ -743,8 +743,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44a69df03df5ab94491508bad003b104, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deathEffectParticlePrefab: {fileID: 1902504369814592601, guid: e231fee14d6bdd84abbc0d1538adc545,
-    type: 3}
   timer: 2
   radius: 5
   force: 400
@@ -753,6 +751,7 @@ MonoBehaviour:
   forceMode: 0
   stunTime: 1
   explodeClip: {fileID: 8300000, guid: b5dd78bd4cccb84498d982f20527c93a, type: 3}
+  growSpeed: 0.4
 --- !u!114 &6780166634032797918
 MonoBehaviour:
   m_ObjectHideFlags: 0

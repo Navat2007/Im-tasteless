@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Interface;
 using UnityEngine;
 
@@ -7,15 +8,34 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
 {
     [SerializeField] private float timer = 2;
     [SerializeField] private float radius = 5;
-    [SerializeField] private float force = 600;
+    [SerializeField] private float force = 400;
     [SerializeField] private float damage = 10;
     [SerializeField] private float upwardsModifier = 0;
     [SerializeField] private ForceMode forceMode;
     [SerializeField] private float stunTime = 1;
     [SerializeField] private AudioClip explodeClip;
 
-    private float _growSpeed = 0.1f;
+    [Header("Скорость расширения")]
+    [SerializeField] private float growSpeed = 0.4f;
+
+    private List<ParticleSystem> _particleSystems = new();
     private bool _isExploded;
+    private float _timer;
+    private bool _spawned;
+
+    private void Update()
+    {
+        if(_isExploded)
+            transform.localScale += Vector3.one * Time.deltaTime * growSpeed;
+        
+        if (_spawned && Time.time > _timer)
+        {
+            foreach (var item in _particleSystems)
+            {
+                DeathEffectPool.Instance.ReturnToPool(item);
+            }
+        }
+    }
 
     protected override void OnDeath(ProjectileHitInfo projectileHitInfo)
     {
@@ -50,8 +70,6 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
             
             while (Time.time < timeToExplode)
             {
-                transform.localScale += Vector3.one * _growSpeed;
-                
                 material.color = Color.red * 2;
                 yield return new WaitForSeconds(0.1f);
                 material.color = startColor * 1;
@@ -68,57 +86,29 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
 
         void ShowEffect()
         {
-            //var deathEffectRenderer = deathEffectParticlePrefab.GetComponent<ParticleSystemRenderer>();
-            //deathEffectRenderer.material.color = materialColor;
+            List<Vector3> vectors = new List<Vector3>
+            {
+                Vector3.forward,
+                Vector3.back,
+                Vector3.right,
+                Vector3.left,
+                Vector3.forward - Vector3.left,
+                Vector3.forward - Vector3.right,
+                Vector3.back - Vector3.left,
+                Vector3.back - Vector3.right
+            };
 
-            var deathEffectGameObject = Instantiate(
-                deathEffectParticlePrefab.gameObject,
-                transform.position,
-                Quaternion.FromToRotation(Vector3.forward, projectileHitInfo.hitDirection));
+            foreach (var item in vectors)
+            {
+                var pSystem = DeathEffectPool.Instance.Get();
+                pSystem.transform.position = transform.position;
+                pSystem.transform.rotation = Quaternion.FromToRotation(item, projectileHitInfo.hitDirection);
+                pSystem.gameObject.SetActive(true);
+                _particleSystems.Add(pSystem);
+            }
 
-            var deathEffectGameObject2 = Instantiate(
-                deathEffectParticlePrefab.gameObject,
-                transform.position,
-                Quaternion.FromToRotation(Vector3.back, projectileHitInfo.hitDirection));
-
-            var deathEffectGameObject3 = Instantiate(
-                deathEffectParticlePrefab.gameObject,
-                transform.position,
-                Quaternion.FromToRotation(Vector3.right, projectileHitInfo.hitDirection));
-
-            var deathEffectGameObject4 = Instantiate(
-                deathEffectParticlePrefab.gameObject,
-                transform.position,
-                Quaternion.FromToRotation(Vector3.left, projectileHitInfo.hitDirection));
-
-            var deathEffectGameObject5 = Instantiate(
-                deathEffectParticlePrefab.gameObject,
-                transform.position,
-                Quaternion.FromToRotation(Vector3.forward - Vector3.left, projectileHitInfo.hitDirection));
-
-            var deathEffectGameObject6 = Instantiate(
-                deathEffectParticlePrefab.gameObject,
-                transform.position,
-                Quaternion.FromToRotation(Vector3.forward - Vector3.right, projectileHitInfo.hitDirection));
-
-            var deathEffectGameObject7 = Instantiate(
-                deathEffectParticlePrefab.gameObject,
-                transform.position,
-                Quaternion.FromToRotation(Vector3.back - Vector3.left, projectileHitInfo.hitDirection));
-
-            var deathEffectGameObject8 = Instantiate(
-                deathEffectParticlePrefab.gameObject,
-                transform.position,
-                Quaternion.FromToRotation(Vector3.back - Vector3.right, projectileHitInfo.hitDirection));
-
-            Destroy(deathEffectGameObject, deathEffectParticlePrefab.main.startLifetime.constantMax);
-            Destroy(deathEffectGameObject2, deathEffectParticlePrefab.main.startLifetime.constantMax);
-            Destroy(deathEffectGameObject3, deathEffectParticlePrefab.main.startLifetime.constantMax);
-            Destroy(deathEffectGameObject4, deathEffectParticlePrefab.main.startLifetime.constantMax);
-            Destroy(deathEffectGameObject5, deathEffectParticlePrefab.main.startLifetime.constantMax);
-            Destroy(deathEffectGameObject6, deathEffectParticlePrefab.main.startLifetime.constantMax);
-            Destroy(deathEffectGameObject7, deathEffectParticlePrefab.main.startLifetime.constantMax);
-            Destroy(deathEffectGameObject8, deathEffectParticlePrefab.main.startLifetime.constantMax);
+            _timer = Time.time + _particleSystems[0].main.startLifetime.constantMax;
+            _spawned = true;
         }
 
         void AddForce()

@@ -10301,8 +10301,7 @@ MonoBehaviour:
   <EmptyAmmoClip>k__BackingField: {fileID: 8300000, guid: 028f72811874bcb4792f60d65f833e6a,
     type: 3}
   <infiniteProjectile>k__BackingField: 0
-  <Projectile>k__BackingField: {fileID: 7583622359539837063, guid: 4ec0a547a72f0aa4591069b4660e65b0,
-    type: 3}
+  <ProjectileType>k__BackingField: 0
   <ProjectileSpawnPoint>k__BackingField:
   - {fileID: 6452119763916350822}
   - {fileID: 1073020688827672542}
@@ -10316,8 +10315,7 @@ MonoBehaviour:
   <ProjectileInClip>k__BackingField: 7
   <CurrentProjectileAmount>k__BackingField: 0
   <MaxProjectileAmount>k__BackingField: 70
-  <Shell>k__BackingField: {fileID: -3824028174251106252, guid: 5f7fd4fe52c99a149a96031eb399fecf,
-    type: 3}
+  <ShellType>k__BackingField: 1
   <ShellSpawnPoint>k__BackingField: {fileID: 383679340775811606}
   <MuzzleParticleSystem>k__BackingField: {fileID: 42104873607274464}
   <MuzzlePoint>k__BackingField: {fileID: 8746887457398723358}

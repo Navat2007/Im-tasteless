@@ -31,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 881701616340266474}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.32743463, y: 0.06194376, z: 0.18583126}
+  m_LocalScale: {x: 0.061520316, y: 0.037772685, z: 0.18583126}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -95,7 +95,7 @@ TrailRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 881701616340266474}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -204,9 +204,9 @@ BoxCollider:
   m_GameObject: {fileID: 881701616340266474}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
-  m_Size: {x: 1.0000001, y: 1, z: 1}
+  m_Size: {x: 5, y: 2, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &4433825680047367506
 Rigidbody:
@@ -219,7 +219,7 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 1
   m_Constraints: 0
@@ -236,7 +236,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 626506fb5f5e4374bbe31fc3a50e10c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  projectileType: 0
   speed: 10
   damage: 1
   criticalChance: 10
   criticalBonus: 2
+  timeToDestroy: 2

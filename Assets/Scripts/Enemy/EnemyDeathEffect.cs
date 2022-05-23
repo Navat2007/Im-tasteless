@@ -1,12 +1,8 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
 public abstract class EnemyDeathEffect : MonoBehaviour
 {
-    [Header("Настройки при смерти")] 
-    [SerializeField] protected ParticleSystem deathEffectParticlePrefab;
-    
     protected Enemy enemy;
     protected Renderer meshRenderer;
     protected HealthSystem healthSystem;
@@ -17,9 +13,6 @@ public abstract class EnemyDeathEffect : MonoBehaviour
     {
         enemy = GetComponent<Enemy>();
         healthSystem = GetComponent<HealthSystem>();
-        
-        if (deathEffectParticlePrefab == null)
-            throw new NotImplementedException("EnemyDeathEffect: не прикреплён ParticleSystem префаб");
     }
 
     private void OnEnable()
@@ -52,7 +45,7 @@ public abstract class EnemyDeathEffect : MonoBehaviour
         healthSystem.enabled = false;
     }
 
-    public EnemyDeathEffect SerRenderer(Renderer newRenderer)
+    public EnemyDeathEffect SetRenderer(Renderer newRenderer)
     {
         meshRenderer = newRenderer;
         material = meshRenderer.material;
