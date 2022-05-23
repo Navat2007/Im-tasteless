@@ -26,6 +26,7 @@ public class EnemyController : MonoBehaviour
 
     private GameObject _target;
     private bool _isDead;
+    private bool _isWalking;
 
     private void Awake()
     {
@@ -54,7 +55,17 @@ public class EnemyController : MonoBehaviour
     {
         try
         {
-            if (Time.time > _nextTimeUpdateSpeed && _navMeshAgent.enabled)
+            if(ControllerManager.player == null && !_isWalking && !_isDead)
+            {
+                _isWalking = true;
+                _navMeshAgent.enabled = true;
+                _navMeshAgent.isStopped = false;
+                _navMeshAgent.speed = 1f;
+                _animationController.SetState(AnimationState.WALK);
+                StartCoroutine(TurnOnWalking());
+            }
+            
+            if (Time.time > _nextTimeUpdateSpeed && _navMeshAgent.enabled && !_isWalking)
             {
                 _nextTimeUpdateSpeed = Time.time + timeUpdateSpeed;
                 _navMeshAgent.angularSpeed = _enemy.TurnSpeed + _bonusTurnSpeed;
@@ -154,6 +165,42 @@ public class EnemyController : MonoBehaviour
         {
             _navMeshAgent.enabled = true;
             _navMeshAgent.isStopped = false;
+        }
+    }
+
+    private IEnumerator TurnOnWalking()
+    {
+        void SetNewDestination()
+        {
+            System.Random random = new System.Random();
+
+            var position = new Vector3(Camera.main.transform.localPosition.x + random.Next(-30, 30), 0, (Camera.main.transform.localPosition.z + 10) + random.Next(-30, 30));
+            
+            _navMeshAgent.SetDestination(position);
+        }
+        
+        yield return new WaitForSeconds(1);
+        SetNewDestination();
+
+        float timer = 0;
+        
+        while (true)
+        {
+            timer += 1;
+
+            System.Random random = new System.Random();
+            if (timer >= random.Next(30, 60))
+            {
+                timer = 0;
+                SetNewDestination();
+            }
+            
+            if(_navMeshAgent.remainingDistance <= 1f)
+                _animationController.SetState(AnimationState.IDLE);
+            else
+                _animationController.SetState(AnimationState.WALK);
+
+            yield return new WaitForSeconds(1);
         }
     }
 }

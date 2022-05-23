@@ -29,7 +29,7 @@ public class AnimationController : MonoBehaviour
                 _animator.SetFloat("Speed", 0); 
                 break;
             case AnimationState.WALK:
-                _animator.SetFloat("Speed", 0.5f);  
+                _animator.SetFloat("Speed", 0.4f);  
                 break;
             case AnimationState.RUN:
                 _animator.SetFloat("Speed", 1f); 

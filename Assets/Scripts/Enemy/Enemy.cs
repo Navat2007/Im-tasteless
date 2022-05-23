@@ -2,6 +2,7 @@ using System;
 using Interface;
 using UnityEngine;
 
+[SelectionBase]
 [RequireComponent(typeof(HealthSystem))]
 public class Enemy : MonoBehaviour, IHealth, IDamageable
 {
