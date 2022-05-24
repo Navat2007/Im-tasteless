@@ -19,6 +19,11 @@ public class AnimationController : MonoBehaviour
         }
     }
 
+    public void Init()
+    {
+        _currentState = AnimationState.IDLE;
+    }
+
     public void SetState(AnimationState state)
     {
         if(_currentState == state || _currentState == AnimationState.DIE) return;

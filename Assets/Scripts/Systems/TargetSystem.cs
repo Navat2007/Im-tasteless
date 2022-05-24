@@ -11,11 +11,6 @@ public class TargetSystem : MonoBehaviour
     
     [SerializeField] private GameObject target;
 
-    private void Start()
-    {
-        StartCoroutine(FindTarget());
-    }
-
     private void SetTarget(GameObject target)
     {
         this.target = target;
@@ -28,7 +23,7 @@ public class TargetSystem : MonoBehaviour
     {
         while (target == null)
         {
-            var player = GameObject.FindGameObjectWithTag("Player");
+            var player = ControllerManager.player.gameObject;
                 
             if(player != null)
                 SetTarget(player);
@@ -47,6 +42,12 @@ public class TargetSystem : MonoBehaviour
             yield return new WaitForSeconds(timeBetweenSearchTarget);
         }
         
+        StartCoroutine(FindTarget());
+    }
+
+    public void Init()
+    {
+        target = null;
         StartCoroutine(FindTarget());
     }
 

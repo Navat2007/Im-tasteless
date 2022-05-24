@@ -7,7 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(AnimationController))]
 public class HealthSystem : MonoBehaviour
 {
-    public event Action<ProjectileHitInfo> OnDeath;
+    public event Action<GameObject, ProjectileHitInfo> OnDeath;
     public event Action<float> OnHealthChange;
     public event Action<float> OnMaxHealthChange;
     public event Action<float, float, float> OnTakeDamage;
@@ -211,7 +211,7 @@ public class HealthSystem : MonoBehaviour
         
         _renderer.material.color = _startColor;
 
-        OnDeath?.Invoke(projectileHitInfo);
+        OnDeath?.Invoke(gameObject, projectileHitInfo);
     }
 
     #region Test

@@ -35,23 +35,6 @@ public class EnemyController : MonoBehaviour
         _navMeshAgent = GetComponent<NavMeshAgent>();
     }
     
-    private void OnEnable()
-    {
-        isDead = false;
-        isWalking = false;
-        
-        _navMeshAgent.enabled = true;
-        _navMeshAgent.isStopped = false;
-        
-        capsuleCollider.enabled = true;
-        capsuleCollider2.enabled = false;
-        
-        _navMeshAgent.speed = _enemy.MoveSpeed;
-        
-        _enemy.GetEnemyTargetSystem.OnTargetChange += OnTargetChange;
-        _enemy.GetEnemyTargetSystem.OnTargetPositionChange += OnTargetPositionChange;
-    }
-
     private void OnDisable()
     {
         _enemy.GetEnemyTargetSystem.OnTargetChange -= OnTargetChange;
@@ -107,6 +90,25 @@ public class EnemyController : MonoBehaviour
     {
         if(_navMeshAgent != null && _navMeshAgent.enabled)
             _navMeshAgent.SetDestination(position);
+    }
+    
+    public void Init()
+    {
+        isDead = false;
+        isWalking = false;
+        
+        _navMeshAgent.enabled = true;
+        _navMeshAgent.isStopped = false;
+        
+        capsuleCollider.enabled = true;
+        capsuleCollider2.enabled = false;
+        
+        _animationController.Init();
+        
+        _navMeshAgent.speed = _enemy.MoveSpeed;
+        
+        _enemy.GetEnemyTargetSystem.OnTargetChange += OnTargetChange;
+        _enemy.GetEnemyTargetSystem.OnTargetPositionChange += OnTargetPositionChange;
     }
     
     public void OnDeath()

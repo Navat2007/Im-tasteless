@@ -14,7 +14,7 @@ public abstract class EnemyDeathEffect : MonoBehaviour
         healthSystem = GetComponent<HealthSystem>();
     }
 
-    protected abstract void OnDeath(ProjectileHitInfo projectileHitInfo);
+    protected abstract void OnDeath(GameObject owner, ProjectileHitInfo projectileHitInfo);
 
     public EnemyDeathEffect SetRenderer(Renderer newRenderer)
     {

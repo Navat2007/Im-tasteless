@@ -52,7 +52,7 @@ public class Player : MonoBehaviour, IHealth, IDamageable
         SetCameraAudioListener(true);
     }
     
-    private void OnDeath(ProjectileHitInfo obj)
+    private void OnDeath(GameObject owner, ProjectileHitInfo obj)
     {
         gameObject.SetActive(false);
     }

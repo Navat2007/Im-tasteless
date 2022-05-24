@@ -1,12 +1,13 @@
 using System;
 using Interface;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [SelectionBase]
 [RequireComponent(typeof(HealthSystem))]
 public class Enemy : MonoBehaviour, IHealth, IDamageable
 {
-    public event Action OnDeath;
+    public event Action<Vector3> OnDeath;
     
     [field: SerializeField] public ZombieType ZombieType { get; private set; }
     [field: SerializeField] public Renderer Renderer { get; private set; }
@@ -59,15 +60,6 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
         _baseColor = Renderer.material.color;
     }
 
-    private void OnEnable()
-    {
-        _healthSystem.enabled = true;
-        _targetSystem.enabled = true;
-        _attackController.enabled = true;
-        _enemyController.enabled = true;
-        _enemyDeathEffect.enabled = true;
-    }
-
     private void OnDisable()
     {
         Renderer.material.color = _baseColor;
@@ -81,10 +73,12 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
 
     public Enemy Setup(Vector3 position, Quaternion rotation, Wave wave = null)
     {
+        print($"Setup start on {gameObject.name}");
+        
         transform.position = position;
         transform.rotation = rotation;
         transform.localScale = Size;
-
+        
         if (wave != null)
         {
             Health += wave.waveStruct.health;
@@ -92,14 +86,26 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
             MoveSpeed += wave.waveStruct.moveSpeed;
             XpOnDeath += wave.waveStruct.xpOnDeath;
         }
+        
+        gameObject.SetActive(true);
+        
+        _healthSystem.enabled = true;
+        _targetSystem.enabled = true;
+        _attackController.enabled = true;
+        _enemyController.enabled = true;
+        _enemyDeathEffect.enabled = true;
 
         _healthSystem.Init(Health);
+        _targetSystem.Init();
+        _attackController.Init();
+        _enemyController.Init();
 
         return this;
     }
 
     public void Die()
     {
+        OnDeath?.Invoke(transform.position);
         Renderer.material.color = _baseColor;
         EnemyPool.Instance.ReturnToPool(this);
     }

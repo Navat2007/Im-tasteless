@@ -100,9 +100,10 @@ public class CrateSpawner : MonoBehaviour
             return spawnPoints[index];
         }
         
-        void OnCrateDeath(ProjectileHitInfo projectileHitInfo, Crate spawnedCrate)
+        void OnCrateDeath(GameObject owner, ProjectileHitInfo projectileHitInfo)
         {
-            _crateList.Remove(spawnedCrate);
+            owner.GetComponent<HealthSystem>().OnDeath -= OnCrateDeath;
+            _crateList.Remove(owner.GetComponent<Crate>());
             StartCoroutine(SpawnCrate(1, 0.4f, Random.Range(minTimeBetweenSpawn, maxTimeBetweenSpawn), false));
         }
 
@@ -124,14 +125,11 @@ public class CrateSpawner : MonoBehaviour
                 .Setup(position, Quaternion.identity)
                 .SetSpawnPoint(point)
                 .gameObject.SetActive(true);
+            
+            crate.GetComponent<HealthSystem>().OnDeath += OnCrateDeath;
 
             _crateList.Add(crate);
             _currentSpawnPoints.Add(point);
-            
-            if (crate.gameObject.TryGetComponent(out HealthSystem healthSystem))
-            {
-                healthSystem.OnDeath += (projectileHitInfo) => OnCrateDeath(projectileHitInfo, crate);
-            }
         }
         
         _isStartSpawn = false;

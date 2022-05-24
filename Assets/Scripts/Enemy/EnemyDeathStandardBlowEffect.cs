@@ -13,10 +13,8 @@ public class EnemyDeathStandardBlowEffect : EnemyDeathEffect
         healthSystem.OnDeath -= OnDeath;
     }
     
-    protected override void OnDeath(ProjectileHitInfo projectileHitInfo)
+    protected override void OnDeath(GameObject owner, ProjectileHitInfo projectileHitInfo)
     {
-        healthSystem.enabled = false;
-        
         enemy.GetEnemyController.OnDeath();
         
         StartCoroutine(Fade(materialColor, Color.grey, 10));

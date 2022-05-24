@@ -38,7 +38,7 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
         _healthSystem.OnDeath += OnDeath;
     }
 
-    private void OnDeath(ProjectileHitInfo projectileHitInfo)
+    private void OnDeath(GameObject owner, ProjectileHitInfo projectileHitInfo)
     {
         WeaponType GetWeaponToSpawn()
         {

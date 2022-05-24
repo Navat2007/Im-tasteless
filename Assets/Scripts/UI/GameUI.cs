@@ -464,7 +464,7 @@ public class GameUI : MonoBehaviour
         }
     }
 
-    private void OnGameOver(ProjectileHitInfo projectileHitInfo)
+    private void OnGameOver(GameObject owner, ProjectileHitInfo projectileHitInfo)
     {
         IEnumerator MoveEnemyCounterPanel()
         {

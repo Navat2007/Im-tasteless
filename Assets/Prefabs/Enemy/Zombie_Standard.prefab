@@ -8342,7 +8342,7 @@ NavMeshAgent:
   m_Height: 2
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 0
+  m_ObstacleAvoidanceType: 1
 --- !u!54 &8075979695828029037
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -8514,6 +8514,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeBetweenSearchTarget: 0.5
+  target: {fileID: 0}
 --- !u!114 &8075979695828029024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8542,6 +8543,9 @@ MonoBehaviour:
   timeUpdateSpeed: 0.1
   capsuleCollider: {fileID: 8075979695828029036}
   capsuleCollider2: {fileID: 8075979695828029034}
+  target: {fileID: 0}
+  isDead: 0
+  isWalking: 0
 --- !u!114 &8075979695828029039
 MonoBehaviour:
   m_ObjectHideFlags: 0

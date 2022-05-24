@@ -36,14 +36,12 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
             transform.localScale += Vector3.one * Time.deltaTime * growSpeed;
     }
 
-    protected override void OnDeath(ProjectileHitInfo projectileHitInfo)
+    protected override void OnDeath(GameObject owner, ProjectileHitInfo projectileHitInfo)
     {
         if (_isExploded)
             return;
 
         _isExploded = true;
-        
-        healthSystem.enabled = false;
         
         if(gameObject.TryGetComponent(out EnemyPowerSkin skin))
         {

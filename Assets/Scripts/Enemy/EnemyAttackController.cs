@@ -12,23 +12,11 @@ public class EnemyAttackController : MonoBehaviour
     private AnimationController _animationController;
 
     private float _nextAttackTime;
-    
+
     private void Awake()
     {
         _enemy = GetComponent<Enemy>();
         _animationController = GetComponent<AnimationController>();
-    }
-    
-    private void Start()
-    {
-        _enemy.GetEnemyTargetSystem.OnTargetPositionChange += OnTargetPositionChange;
-        _enemy.GetEnemyHealthSystem.OnDeath += HealthSystemOnOnDeath;
-    }
-
-    private void OnDestroy()
-    {
-        _enemy.GetEnemyTargetSystem.OnTargetPositionChange -= OnTargetPositionChange;
-        _enemy.GetEnemyHealthSystem.OnDeath -= HealthSystemOnOnDeath;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -52,25 +40,7 @@ public class EnemyAttackController : MonoBehaviour
             }
         }
     }
-
-    private void OnTargetPositionChange(Vector3 position, GameObject target)
-    {
-        /*
-        if (Time.time > _nextAttackTime)
-        {
-            float sqrDistanceToTarget = (position - transform.position).sqrMagnitude;
-
-            if (target.activeSelf && sqrDistanceToTarget < Mathf.Pow(_enemy.AttackDistance, 2))
-                Attack(target);
-        }
-        */
-    }
     
-    private void HealthSystemOnOnDeath(ProjectileHitInfo obj)
-    {
-        enabled = false;
-    }
-
     private void Attack(GameObject target)
     {
         _nextAttackTime = Time.time + _enemy.MsBetweenAttack / 1000;
@@ -88,5 +58,10 @@ public class EnemyAttackController : MonoBehaviour
         }
 
         _animationController.SetState(AnimationState.ATTACK);
+    }
+
+    public void Init()
+    {
+        
     }
 }
