@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Interface;
+using Pools;
 using UnityEngine;
 
 [RequireComponent(typeof(AnimationController))]
@@ -20,9 +21,7 @@ public class HealthSystem : MonoBehaviour
     [field: SerializeField] public float InvulnerabilityTime { get; private set; }
 
     [Header("Настройки эффекта вспышки при получении урона")]
-    [SerializeField] private float blinkIntensity = 10;
     [SerializeField] private float blinkDuration = 0.1f;
-    [SerializeField] private float blinkTimer;
 
     [Header("Настройки всплывающий текст")] 
     [SerializeField] private GameObject floatingTextPrefab;
@@ -31,7 +30,6 @@ public class HealthSystem : MonoBehaviour
     
     private Renderer _renderer;
     private Color _startColor;
-    private const float DefaultHealth = 1;
     private bool _isOverTimeHealActive;
     private bool _isDeath;
     private float _nextInvulnerabilityTime;
@@ -44,36 +42,14 @@ public class HealthSystem : MonoBehaviour
     
     private void OnEnable()
     {
+        _isDeath = false;
+        _isOverTimeHealActive = false;
+        
         AddHealth(MaxHealth);
-    }
-
-    private void Start()
-    {
-        IHealth health = GetComponent<IHealth>();
-        if (health != null)
-        {
-            Init(health.Health);
-        }
-        else
-        {
-            Init(DefaultHealth);
-        }
     }
 
     private void Update()
     {
-        /*
-        if (blinkTimer > 0)
-        {
-            blinkTimer -= Time.deltaTime;
-            float lerp = Mathf.Clamp01(blinkTimer / blinkDuration);
-            float intensity = (lerp * blinkIntensity) + 1;
-            _renderer.material.color = Color.white * intensity;
-        }
-        else if(enabled)
-            _renderer.material.color = _startColor;
-            */
-
         if (Time.time > _nextHealthInSecondTickTime)
         {
             _nextHealthInSecondTickTime = Time.time + 1;
@@ -121,13 +97,27 @@ public class HealthSystem : MonoBehaviour
     public void AddMaxHealth(float value)
     {
         MaxHealth += value;
+
         OnMaxHealthChange?.Invoke(MaxHealth);
+        
+        if (CurrentHealth > MaxHealth)
+        {
+            CurrentHealth = MaxHealth;
+            OnHealthChange?.Invoke(CurrentHealth);
+        }
     }
     
     public void AddMaxHealthPercent(float percent)
     {
         MaxHealth += MaxHealth / 100 * percent;
+
         OnMaxHealthChange?.Invoke(MaxHealth);
+        
+        if (CurrentHealth > MaxHealth)
+        {
+            CurrentHealth = MaxHealth;
+            OnHealthChange?.Invoke(CurrentHealth);
+        }
     }
 
     private IEnumerator HealOverTime(float amount, float tickTimePeriod, int tickAmount)
@@ -180,22 +170,18 @@ public class HealthSystem : MonoBehaviour
         if(Time.time < _nextInvulnerabilityTime) return;
         
         StopCoroutine(Blink(blinkDuration));
+        StartCoroutine(Blink(blinkDuration));
 
         _animationController.SetState(AnimationState.HIT);
-        
-        //blinkTimer = blinkDuration;
-        StartCoroutine(Blink(blinkDuration));
         
         if(projectileHitInfo.isCritical)
             projectileHitInfo.MakeDamageCritical();
 
         if (floatingTextPrefab != null)
         {
-            GameObject floatingTextGameObject = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity);
-            if (floatingTextGameObject.gameObject.TryGetComponent(out FloatingText floatingText))
-            {
-                floatingText.Setup(projectileHitInfo.damage.ToString(), projectileHitInfo.isCritical, Armor > 0);
-            }
+            var floatingText = FloatingTextPool.Instance.Get();
+           floatingText.Setup(projectileHitInfo.damage.ToString(), projectileHitInfo.isCritical, Armor > 0, transform.position);
+           floatingText.gameObject.SetActive(true);
         }
 
         if (Armor > 0)
@@ -223,7 +209,6 @@ public class HealthSystem : MonoBehaviour
     {
         _isDeath = true;
         
-        blinkTimer = 0;
         _renderer.material.color = _startColor;
 
         OnDeath?.Invoke(projectileHitInfo);

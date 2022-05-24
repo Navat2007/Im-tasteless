@@ -11,6 +11,8 @@ public abstract class PickableWeapon : MonoBehaviour, IPickable
     
     protected WeaponController weaponController;
     
+    private WeaponType _weaponType;
+    
     private void Awake()
     {
         weaponController = GameObject.FindGameObjectWithTag("Player").GetComponent<WeaponController>();
@@ -27,6 +29,22 @@ public abstract class PickableWeapon : MonoBehaviour, IPickable
         {
             PickUp();
         }
+    }
+
+    public PickableWeapon Setup(Vector3 position, Quaternion rotation)
+    {
+        transform.position = position;
+        transform.rotation = rotation;
+        
+        return this;
+    }
+
+    public WeaponType GetWeaponType => _weaponType;
+
+    public PickableWeapon SetWeaponType(WeaponType weaponType)
+    {
+        _weaponType = weaponType;
+        return this;
     }
     
     public abstract void PickUp();

@@ -11,7 +11,7 @@ namespace Busters
         public override void PickUp()
         {
             busterController.PickBandage(count, percentToAddOverTime, tickTimePeriod, tickAmount);
-            Destroy(gameObject);
+            BusterPool.Instance.ReturnToPool(this);
         }
     }
 }

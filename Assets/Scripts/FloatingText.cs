@@ -1,10 +1,13 @@
 using System;
+using Pools;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class FloatingText : MonoBehaviour
 {
+    [SerializeField] private int minFontSize = 16;
+    [SerializeField] private int maxFontSize = 22;
     [SerializeField] private Image armorImage;
     [SerializeField] private TMP_Text text;
     private float _destroyTime = 3;
@@ -27,11 +30,6 @@ public class FloatingText : MonoBehaviour
         {
             throw new NotImplementedException("Floating text, не назначено изображение брони");
         }
-    }
-
-    private void Start()
-    {
-        Destroy(gameObject, _destroyTime);
     }
 
     private void Update()
@@ -60,18 +58,25 @@ public class FloatingText : MonoBehaviour
             text.color = _textColor;
             
             if(_textColor.a < 0)
-                Destroy(gameObject);
+                FloatingTextPool.Instance.ReturnToPool(this);
         }
     }
     
-    public void Setup(String textValue, bool isCritical, bool isShield)
+    public void Setup(String textValue, bool isCritical, bool isShield, Vector3 position)
     {
+        transform.localScale = Vector3.one;
+        transform.position = position;
         text.SetText(textValue);
 
         if (isCritical)
         {
-            text.fontSize = 24;
+            text.fontSize = maxFontSize;
             text.color = Color.red;
+        }
+        else
+        {
+            text.fontSize = minFontSize;
+            text.color = Color.yellow;
         }
             
         _textColor = text.color;
@@ -81,5 +86,7 @@ public class FloatingText : MonoBehaviour
         
         if(isShield)
             armorImage.gameObject.SetActive(true);
+        else
+            armorImage.gameObject.SetActive(false);
     }
 }

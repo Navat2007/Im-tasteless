@@ -13,6 +13,9 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float timeUpdateSpeed = 0.1f;
     [SerializeField] private CapsuleCollider capsuleCollider;
     [SerializeField] private CapsuleCollider capsuleCollider2;
+    [SerializeField] private GameObject target;
+    [SerializeField] private bool isDead;
+    [SerializeField] private bool isWalking;
     
     private Enemy _enemy;
     private AnimationController _animationController;
@@ -24,10 +27,6 @@ public class EnemyController : MonoBehaviour
     private float _bonusTurnSpeed;
     private float _nextTimeUpdateSpeed;
 
-    private GameObject _target;
-    private bool _isDead;
-    private bool _isWalking;
-
     private void Awake()
     {
         _enemy = GetComponent<Enemy>();
@@ -35,17 +34,25 @@ public class EnemyController : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
     }
-
-    private void Start()
+    
+    private void OnEnable()
     {
+        isDead = false;
+        isWalking = false;
+        
+        _navMeshAgent.enabled = true;
+        _navMeshAgent.isStopped = false;
+        
+        capsuleCollider.enabled = true;
+        capsuleCollider2.enabled = false;
+        
         _navMeshAgent.speed = _enemy.MoveSpeed;
-        _animationController.SetState(AnimationState.IDLE);
         
         _enemy.GetEnemyTargetSystem.OnTargetChange += OnTargetChange;
         _enemy.GetEnemyTargetSystem.OnTargetPositionChange += OnTargetPositionChange;
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         _enemy.GetEnemyTargetSystem.OnTargetChange -= OnTargetChange;
         _enemy.GetEnemyTargetSystem.OnTargetPositionChange -= OnTargetPositionChange;
@@ -55,9 +62,9 @@ public class EnemyController : MonoBehaviour
     {
         try
         {
-            if(ControllerManager.player == null && !_isWalking && !_isDead)
+            if(ControllerManager.player == null && !isWalking && !isDead)
             {
-                _isWalking = true;
+                isWalking = true;
                 _navMeshAgent.enabled = true;
                 _navMeshAgent.isStopped = false;
                 _navMeshAgent.speed = 1f;
@@ -65,13 +72,13 @@ public class EnemyController : MonoBehaviour
                 StartCoroutine(TurnOnWalking());
             }
             
-            if (Time.time > _nextTimeUpdateSpeed && _navMeshAgent.enabled && !_isWalking)
+            if (Time.time > _nextTimeUpdateSpeed && _navMeshAgent.enabled && !isWalking && !isDead)
             {
                 _nextTimeUpdateSpeed = Time.time + timeUpdateSpeed;
                 _navMeshAgent.angularSpeed = _enemy.TurnSpeed + _bonusTurnSpeed;
                 _navMeshAgent.speed = _enemy.MoveSpeed + _bonusSpeed;
 
-                if (_target != null && Vector3.Distance(_target.transform.position, _enemy.transform.position) <=
+                if (target != null && Vector3.Distance(target.transform.position, _enemy.transform.position) <=
                     _navMeshAgent.stoppingDistance)
                 {
                     _navMeshAgent.isStopped = true;
@@ -93,7 +100,7 @@ public class EnemyController : MonoBehaviour
 
     private void OnTargetChange(GameObject target)
     {
-        _target = target;
+        this.target = target;
     }
     
     private void OnTargetPositionChange(Vector3 position, GameObject target)
@@ -104,7 +111,7 @@ public class EnemyController : MonoBehaviour
     
     public void OnDeath()
     {
-        _isDead = true;
+        isDead = true;
 
         if (_navMeshAgent.enabled)
         {
@@ -161,7 +168,7 @@ public class EnemyController : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         
-        if (!_isDead)
+        if (!isDead)
         {
             _navMeshAgent.enabled = true;
             _navMeshAgent.isStopped = false;
@@ -176,7 +183,8 @@ public class EnemyController : MonoBehaviour
 
             var position = new Vector3(Camera.main.transform.localPosition.x + random.Next(-30, 30), 0, (Camera.main.transform.localPosition.z + 10) + random.Next(-30, 30));
             
-            _navMeshAgent.SetDestination(position);
+            if(_navMeshAgent != null)
+                _navMeshAgent.SetDestination(position);
         }
         
         yield return new WaitForSeconds(1);
@@ -195,9 +203,9 @@ public class EnemyController : MonoBehaviour
                 SetNewDestination();
             }
             
-            if(_navMeshAgent.remainingDistance <= 1f)
+            if(_navMeshAgent != null & _navMeshAgent.remainingDistance <= 1f)
                 _animationController.SetState(AnimationState.IDLE);
-            else
+            else if(_navMeshAgent != null & _navMeshAgent.remainingDistance > 1f)
                 _animationController.SetState(AnimationState.WALK);
 
             yield return new WaitForSeconds(1);

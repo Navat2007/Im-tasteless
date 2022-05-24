@@ -384,6 +384,7 @@ public class GameUI : MonoBehaviour
 
     private void OnHealthChange(float currentHealth)
     {
+        //print($"OnHealthChange: {currentHealth}");
         if (healthText != null)
         {
             healthText.SetText($"{Math.Round(currentHealth)} / {Math.Round(ControllerManager.healthSystem.MaxHealth)}");
@@ -397,6 +398,7 @@ public class GameUI : MonoBehaviour
     
     private void OnMaxHealthChange(float maxHealth)
     {
+        //print($"OnMaxHealthChange: {maxHealth}");
         if (healthText != null)
         {
             healthText.SetText($"{Math.Round(ControllerManager.healthSystem.CurrentHealth)} / {Math.Round(maxHealth)}");
@@ -405,6 +407,7 @@ public class GameUI : MonoBehaviour
         if (healthSlider != null)
         {
             healthSlider.maxValue = Mathf.Round(maxHealth);
+            healthSlider.value = Mathf.Round(ControllerManager.healthSystem.CurrentHealth);
         }
     }
     
@@ -436,6 +439,7 @@ public class GameUI : MonoBehaviour
         if (xpSlider != null)
         {
             xpSlider.maxValue = Mathf.Round(nextLevelXp);
+            xpSlider.value = Mathf.Round(ControllerManager.experienceSystem.Xp);
         }
     }
 
@@ -465,7 +469,7 @@ public class GameUI : MonoBehaviour
         IEnumerator MoveEnemyCounterPanel()
         {
             float newY = enemyCounterPanel.position.y;
-            float speed = 15;
+            float speed = 25;
             
             while (newY > 45)
             {

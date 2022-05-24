@@ -1,4 +1,5 @@
 using Interface;
+using Pools;
 using UnityEngine;
 
 public class Grenade : MonoBehaviour
@@ -13,16 +14,24 @@ public class Grenade : MonoBehaviour
     [SerializeField] private float stunTime = 1;
     
     [Space(10)]
-    [SerializeField] private ParticleSystem explodeEffect;
     [SerializeField] private AudioClip explodeClip;
+    
+    [Space(10)]
+    [SerializeField] private MeshRenderer grenade1MeshRenderer;
+    [SerializeField] private MeshRenderer grenade2MeshRenderer;
+    [SerializeField] private MeshRenderer grenade3MeshRenderer;
 
     private bool _isExploded;
     private float _countdown;
     private Collider _collider;
+    private Rigidbody _rigidbody;
+    private float _timer;
+    private ParticleSystem _explosiveParticleSystem;
 
     private void Awake()
     {
         _collider = GetComponent<Collider>();
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
     private void Start()
@@ -33,6 +42,12 @@ public class Grenade : MonoBehaviour
     private void Update()
     {
         _countdown -= Time.deltaTime;
+
+        if (Time.time > _timer && _isExploded)
+        {
+            ExplosivePool.Instance.ReturnToPool(_explosiveParticleSystem);
+            GrenadetPool.Instance.ReturnToPool(this);
+        }
 
         if (_countdown <= 0 && !_isExploded)
         {
@@ -50,6 +65,21 @@ public class Grenade : MonoBehaviour
             Explode();
     }
 
+    public void Setup(Vector3 position, Quaternion rotation, Vector3 forceToAdd)
+    {
+        _isExploded = false;
+        transform.position = position;
+        transform.rotation = rotation;
+
+        _countdown = delay;
+
+        grenade1MeshRenderer.enabled = true;
+        grenade2MeshRenderer.enabled = true;
+        grenade3MeshRenderer.enabled = true;
+        
+        _rigidbody.AddForce(forceToAdd, ForceMode.Impulse);
+    }
+
     private void Explode()
     {
         if(_isExploded)
@@ -59,11 +89,11 @@ public class Grenade : MonoBehaviour
         
         void ShowEffect()
         {
-            if(explodeEffect != null)
-                Destroy(
-                    Instantiate(explodeEffect.gameObject, transform.position + new Vector3(0, 1.1f, 0), transform.rotation),
-                    explodeEffect.main.startLifetime.constantMax
-                );
+            _explosiveParticleSystem = ExplosivePool.Instance.Get();
+            _explosiveParticleSystem.transform.position = transform.position + new Vector3(0, 1.1f, 0);
+            _explosiveParticleSystem.transform.rotation = transform.rotation;
+            _explosiveParticleSystem.gameObject.SetActive(true);
+            _timer = Time.time + _explosiveParticleSystem.main.startLifetime.constantMax;
         }
 
         void AddForce()
@@ -109,6 +139,8 @@ public class Grenade : MonoBehaviour
         AddForce();
         ExplodeSound();
         
-        Destroy(gameObject);
+        grenade1MeshRenderer.enabled = false;
+        grenade2MeshRenderer.enabled = false;
+        grenade3MeshRenderer.enabled = false;
     }
 }

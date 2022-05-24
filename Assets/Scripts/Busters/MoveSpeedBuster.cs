@@ -10,7 +10,7 @@ namespace Busters
         public override void PickUp()
         {
             busterController.PickMoveSpeed(count, duration, moveSpeedPercent);
-            Destroy(gameObject);
+            BusterPool.Instance.ReturnToPool(this);
         }
     }
 }

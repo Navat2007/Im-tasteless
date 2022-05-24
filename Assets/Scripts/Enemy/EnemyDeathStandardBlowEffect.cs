@@ -1,32 +1,39 @@
+using System.Collections;
 using UnityEngine;
 
 public class EnemyDeathStandardBlowEffect : EnemyDeathEffect
 {
-    private ParticleSystem _particleSystem;
-    private float _timer;
-    private bool _spawned;
-    
-    private void Update()
+    private void OnEnable()
     {
-        if (_spawned && Time.time > _timer)
-        {
-            DeathEffectPool.Instance.ReturnToPool(_particleSystem);
-        }
+        healthSystem.OnDeath += OnDeath;
     }
 
+    private void OnDisable()
+    {
+        healthSystem.OnDeath -= OnDeath;
+    }
+    
     protected override void OnDeath(ProjectileHitInfo projectileHitInfo)
     {
-        base.OnDeath(projectileHitInfo);
-
-        _particleSystem = DeathEffectPool.Instance.Get();
-        _particleSystem.transform.position = projectileHitInfo.hitPoint;
-        _particleSystem.transform.rotation = Quaternion.FromToRotation(Vector3.forward, projectileHitInfo.hitDirection);
-        _particleSystem.gameObject.SetActive(true);
-
-        _timer = Time.time + _particleSystem.main.startLifetime.constantMax;
-        _spawned = true;
+        healthSystem.enabled = false;
+        
         enemy.GetEnemyController.OnDeath();
         
         StartCoroutine(Fade(materialColor, Color.grey, 10));
+    }
+    
+    private IEnumerator Fade(Color from, Color to, float time)
+    {
+        float speed = 1 / time;
+        float percent = 1;
+
+        while (percent > 0)
+        {
+            percent -= Time.deltaTime * speed;
+            material.color = Color.Lerp(to, from, percent);
+            yield return null;
+        }
+        
+        enemy.Die();
     }
 }

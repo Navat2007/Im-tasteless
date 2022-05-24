@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Interface;
+using Pools;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -33,12 +34,13 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
         _healthSystem = GetComponent<HealthSystem>();
         
         _healthSystem.SetRender(Renderer);
+        _healthSystem.Init(Health);
         _healthSystem.OnDeath += OnDeath;
     }
 
     private void OnDeath(ProjectileHitInfo projectileHitInfo)
     {
-        GameObject GetWeaponToSpawn()
+        WeaponType GetWeaponToSpawn()
         {
             int count = 0;
 
@@ -53,19 +55,19 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
                     case WeaponType.SHOTGUN:
                         if (Helper.IsCritical(shotgunSpawnChance))
                         {
-                            return shotgunPrefab;
+                            return weaponType;
                         }
                         break;
                     case WeaponType.RIFLE:
                         if (Helper.IsCritical(rifleSpawnChance))
                         {
-                            return riflePrefab;
+                            return weaponType;
                         }
                         break;
                     case WeaponType.GRENADE:
                         if (Helper.IsCritical(grenadeSpawnChance))
                         {
-                            return grenadePrefab;
+                            return weaponType;
                         }
                         break;
                 }
@@ -73,9 +75,7 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
                 count++;
             }
         
-            //print($"Оружие заспавнено с {count} попытки");
-        
-            return grenadePrefab;
+            return WeaponType.GRENADE;
         }
 
         void AddWeaponAmmo()
@@ -91,6 +91,7 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
             System.Random random = new System.Random();
             var weapon = activeWeapon[random.Next(activeWeapon.Count)];
             ControllerManager.weaponController.AddAmmo(ControllerManager.weaponController.GetWeaponInfo(weapon).ammoMax, weapon, false);
+            //TODO показать всплывающий значок
         }
         
         if(_spawned) return;
@@ -108,21 +109,30 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
         }
         else
         {
-            Instantiate(
-                GetWeaponToSpawn(), 
-                new Vector3(transform.position.x, spawnHeight, transform.position.z), 
-                Quaternion.identity, 
-                GameObject.FindGameObjectWithTag("WeaponPool").transform
-            );
+            var pickableWeapon = PickableWeaponPool.Instance.Get(GetWeaponToSpawn());
+            pickableWeapon
+                .Setup(new Vector3(transform.position.x, spawnHeight, transform.position.z), Quaternion.identity)
+                .gameObject.SetActive(true);
         }
         
         ControllerManager.crateSpawner.RemoveSpawnPoint(_spawnPoint);
 
-        Destroy(gameObject);
+        CratePool.Instance.ReturnToPool(this);
     }
 
-    public void SetSpawnPoint(SpawnPoint spawnPoint)
+    public Crate SetSpawnPoint(SpawnPoint spawnPoint)
     {
         _spawnPoint = spawnPoint;
+        
+        return this;
+    }
+
+    public Crate Setup(Vector3 position, Quaternion rotation)
+    {
+        _spawned = false;
+        transform.position = position;
+        transform.rotation = rotation;
+        
+        return this;
     }
 }

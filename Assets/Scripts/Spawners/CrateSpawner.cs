@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Pools;
 using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -95,10 +96,6 @@ public class CrateSpawner : MonoBehaviour
 
             if (index == -1)
                 index = 0;
-            
-            //print($"Точка спавна найдена с {count} попытки");
-
-            
 
             return spawnPoints[index];
         }
@@ -120,21 +117,20 @@ public class CrateSpawner : MonoBehaviour
         {
             SpawnPoint point = GetRandomSpawnerPoint();
             Vector3 position = new Vector3(point.transform.position.x, spawnYPosition, point.transform.position.z);
+
+            var crate = CratePool.Instance.Get();
             
-            Crate spawnedCrate = Instantiate(
-                cratePrefab, 
-                position, 
-                Quaternion.identity, 
-                cratePool
-            );
-            
-            _crateList.Add(spawnedCrate);
+            crate
+                .Setup(position, Quaternion.identity)
+                .SetSpawnPoint(point)
+                .gameObject.SetActive(true);
+
+            _crateList.Add(crate);
             _currentSpawnPoints.Add(point);
-            spawnedCrate.SetSpawnPoint(point);
             
-            if (spawnedCrate.gameObject.TryGetComponent(out HealthSystem healthSystem))
+            if (crate.gameObject.TryGetComponent(out HealthSystem healthSystem))
             {
-                healthSystem.OnDeath += (projectileHitInfo) => OnCrateDeath(projectileHitInfo, spawnedCrate);
+                healthSystem.OnDeath += (projectileHitInfo) => OnCrateDeath(projectileHitInfo, crate);
             }
         }
         

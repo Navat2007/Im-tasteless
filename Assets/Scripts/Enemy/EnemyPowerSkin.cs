@@ -3,18 +3,22 @@ using UnityEngine;
 
 public class EnemyPowerSkin : MonoBehaviour
 {
+    [SerializeField] private Color color;
     [SerializeField] private float blinkDuration = 0.4f;
 
-    private ZombieType _zombieType;
     private Renderer _renderer;
     private Material _material;
     private Color _color;
-    private int _emissionColor = Shader.PropertyToID("_EmissionColor");
     private bool _isWorking;
 
-    private void Start()
+    private void OnEnable()
     {
         StartCoroutine(Blink());
+    }
+
+    private void OnDisable()
+    {
+        StopCoroutine(Blink());
     }
 
     private IEnumerator Blink()
@@ -23,38 +27,20 @@ public class EnemyPowerSkin : MonoBehaviour
 
         while (_isWorking)
         {
-            switch (_zombieType)
+            if (_material == null)
             {
-                case ZombieType.FAST:
-                    _material.color = Color.blue * 2;
-                    break;
-                default:
-                    _material.color = Color.yellow * 2;
-                    break;
+                _material = GetComponent<Enemy>().Renderer.material;
+                _color = _material.color;
+                yield return new WaitForSeconds(1);
             }
-            yield return new WaitForSeconds(blinkDuration);
-            _material.color = _color * 1;
-            yield return new WaitForSeconds(blinkDuration);
+            else
+            {
+                _material.color = color * 2;
+                yield return new WaitForSeconds(blinkDuration);
+                _material.color = _color * 1;
+                yield return new WaitForSeconds(blinkDuration);
+            }
         }
-    }
-
-    public EnemyPowerSkin SetColor(Color color)
-    {
-        _color = color;
-        return this;
-    }
-    
-    public EnemyPowerSkin SetZombieType(ZombieType zombieType)
-    {
-        _zombieType = zombieType;
-        return this;
-    }
-
-    public EnemyPowerSkin SetRenderer(Renderer newRenderer)
-    {
-        _renderer = newRenderer;
-        _material = _renderer.material;
-        return this;
     }
 
     public void Switch()

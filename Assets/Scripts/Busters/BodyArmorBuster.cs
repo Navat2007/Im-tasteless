@@ -5,7 +5,7 @@
         public override void PickUp()
         {
             busterController.PickBodyArmor(count);
-            Destroy(gameObject);
+            BusterPool.Instance.ReturnToPool(this);
         }
     }
 }

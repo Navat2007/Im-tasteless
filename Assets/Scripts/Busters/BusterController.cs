@@ -195,11 +195,8 @@ public class BusterController : MonoBehaviour
         System.Random random = new System.Random();
         BusterType busterType = (BusterType)values.GetValue(random.Next(values.Length));
 
-        Instantiate(
-            ControllerManager.busterController.GetBusterPrefab(busterType),
-            new Vector3(position.x, 1, position.z),
-            Quaternion.identity,
-            busterPool
-        );
+        var buster = BusterPool.Instance.Get(busterType);
+        buster.Setup(new Vector3(position.x, 1, position.z), Quaternion.identity);
+        buster.gameObject.SetActive(true);
     }
 }

@@ -10,13 +10,11 @@ public abstract class Buster : MonoBehaviour, IPickable
     [field: SerializeField] protected int count;
     
     protected BusterController busterController;
+    protected BusterType _busterType;
     
     private void Awake()
     {
-        var player = GameObject.FindGameObjectWithTag("Player");
-        
-        if(player != null)
-            busterController = player.GetComponent<BusterController>();
+        busterController = ControllerManager.busterController;
     }
     
     void Update()
@@ -30,6 +28,19 @@ public abstract class Buster : MonoBehaviour, IPickable
         {
             PickUp();
         }
+    }
+
+    public BusterType GetBusterType => _busterType;
+
+    public void SetBusterType(BusterType busterType)
+    {
+        _busterType = busterType;
+    }
+
+    public void Setup(Vector3 position, Quaternion rotation)
+    {
+        transform.position = position;
+        transform.rotation = rotation;
     }
     
     public abstract void PickUp();

@@ -9,7 +9,7 @@ public class TargetSystem : MonoBehaviour
 
     [SerializeField] private float timeBetweenSearchTarget = 0.5f;
     
-    private GameObject _target;
+    [SerializeField] private GameObject target;
 
     private void Start()
     {
@@ -18,15 +18,15 @@ public class TargetSystem : MonoBehaviour
 
     private void SetTarget(GameObject target)
     {
-        _target = target;
-        OnTargetChange?.Invoke(_target);
+        this.target = target;
+        OnTargetChange?.Invoke(this.target);
         
         StartCoroutine(FindTargetPosition());
     }
 
     private IEnumerator FindTarget()
     {
-        while (_target == null)
+        while (target == null)
         {
             var player = GameObject.FindGameObjectWithTag("Player");
                 
@@ -39,10 +39,10 @@ public class TargetSystem : MonoBehaviour
     
     private IEnumerator FindTargetPosition()
     {
-        while (_target != null && _target.activeSelf)
+        while (target != null && target.activeSelf)
         {
-            Vector3 position = new Vector3(_target.transform.position.x, 0, _target.transform.position.z);
-            OnTargetPositionChange?.Invoke(position, _target);
+            Vector3 position = new Vector3(target.transform.position.x, 0, target.transform.position.z);
+            OnTargetPositionChange?.Invoke(position, target);
 
             yield return new WaitForSeconds(timeBetweenSearchTarget);
         }
@@ -52,6 +52,6 @@ public class TargetSystem : MonoBehaviour
 
     public GameObject GetTarget()
     {
-        return _target;
+        return target;
     }
 }

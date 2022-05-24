@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,7 +23,6 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float maxSpawnDistance = 5;
 
     [Header("Хранилище объектов")]
-    [SerializeField] private Transform enemyPool;
     [SerializeField] private List<Enemy> enemyList;
 
     [Header("Шанс спавна бустеров")]
@@ -54,6 +54,23 @@ public class EnemySpawner : MonoBehaviour
 
     private void Update()
     {
+        int GetZombieCountToSpawn(ZombieType zombieType, bool isCritical)
+        {
+            int count = 1;
+
+            if (zombieType == ZombieType.FAST)
+            {
+                count++;
+
+                if (isCritical)
+                {
+                    count += 2;
+                }
+            }
+
+            return count;
+        }
+        
         for (int i = 0; i < waves.Count; i++)
         {
             Wave wave = waves[i];
@@ -65,24 +82,13 @@ public class EnemySpawner : MonoBehaviour
 
                 var powerEnemyChanceSO = wave.waveStruct.powerEnemyChance + (wave.waveStruct.powerEnemyChance / 100 * _bonusPowerEnemySpawnChance);
 
-                var enemy = GetEnemy(wave.waveStruct.enemyList, wave);
-                var powerEnemyChance = Helper.IsCritical(enemy.ZombieType == ZombieType.FAST
-                                                         || enemy.ZombieType == ZombieType.FAT
+                var zombieType = GetEnemy(wave.waveStruct.enemyList, wave);
+                var powerEnemyChance = Helper.IsCritical(zombieType == ZombieType.FAST
+                                                         || zombieType == ZombieType.FAT
                     ? powerEnemyChanceSO * 2
                     : powerEnemyChanceSO);
 
-                SpawnEnemy(enemy, powerEnemyChance, wave);
-
-                if (enemy.ZombieType == ZombieType.FAST)
-                {
-                    SpawnEnemy(enemy, powerEnemyChance, wave);
-
-                    if (powerEnemyChance)
-                    {
-                        SpawnEnemy(enemy, powerEnemyChance, wave);
-                        SpawnEnemy(enemy, powerEnemyChance, wave);
-                    }
-                }
+                SpawnEnemy(GetZombieCountToSpawn(zombieType, powerEnemyChance), zombieType, powerEnemyChance, wave);
             }
 
             if (i < waves.Count - 1 && !waves[i + 1].done && CheckNextWave(waves[i], waves[i + 1]))
@@ -93,7 +99,7 @@ public class EnemySpawner : MonoBehaviour
                 wave.done = true;
                 wave.active = false;
 
-                if (wave.finalWave && enemyPool.childCount <= 0)
+                if (wave.finalWave && enemyList.Count <= 0)
                 {
                     GameUI.instance.OpenPanel(PanelType.RESULT);
                 }
@@ -135,45 +141,40 @@ public class EnemySpawner : MonoBehaviour
         wave.SetRemainingToSpawn(wave.waveStruct.enemyCount);
     }
 
-    private Enemy GetEnemy(List<Enemy> prefabList, Wave wave)
+    private ZombieType GetEnemy(List<ZombieType> enemyList, Wave wave)
     {
         int count = 0;
-        var found = false;
-        Enemy randomEnemy = standardEnemyPrefab;
 
-        while (!found && count < 1000)
+        while (count < 1000)
         {
             System.Random random = new System.Random();
-            randomEnemy = prefabList[random.Next(prefabList.Count)];
-
-            switch (randomEnemy.ZombieType)
+            var zombieType = enemyList[random.Next(enemyList.Count)];
+            
+            switch (zombieType)
             {
                 case ZombieType.FAT:
                     if (wave.GetFatCount < wave.waveStruct.fatMaxCount)
                     {
-                        found = true;
+                        return zombieType;
                     }
-
                     break;
                 case ZombieType.FAST:
                     if (wave.GetFastCount < wave.waveStruct.fastMaxCount)
                     {
-                        found = true;
+                        return zombieType;
                     }
-
                     break;
                 case ZombieType.STANDARD:
-                    found = true;
-                    break;
+                    return zombieType;
             }
 
             count++;
         }
 
-        return randomEnemy;
+        return ZombieType.STANDARD;
     }
 
-    private Enemy SpawnEnemy(Enemy enemy, bool isPowerZombie, Wave wave)
+    private void SpawnEnemy(int count, ZombieType zombieType, bool isPowerZombie, Wave wave)
     {
         Vector3 GetRandomSpawnerPoint()
         {
@@ -203,18 +204,74 @@ public class EnemySpawner : MonoBehaviour
                 UnityEngine.Random.Range(minSpawnDistance, maxSpawnDistance));
         }
 
-        void SetupEnemy(Enemy spawnedEnemy)
+        void ShowEffect(Enemy spawnedEnemy, ProjectileHitInfo projectileHitInfo)
         {
-            spawnedEnemy.IsPower = isPowerZombie;
-            spawnedEnemy.Setup(wave);
+            IEnumerator Remove(float time, List<ParticleSystem> particleSystems)
+            {
+                yield return new WaitForSeconds(time * 5);
+                
+                print($"Remove after {time}: {particleSystems.Count}");
+                
+                foreach (var item in particleSystems)
+                {
+                    DeathEffectPool.Instance.ReturnToPool(item);
+                }
+                
+                particleSystems.Clear();
+            }
+            
+            if (spawnedEnemy.ZombieType == ZombieType.STANDARD || spawnedEnemy.ZombieType == ZombieType.FAST)
+            {
+                List<ParticleSystem> particleSystems = new();
+                
+                var particle = DeathEffectPool.Instance.Get();
+                particle.transform.position = projectileHitInfo.hitPoint;
+                particle.transform.rotation = Quaternion.FromToRotation(Vector3.forward, projectileHitInfo.hitDirection);
+                particle.gameObject.SetActive(true);
+                
+                particleSystems.Add(particle);
+                
+                StartCoroutine(Remove(particle.main.duration, particleSystems));
+            }
+
+            if (spawnedEnemy.ZombieType == ZombieType.FAT)
+            {
+                List<ParticleSystem> particleSystems = new();
+                List<Vector3> vectors = new List<Vector3>
+                {
+                    Vector3.forward,
+                    Vector3.back,
+                    Vector3.right,
+                    Vector3.left,
+                    Vector3.forward - Vector3.left,
+                    Vector3.forward - Vector3.right,
+                    Vector3.back - Vector3.left,
+                    Vector3.back - Vector3.right
+                };
+
+                foreach (var item in vectors)
+                {
+                    var particle = DeathEffectPool.Instance.Get();
+                    particle.transform.position = transform.position;
+                    particle.transform.rotation = Quaternion.FromToRotation(item, projectileHitInfo.hitDirection);
+                    particle.gameObject.SetActive(true);
+                    particleSystems.Add(particle);
+                }
+                
+                print(particleSystems.Count);
+                
+                StartCoroutine(Remove(particleSystems[0].main.duration, particleSystems));
+            }
         }
 
-        void OnEnemyDeath(Enemy spawnedEnemy)
+        void OnEnemyDeath(Enemy spawnedEnemy, ProjectileHitInfo projectileHitInfo)
         {
             wave.SetRemainingAlive(wave.GetRemainingAlive - 1);
             wave.RemoveEnemyFromList(spawnedEnemy);
             enemyList.Remove(spawnedEnemy);
-            OnEnemyCountChange?.Invoke(enemyPool.childCount);
+            OnEnemyCountChange?.Invoke(enemyList.Count);
+            
+            ShowEffect(spawnedEnemy, projectileHitInfo);
 
             spawnedEnemy.GetEnemyAttackController.enabled = false;
 
@@ -256,38 +313,36 @@ public class EnemySpawner : MonoBehaviour
                 ControllerManager.busterController.SpawnBuster(spawnedEnemy.transform.position);
         }
 
-        Enemy spawnedEnemy = Instantiate(
-            enemy,
-            GetRandomSpawnerPoint(),
-            Quaternion.identity,
-            enemyPool
-        );
-
-        switch (spawnedEnemy.ZombieType)
+        for (int i = 0; i < count; i++)
         {
-            case ZombieType.FAT:
-                wave.SetFatCount(wave.GetFatCount + 1);
-                break;
-            case ZombieType.FAST:
-                wave.SetFastCount(wave.GetFastCount + (isPowerZombie ? 4 : 2));
-                break;
+            var enemy = EnemyPool.Instance.Get(zombieType, isPowerZombie);
+
+            enemy
+                .Setup(GetRandomSpawnerPoint(), Quaternion.identity, wave)
+                .gameObject.SetActive(true);
+
+            switch (zombieType)
+            {
+                case ZombieType.FAT:
+                    wave.SetFatCount(wave.GetFatCount + 1);
+                    break;
+                case ZombieType.FAST:
+                    wave.SetFastCount(wave.GetFastCount + (isPowerZombie ? 4 : 2));
+                    break;
+            }
+
+            wave.SetRemainingToSpawn(wave.GetRemainingToSpawn - 1);
+            wave.SetRemainingAlive(wave.GetRemainingAlive + 1);
+            wave.SetAlreadySpawned(wave.GetAlreadySpawned + 1);
+            wave.AddEnemyToList(enemy);
+            enemyList.Add(enemy);
+            OnEnemyCountChange?.Invoke(enemyList.Count);
+
+            if (enemy.gameObject.TryGetComponent(out HealthSystem healthSystem))
+            {
+                healthSystem.OnDeath += (hitInfo) => OnEnemyDeath(enemy, hitInfo);
+            }
         }
-
-        wave.SetRemainingToSpawn(wave.GetRemainingToSpawn - 1);
-        wave.SetRemainingAlive(wave.GetRemainingAlive + 1);
-        wave.SetAlreadySpawned(wave.GetAlreadySpawned + 1);
-        wave.AddEnemyToList(spawnedEnemy);
-        enemyList.Add(spawnedEnemy);
-        OnEnemyCountChange?.Invoke(enemyPool.childCount);
-
-        SetupEnemy(spawnedEnemy);
-
-        if (spawnedEnemy.gameObject.TryGetComponent(out HealthSystem healthSystem))
-        {
-            healthSystem.OnDeath += (hitInfo) => OnEnemyDeath(spawnedEnemy);
-        }
-
-        return spawnedEnemy;
     }
 
     public void AddPowerEnemySpawnChance(float value)

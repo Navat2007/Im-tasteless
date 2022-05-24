@@ -30,9 +30,12 @@ public class DeathEffectPool : MonoBehaviour
 
     private void AddDeathEffect(int count)
     {
-        var deathEffect = Instantiate(deathEffectPrefab, deathEffectPool);
-        deathEffect.gameObject.SetActive(false);
-        _deathEffects.Enqueue(deathEffect);
+        for (int i = 0; i < count; i++)
+        {
+            var deathEffect = Instantiate(deathEffectPrefab, deathEffectPool);
+            deathEffect.gameObject.SetActive(false);
+            _deathEffects.Enqueue(deathEffect);
+        }
     }
 
     public ParticleSystem Get()

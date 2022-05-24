@@ -330,10 +330,9 @@ public class WeaponController : MonoBehaviour
 
         var distanceToCrosshair = Mathf.Clamp(Vector3.Distance(_crosshairPosition, leftHandHold.position), 0, grenadeMaxThrowingForce);
 
-        GameObject grenadeGameObject = Instantiate(grenadePrefab, leftHandHold.position, leftHandHold.rotation);
-        Rigidbody grenadeRigidbody = grenadeGameObject.GetComponent<Rigidbody>();
-        Vector3 forceToAdd = transform.forward * distanceToCrosshair + transform.up * grenadeThrowingUpwardForce;
-        grenadeRigidbody.AddForce(forceToAdd, ForceMode.Impulse);
+        var grenade = GrenadetPool.Instance.Get();
+        grenade.gameObject.SetActive(true);
+        grenade.Setup(leftHandHold.position, leftHandHold.rotation, transform.forward * distanceToCrosshair + transform.up * grenadeThrowingUpwardForce);
     }
     
     public void EquipWeapon(WeaponType weaponType)

@@ -11,7 +11,7 @@ public struct WaveStruct
     public float timeBetweenSpawn ;
         
     [Header("Варианты врагов")]
-    public List<Enemy> enemyList;
+    public List<ZombieType> enemyList;
     [Space]
     public float powerEnemyChance;
     public int fatMaxCount;

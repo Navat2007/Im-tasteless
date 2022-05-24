@@ -1,3 +1,4 @@
+using System;
 using Interface;
 using UnityEngine;
 
@@ -27,9 +28,14 @@ public class Player : MonoBehaviour, IHealth, IDamageable
     {
         ControllerManager.player = this;
         ControllerManager.healthSystem = _healthSystem;
-        
+
         _healthSystem.OnDeath += OnDeath;
         SetCameraAudioListener(false);
+    }
+
+    private void Start()
+    {
+        _healthSystem.Init(Health);
     }
 
     private void OnDisable()

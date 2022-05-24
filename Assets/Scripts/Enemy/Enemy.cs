@@ -24,26 +24,16 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
     [field: SerializeField] public int XpOnDeath { get; private set; } = 1;
     [field: SerializeField] public Color Color { get; private set; }
     [field: SerializeField] public Vector3 Size { get; private set; }
-    
-    [field: Header("Усиленные параметры")]
-    [field: SerializeField] public bool IsPower { get; set; }
-    [field: SerializeField] public float PowerHealth { get; private set; }
-    [field: SerializeField] public float PowerDamage { get; private set; }
-    [field: SerializeField] public float PowerCriticalChance { get; private set; }
-    [field: SerializeField] public float PowerCriticalBonus { get; private set; }
-    [field: SerializeField] public float PowerAttackDistance { get; private set; }
-    [field: SerializeField] public float PowerMsBetweenAttack { get; private set; }
-    [field: SerializeField] public float PowerMoveSpeed { get; private set; }
-    [field: SerializeField] public float PowerTurnSpeed { get; private set; }
-    [field: SerializeField] public int PowerXpOnDeath { get; private set; }
-    [field: SerializeField] public Color PowerColor { get; private set; }
-    [field: SerializeField] public Vector3 PowerSize { get; private set; }
 
     private TargetSystem _targetSystem;
     private HealthSystem _healthSystem;
     private EnemyAttackController _attackController;
     private EnemyController _enemyController;
     private EnemyDeathEffect _enemyDeathEffect;
+
+    private Color _baseColor;
+
+    private bool _isPower;
 
     private void Awake()
     {
@@ -53,6 +43,8 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
         _enemyController = GetComponent<EnemyController>();
         _enemyDeathEffect = GetComponent<EnemyDeathEffect>();
 
+        _isPower = GetComponent<EnemyPowerSkin>() != null;
+        
         if (SkinRendererList.Length > 0)
         {
             System.Random random = new System.Random();
@@ -60,53 +52,38 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
         }
         
         Renderer.gameObject.SetActive(true);
-    }
-
-    private void Start()
-    {
-        Setup();
         
         _healthSystem.SetRender(Renderer);
         _enemyDeathEffect.SetRenderer(Renderer);
+
+        _baseColor = Renderer.material.color;
     }
 
-    public void Setup(Wave wave = null)
+    private void OnEnable()
     {
+        _healthSystem.enabled = true;
+        _targetSystem.enabled = true;
+        _attackController.enabled = true;
+        _enemyController.enabled = true;
+        _enemyDeathEffect.enabled = true;
+    }
+
+    private void OnDisable()
+    {
+        Renderer.material.color = _baseColor;
+        
+        _healthSystem.enabled = false;
+        _targetSystem.enabled = false;
+        _attackController.enabled = false;
+        _enemyController.enabled = false;
+        _enemyDeathEffect.enabled = false;
+    }
+
+    public Enemy Setup(Vector3 position, Quaternion rotation, Wave wave = null)
+    {
+        transform.position = position;
+        transform.rotation = rotation;
         transform.localScale = Size;
-
-        if (IsPower)
-        {
-            Health = PowerHealth;
-            Damage = PowerDamage;
-            CriticalChance = PowerCriticalChance;
-            CriticalBonus = PowerCriticalBonus;
-            AttackDistance = PowerAttackDistance;
-            MsBetweenAttack = PowerMsBetweenAttack;
-            MoveSpeed = PowerMoveSpeed;
-            TurnSpeed = PowerTurnSpeed;
-            XpOnDeath = PowerXpOnDeath;
-            
-            transform.localScale = PowerSize;
-            
-            gameObject
-                .AddComponent<EnemyPowerSkin>()
-                .SetZombieType(ZombieType)
-                .SetRenderer(Renderer)
-                .SetColor(Renderer.material.color);
-
-            switch (ZombieType)
-            {
-                case ZombieType.FAT:
-                    gameObject.AddComponent<EnemyFatController>();
-                    break;
-                case ZombieType.FAST:
-                    gameObject.AddComponent<EnemyFastController>();
-                    break;
-                case ZombieType.STANDARD:
-                    gameObject.AddComponent<EnemyStandardController>();
-                    break;
-            }
-        }
 
         if (wave != null)
         {
@@ -117,6 +94,14 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
         }
 
         _healthSystem.Init(Health);
+
+        return this;
+    }
+
+    public void Die()
+    {
+        Renderer.material.color = _baseColor;
+        EnemyPool.Instance.ReturnToPool(this);
     }
 
     public TargetSystem GetEnemyTargetSystem => _targetSystem;
@@ -124,12 +109,7 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
     public EnemyAttackController GetEnemyAttackController => _attackController;
     public EnemyController GetEnemyController => _enemyController;
 
-    [ContextMenu("Сделать усиленным")]
-    private void MakePower()
-    {
-        IsPower = true;
-        Setup();
-    }
+    public bool IsPower => _isPower;
 }
 
 public enum ZombieType

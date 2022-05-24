@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using Interface;
 using UnityEngine;
 
@@ -17,24 +16,24 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
 
     [Header("Скорость расширения")]
     [SerializeField] private float growSpeed = 0.4f;
-
-    private List<ParticleSystem> _particleSystems = new();
+    
     private bool _isExploded;
-    private float _timer;
-    private bool _spawned;
+    
+    private void OnEnable()
+    {
+        _isExploded = false;
+        healthSystem.OnDeath += OnDeath;
+    }
 
+    private void OnDisable()
+    {
+        healthSystem.OnDeath -= OnDeath;
+    }
+    
     private void Update()
     {
         if(_isExploded)
             transform.localScale += Vector3.one * Time.deltaTime * growSpeed;
-        
-        if (_spawned && Time.time > _timer)
-        {
-            foreach (var item in _particleSystems)
-            {
-                DeathEffectPool.Instance.ReturnToPool(item);
-            }
-        }
     }
 
     protected override void OnDeath(ProjectileHitInfo projectileHitInfo)
@@ -43,24 +42,22 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
             return;
 
         _isExploded = true;
-        base.OnDeath(projectileHitInfo);
+        
+        healthSystem.enabled = false;
         
         if(gameObject.TryGetComponent(out EnemyPowerSkin skin))
         {
             skin.Switch();
+            
+            timer += 1;
+            radius += 3;
+            force *= 2;
+            damage *= 3;
         }
         
         if(gameObject.TryGetComponent(out EnemyController controller))
         {
             controller.ResetBonusSpeed();
-        }
-
-        if (enemy.IsPower)
-        {
-            timer += 1;
-            radius += 3;
-            force *= 2;
-            damage *= 3;
         }
         
         IEnumerator Timer()
@@ -76,39 +73,11 @@ public class EnemyDeathFatBlowEffect : EnemyDeathEffect
                 yield return new WaitForSeconds(0.1f);
             }
 
-            ShowEffect();
             AddForce();
             ExplodeSound();
             
             enemy.GetEnemyController.OnDeath();
-            Destroy(gameObject);
-        }
-
-        void ShowEffect()
-        {
-            List<Vector3> vectors = new List<Vector3>
-            {
-                Vector3.forward,
-                Vector3.back,
-                Vector3.right,
-                Vector3.left,
-                Vector3.forward - Vector3.left,
-                Vector3.forward - Vector3.right,
-                Vector3.back - Vector3.left,
-                Vector3.back - Vector3.right
-            };
-
-            foreach (var item in vectors)
-            {
-                var pSystem = DeathEffectPool.Instance.Get();
-                pSystem.transform.position = transform.position;
-                pSystem.transform.rotation = Quaternion.FromToRotation(item, projectileHitInfo.hitDirection);
-                pSystem.gameObject.SetActive(true);
-                _particleSystems.Add(pSystem);
-            }
-
-            _timer = Time.time + _particleSystems[0].main.startLifetime.constantMax;
-            _spawned = true;
+            enemy.Die();
         }
 
         void AddForce()

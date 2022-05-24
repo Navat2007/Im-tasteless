@@ -7,7 +7,7 @@ namespace Busters
         public override void PickUp()
         {
             busterController.PickClip(count);
-            Destroy(gameObject);
+            BusterPool.Instance.ReturnToPool(this);
         }
     }
 }

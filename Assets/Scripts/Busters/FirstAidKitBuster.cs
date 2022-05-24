@@ -9,7 +9,7 @@ namespace Busters
         public override void PickUp()
         {
             busterController.PickFirstAidKit(count, percentToAdd);
-            Destroy(gameObject);
+            BusterPool.Instance.ReturnToPool(this);
         }
     }
 }

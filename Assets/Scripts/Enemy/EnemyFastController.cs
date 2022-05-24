@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -26,7 +27,12 @@ public class EnemyFastController : MonoBehaviour
 
         _bonusSpeed = _enemy.MoveSpeed / 100 * movePercent;
     }
-    
+
+    private void OnEnable()
+    {
+        _isSlowed = false;
+    }
+
     private void Update()
     {
         if (Time.time > _stuckTimer && _isSlowed)

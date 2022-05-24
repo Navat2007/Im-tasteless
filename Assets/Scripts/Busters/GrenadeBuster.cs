@@ -5,7 +5,7 @@
         public override void PickUp()
         {
             busterController.PickGrenade(count);
-            Destroy(gameObject);
+            BusterPool.Instance.ReturnToPool(this);
         }
     }
 }

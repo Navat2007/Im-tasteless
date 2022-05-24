@@ -306,6 +306,7 @@ MonoBehaviour:
   upwardsModifier: 0
   forceMode: 0
   stunTime: 1
-  explodeEffect: {fileID: 198656289721292014, guid: 64891a0eb28db934898420d80ca07cb3,
-    type: 3}
   explodeClip: {fileID: 8300000, guid: f453f326ff5a6ab4994d3d49af54c84e, type: 3}
+  grenade1MeshRenderer: {fileID: 8304818379214826659}
+  grenade2MeshRenderer: {fileID: 8306449738773891131}
+  grenade3MeshRenderer: {fileID: 8304990363183692631}

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,13 +11,19 @@ public class CratePointer : MonoBehaviour
     [SerializeField] private float fadeTimer = 10;
     
     private Camera _camera;
-    public bool IsShow { get; private set; } = true;
+    public bool IsShow { get; private set; }
     public bool IsFade { get; private set; }
 
     private void Awake()
     {
         _camera = Camera.main;
+    }
 
+    private void OnEnable()
+    {
+        IsFade = false;
+        IsShow = true;
+        
         StartCoroutine(Fade(new Color(1, 1, 1, 1), new Color(1, 1, 1, 0), fadeTimer));
     }
 

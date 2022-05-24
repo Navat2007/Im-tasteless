@@ -558,7 +558,7 @@ NavMeshAgent:
   m_Acceleration: 4
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 1
+  m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 0
   m_AutoRepath: 1
@@ -656,18 +656,6 @@ MonoBehaviour:
   <XpOnDeath>k__BackingField: 150
   <Color>k__BackingField: {r: 0.2735849, g: 0.23874155, b: 0.23874155, a: 0}
   <Size>k__BackingField: {x: 1.9, y: 1.9, z: 1.9}
-  <IsPower>k__BackingField: 0
-  <PowerHealth>k__BackingField: 1200
-  <PowerDamage>k__BackingField: 60
-  <PowerCriticalChance>k__BackingField: 0
-  <PowerCriticalBonus>k__BackingField: 0
-  <PowerAttackDistance>k__BackingField: 3
-  <PowerMsBetweenAttack>k__BackingField: 500
-  <PowerMoveSpeed>k__BackingField: 3.5
-  <PowerTurnSpeed>k__BackingField: 100
-  <PowerXpOnDeath>k__BackingField: 3000
-  <PowerColor>k__BackingField: {r: 0.27450982, g: 0.23921569, b: 0.23921569, a: 0}
-  <PowerSize>k__BackingField: {x: 2.2, y: 2.2, z: 2.2}
 --- !u!114 &6780166634032797893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -675,7 +663,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6863741981552844846}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52407f4437a9b5346a97a81d5f2979bb, type: 3}
   m_Name: 
@@ -690,7 +678,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6863741981552844846}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9d25b3abe2c32f3409cc6910a48118b8, type: 3}
   m_Name: 
@@ -703,7 +691,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6863741981552844846}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ecb7a03356bd3cb4a975766048070815, type: 3}
   m_Name: 
@@ -713,9 +701,7 @@ MonoBehaviour:
   <HealthInSecond>k__BackingField: 0
   <Armor>k__BackingField: 0
   <InvulnerabilityTime>k__BackingField: 0
-  blinkIntensity: 10
   blinkDuration: 0.1
-  blinkTimer: 0
   floatingTextPrefab: {fileID: 8207889132182933893, guid: 56202c895bbbd2f46a668a38c741d200,
     type: 3}
 --- !u!114 &6780166634032797915
@@ -725,7 +711,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6863741981552844846}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d19da46bce00ea542ae22269954c5a97, type: 3}
   m_Name: 
@@ -738,7 +724,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6863741981552844846}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44a69df03df5ab94491508bad003b104, type: 3}
   m_Name: 
