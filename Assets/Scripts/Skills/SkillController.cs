@@ -40,6 +40,7 @@ public class SkillController : MonoBehaviour
     [SerializeField] private int uniqueSkillMaxCount = 1;
     [SerializeField] private List<Skill> uniqueSkills = new();
 
+    private List<int> _exceptedSkills = new();
     private List<Skill> _currentChoiceList = new ();
     private List<SkillStruct> _currentSkillsList = new ();
 
@@ -50,6 +51,7 @@ public class SkillController : MonoBehaviour
 
     private void OnDisable()
     {
+        _exceptedSkills.Clear();
         _currentChoiceList.Clear();
         _currentSkillsList.Clear();
         ControllerManager.skillController = null;
@@ -93,6 +95,8 @@ public class SkillController : MonoBehaviour
             if (_currentChoiceList.Contains(skill)) return false;
             if (_currentSkillsList.Exists(item => item.skill.GetID == skill.GetID) 
                 && _currentSkillsList.Find(item => item.skill.GetID == skill.GetID).level >= skill.GetMaxLevel) return false;
+
+            if (_exceptedSkills.Exists(item => item == skill.GetID)) return false;
             
             switch (skill.GetSkillRarity)
             {
@@ -144,7 +148,6 @@ public class SkillController : MonoBehaviour
 
     public void AddToSkillsList(Skill skill)
     {
-
         bool IsInSkillsList()
         {
             return _currentSkillsList.Exists(item => item.skill.GetID == skill.GetID);
@@ -176,6 +179,11 @@ public class SkillController : MonoBehaviour
             SetNextSkillDouble(false);
         
         ResetChoiceList();
+    }
+
+    public void AddToExceptedList(int id)
+    {
+        _exceptedSkills.Add(id);
     }
 
     public void SetNextSkillDouble(bool value)

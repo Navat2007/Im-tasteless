@@ -75,7 +75,7 @@ public class WeaponController : MonoBehaviour
 
     private void Awake()
     {
-        _gameUI = GameObject.FindGameObjectWithTag("GameUI").GetComponent<GameUI>();
+        _gameUI = GameUI.instance;
         _playerInput = GetComponent<PlayerInput>();
         _playerController = GetComponent<PlayerController>();
         _animator = GetComponent<Animator>();
@@ -339,7 +339,6 @@ public class WeaponController : MonoBehaviour
     {
         _isReloading = false;
 
-        // Если уже что-то экипировано выключаем и сбрасываем вращение
         if (_equippedWeapon != null)
         {
             _equippedWeapon.transform.localEulerAngles = _initialRotation;

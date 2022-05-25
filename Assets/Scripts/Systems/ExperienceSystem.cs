@@ -13,6 +13,9 @@ public class ExperienceSystem : MonoBehaviour
     [field: SerializeField] public float Xp { get; private set; }
     [field: SerializeField] public float NextLevelXp { get; private set; }
 
+    [Header("На сколько увеличивается опыт для след. уровня")] 
+    [SerializeField] private float nextLevelAdditive = 1000;
+
     private float _bonusExperiencePercent;
     
     private void OnEnable()
@@ -59,7 +62,7 @@ public class ExperienceSystem : MonoBehaviour
         Level++;
 
         Xp = 0;
-        NextLevelXp += 1000;
+        NextLevelXp += nextLevelAdditive;
         
         OnLevelChange?.Invoke(Level);
         OnNextLevelXpChange?.Invoke(NextLevelXp);

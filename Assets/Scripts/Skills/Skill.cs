@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Skills
 {
@@ -12,8 +12,20 @@ namespace Skills
         [SerializeField] protected string skillDescription;
         [SerializeField] protected SkillRarity skillRarity;
         [SerializeField] protected int maxLevel;
-    
-        public abstract void Activate();
+        [SerializeField] protected List<Skill> exceptedSkills;
+
+        private void Awake()
+        {
+            if (maxLevel == 0) maxLevel++;
+        }
+
+        public virtual void Activate()
+        {
+            foreach (var skill in exceptedSkills)
+            {
+                ControllerManager.skillController.AddToExceptedList(skill.GetID);
+            }
+        }
 
         public int GetID => id;
         public Sprite GetImage => skillImage;
@@ -21,6 +33,7 @@ namespace Skills
         public string GetDescription => skillDescription;
         public SkillRarity GetSkillRarity => skillRarity;
         public int GetMaxLevel => maxLevel;
+        public List<Skill> GetExceptedSkills => exceptedSkills;
     }
 
     public enum SkillRarity

@@ -4,6 +4,9 @@ namespace Skills.rare
     {
         public override void Activate()
         {
+            base.Activate();
+            
+            
             
         }
     }
