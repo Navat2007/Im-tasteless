@@ -21,7 +21,7 @@ public class TargetSystem : MonoBehaviour
 
     private IEnumerator FindTarget()
     {
-        while (target == null)
+        while (target == null && ControllerManager.player != null)
         {
             var player = ControllerManager.player.gameObject;
                 

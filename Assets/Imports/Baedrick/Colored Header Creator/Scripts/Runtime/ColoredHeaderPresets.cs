@@ -14,7 +14,7 @@ namespace Baedrick.ColoredHeaders
 	[CreateAssetMenu(fileName = "New Header Preset", menuName = "Colored Header Creator/Header Preset")]
 	public class ColoredHeaderPresets : ScriptableObject
 	{
-		public List<ColorSettings> coloredHeaderPresets = new List<ColorSettings>();
+		public List<ColorSettings> coloredHeaderPresets = new ();
 	}
 
 }

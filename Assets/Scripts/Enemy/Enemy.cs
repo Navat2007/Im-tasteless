@@ -73,8 +73,6 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
 
     public Enemy Setup(Vector3 position, Quaternion rotation, Wave wave = null)
     {
-        print($"Setup start on {gameObject.name}");
-        
         transform.position = position;
         transform.rotation = rotation;
         transform.localScale = Size;

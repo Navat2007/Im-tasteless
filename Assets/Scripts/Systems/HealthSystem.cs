@@ -10,6 +10,7 @@ public class HealthSystem : MonoBehaviour
     public event Action<GameObject, ProjectileHitInfo> OnDeath;
     public event Action<float> OnHealthChange;
     public event Action<float> OnMaxHealthChange;
+    public event Action<float> OnHealed;
     public event Action<float, float, float> OnTakeDamage;
     public event Action<int> OnArmorChange;
     
@@ -81,6 +82,8 @@ public class HealthSystem : MonoBehaviour
 
         if (CurrentHealth > MaxHealth)
             CurrentHealth = MaxHealth;
+        
+        OnHealed?.Invoke(CurrentHealth);
         
         if(prevHealth < MaxHealth)
             OnHealthChange?.Invoke(CurrentHealth);

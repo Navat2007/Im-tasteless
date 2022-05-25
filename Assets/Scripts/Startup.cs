@@ -10,6 +10,6 @@ public class Startup : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void TargetFrameRate()
     {
-        Application.targetFrameRate = -1;
+        Application.targetFrameRate = 300;
     }
 }

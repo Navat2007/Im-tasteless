@@ -87,6 +87,10 @@ public class GameUI : MonoBehaviour
     public static GameUI instance;
     
     [SerializeField] private Image fadePanel;
+    
+    [Header("FPS")]
+    [SerializeField] private Transform fpsPanel;
+    [SerializeField] private TMP_Text fpsText;
 
     [Header("Timer")] 
     [SerializeField] private Transform timerPanel;
@@ -118,9 +122,11 @@ public class GameUI : MonoBehaviour
     [Header("Player")] 
     [SerializeField] private Transform playerPanel;
     [SerializeField] private TMP_Text healthText;
-    [SerializeField] private Slider healthSlider;
+    [SerializeField] private Image healthBarImage;
+    [SerializeField] private Image healthDamagedBarImage;
+    [SerializeField] private float healthDamagedShrinkTimer;
     [SerializeField] private TMP_Text xpText;
-    [SerializeField] private Slider xpSlider;
+    [SerializeField] private Image xpBarImage;
     [SerializeField] private TMP_Text levelText;
 
     [Header("Buff")] 
@@ -221,7 +227,20 @@ public class GameUI : MonoBehaviour
 
     private void Start()
     {
+        InvokeRepeating(nameof(GetFPS), 1, 1);
         Subscribe();
+    }
+    
+    private void Update() {
+        
+        healthDamagedShrinkTimer -= Time.deltaTime;
+        
+        if (healthDamagedShrinkTimer < 0) {
+            if (healthBarImage.fillAmount < healthDamagedBarImage.fillAmount) {
+                float shrinkSpeed = 1f;
+                healthDamagedBarImage.fillAmount -= shrinkSpeed * Time.deltaTime;
+            }
+        }
     }
 
     private void Restart()
@@ -242,7 +261,8 @@ public class GameUI : MonoBehaviour
         if (ControllerManager.healthSystem != null)
         {
             ControllerManager.healthSystem.OnDeath += OnGameOver;
-            ControllerManager.healthSystem.OnHealthChange += OnHealthChange;
+            ControllerManager.healthSystem.OnTakeDamage += OnDamaged;
+            ControllerManager.healthSystem.OnHealed += OnHealed;
             ControllerManager.healthSystem.OnMaxHealthChange += OnMaxHealthChange;
             ControllerManager.healthSystem.OnArmorChange += OnArmorChange;
         }
@@ -269,6 +289,11 @@ public class GameUI : MonoBehaviour
             ControllerManager.busterController.OnDamageChange += OnDamageBusterChange;
             ControllerManager.busterController.OnAttackSpeedChange += OnAttackSpeedBusterChange;
         }
+
+        if (ControllerManager.playerInput != null)
+        {
+            ControllerManager.playerInput.actions["FPS"].performed += ShowFpsPanel;
+        }
     }
 
     private void Unsubscribe()
@@ -282,7 +307,8 @@ public class GameUI : MonoBehaviour
         if (ControllerManager.healthSystem != null)
         {
             ControllerManager.healthSystem.OnDeath -= OnGameOver;
-            ControllerManager.healthSystem.OnHealthChange -= OnHealthChange;
+            ControllerManager.healthSystem.OnTakeDamage -= OnDamaged;
+            ControllerManager.healthSystem.OnHealed -= OnHealed;
             ControllerManager.healthSystem.OnMaxHealthChange -= OnMaxHealthChange;
             ControllerManager.healthSystem.OnArmorChange -= OnArmorChange;
         }
@@ -308,6 +334,25 @@ public class GameUI : MonoBehaviour
             ControllerManager.busterController.OnMoveSpeedChange -= OnMoveSpeedBusterChange;
             ControllerManager.busterController.OnDamageChange -= OnDamageBusterChange;
             ControllerManager.busterController.OnAttackSpeedChange -= OnAttackSpeedBusterChange;
+        }
+        
+        if (ControllerManager.playerInput != null)
+        {
+            ControllerManager.playerInput.actions["FPS"].performed -= ShowFpsPanel;
+        }
+    }
+
+    private void GetFPS()
+    {
+        var fps = (int)(1f / Time.unscaledDeltaTime);
+        if(fpsText != null) fpsText.SetText($"FPS: {fps}");
+    }
+    
+    private void ShowFpsPanel(InputAction.CallbackContext obj)
+    {
+        if (fpsPanel != null)
+        {
+            fpsPanel.gameObject.SetActive(!fpsPanel.gameObject.activeSelf);
         }
     }
 
@@ -382,18 +427,26 @@ public class GameUI : MonoBehaviour
         enemyCounterText.SetText($"Зомби: {enemyCount}");
     }
 
-    private void OnHealthChange(float currentHealth)
+    private void OnHealed(float currentHealth)
     {
-        //print($"OnHealthChange: {currentHealth}");
         if (healthText != null)
         {
             healthText.SetText($"{Math.Round(currentHealth)} / {Math.Round(ControllerManager.healthSystem.MaxHealth)}");
         }
 
-        if (healthSlider != null)
+        healthBarImage.fillAmount = currentHealth / ControllerManager.healthSystem.MaxHealth;
+        healthDamagedBarImage.fillAmount = healthBarImage.fillAmount;
+    }
+    
+    private void OnDamaged(float damage, float currentHealth, float maxHealth)
+    {
+        if (healthText != null)
         {
-            healthSlider.value = Mathf.Round(currentHealth);
+            healthText.SetText($"{Math.Round(currentHealth)} / {Math.Round(maxHealth)}");
         }
+
+        healthDamagedShrinkTimer = 0.6f;
+        healthBarImage.fillAmount = currentHealth / maxHealth;
     }
     
     private void OnMaxHealthChange(float maxHealth)
@@ -404,11 +457,8 @@ public class GameUI : MonoBehaviour
             healthText.SetText($"{Math.Round(ControllerManager.healthSystem.CurrentHealth)} / {Math.Round(maxHealth)}");
         }
 
-        if (healthSlider != null)
-        {
-            healthSlider.maxValue = Mathf.Round(maxHealth);
-            healthSlider.value = Mathf.Round(ControllerManager.healthSystem.CurrentHealth);
-        }
+        healthBarImage.fillAmount = (float)ControllerManager.healthSystem.CurrentHealth / ControllerManager.healthSystem.MaxHealth;
+        healthDamagedBarImage.fillAmount = healthBarImage.fillAmount;
     }
     
     private void OnArmorChange(int currentArmor)
@@ -422,11 +472,8 @@ public class GameUI : MonoBehaviour
         {
             xpText.SetText($"{Math.Round(currentXp)} / {Math.Round(ControllerManager.experienceSystem.NextLevelXp)}");
         }
-
-        if (xpSlider != null)
-        {
-            xpSlider.value = Mathf.Round(currentXp);
-        }
+        
+        xpBarImage.fillAmount = currentXp / ControllerManager.experienceSystem.NextLevelXp;
     }
     
     private void OnNextLevelXpChange(float nextLevelXp)
@@ -436,11 +483,7 @@ public class GameUI : MonoBehaviour
             xpText.SetText($"{Math.Round(ControllerManager.experienceSystem.Xp)} / {Math.Round(nextLevelXp)}");
         }
 
-        if (xpSlider != null)
-        {
-            xpSlider.maxValue = Mathf.Round(nextLevelXp);
-            xpSlider.value = Mathf.Round(ControllerManager.experienceSystem.Xp);
-        }
+        xpBarImage.fillAmount = ControllerManager.experienceSystem.Xp / nextLevelXp;
     }
 
     private void OnLevelChange(int level)
