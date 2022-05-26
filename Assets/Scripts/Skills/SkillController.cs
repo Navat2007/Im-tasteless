@@ -131,8 +131,6 @@ public class SkillController : MonoBehaviour
             
             var skill = GetSkill(randomSkillRarity);
             
-            //print($"{skill.GetName} попытка {count}");
-            
             if (skill != null && IsAvailableToAdd(skill))
             {
                 _currentChoiceList.Add(skill);
@@ -142,7 +140,6 @@ public class SkillController : MonoBehaviour
             count++;
         }
 
-        print($"Не нашли скилл с {count} попытки");
         return lastSkill;
     }
 

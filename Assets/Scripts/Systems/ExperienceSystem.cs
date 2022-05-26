@@ -41,6 +41,7 @@ public class ExperienceSystem : MonoBehaviour
         if (levelList.Count == 0) throw new Exception("Player => ExperienceSystem => Опыт для уровней не назначен");
 
         Level = 1;
+        Xp = 0;
         NextLevelXp = levelList[0];
         MaxLevel = levelList.Count + 1;
         OnNextLevelXpChange?.Invoke(NextLevelXp);

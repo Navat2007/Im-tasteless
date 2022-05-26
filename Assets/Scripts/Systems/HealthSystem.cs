@@ -164,6 +164,20 @@ public class HealthSystem : MonoBehaviour
     {
         IEnumerator Blink(float time)
         {
+            if (_renderer == null)
+            {
+                var renders = gameObject.GetComponentsInChildren<Renderer>();
+
+                foreach (var item in renders)
+                {
+                    if (!item.gameObject.activeSelf) continue;
+                    
+                    _renderer = item;
+                    _startColor = _renderer.material.color;
+                    break;
+                }
+            }
+            
             _renderer.material.color = Color.white * 10;
             yield return new WaitForSeconds(time);
             _renderer.material.color = _startColor * 1;

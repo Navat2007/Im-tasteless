@@ -210,6 +210,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd44b6136d1bffb4b84454e61ffed5b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnPoints:
+  - {fileID: 5051199912533826798}
+  - {fileID: 5051199911571813159}
+  - {fileID: 5051199912780648138}
+  - {fileID: 5051199912228948508}
+  - {fileID: 5051199911924774297}
+  - {fileID: 5051199912259688281}
+  - {fileID: 5051199912519010421}
+  - {fileID: 5051199911048811607}
+  - {fileID: 5051199911977267848}
+  - {fileID: 5051199911011894721}
+  - {fileID: 5051199912537745454}
+  - {fileID: 5051199911243915639}
+  - {fileID: 5051199912741502995}
+  - {fileID: 5051199912021554968}
+  - {fileID: 5051199912891327302}
   waves:
   - active: 0
     done: 0
@@ -307,33 +323,17 @@ MonoBehaviour:
       moveSpeed: 0
       health: 0
     enemies: []
-  spawnPoints:
-  - {fileID: 5051199912533826798}
-  - {fileID: 5051199911571813159}
-  - {fileID: 5051199912780648138}
-  - {fileID: 5051199912228948508}
-  - {fileID: 5051199911924774297}
-  - {fileID: 5051199912259688281}
-  - {fileID: 5051199912519010421}
-  - {fileID: 5051199911048811607}
-  - {fileID: 5051199911977267848}
-  - {fileID: 5051199911011894721}
-  - {fileID: 5051199912537745454}
-  - {fileID: 5051199911243915639}
-  - {fileID: 5051199912741502995}
-  - {fileID: 5051199912021554968}
-  - {fileID: 5051199912891327302}
   standardEnemyPrefab: {fileID: 8075979695828029026, guid: 55c4b51e477b18244aa793c338c72677,
     type: 3}
   minSpawnDistance: -7
   maxSpawnDistance: 7
   enemyList: []
   standardBusterSpawnChance: 5
-  powerStandardBusterSpawnChance: 100
+  powerStandardBusterSpawnChance: 50
   fastBusterSpawnChance: 10
-  powerFastBusterSpawnChance: 50
+  powerFastBusterSpawnChance: 25
   fatBusterSpawnChance: 15
-  powerFatBusterSpawnChance: 100
+  powerFatBusterSpawnChance: 50
 --- !u!1 &5051199911571813157
 GameObject:
   m_ObjectHideFlags: 0

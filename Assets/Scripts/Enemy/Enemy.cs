@@ -54,8 +54,8 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
         
         Renderer.gameObject.SetActive(true);
         
-        _healthSystem.SetRender(Renderer);
-        _enemyDeathEffect.SetRenderer(Renderer);
+        _healthSystem?.SetRender(Renderer);
+        _enemyDeathEffect?.SetRenderer(Renderer);
 
         _baseColor = Renderer.material.color;
     }

@@ -54,6 +54,7 @@ public class PlayerController : MonoBehaviour
         {
             Ray ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
             Plane groundPlane = new Plane(Vector3.up, Vector3.up * ControllerManager.weaponController.GetWeaponHold.position.y);
+            //Debug.DrawRay(_camera.transform.position, crosshair.transform.position - _camera.transform.position);
 
             if (groundPlane.Raycast(ray, out var rayDistance))
             {

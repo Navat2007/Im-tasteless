@@ -116,8 +116,7 @@ public class WeaponController : MonoBehaviour
         if(_playerInput.actions["Fire"].IsPressed())
             OnFire(new InputAction.CallbackContext());
         
-        Vector2 scrollVector = Mouse.current.scroll.ReadValue();
-        HandleMouseScroll(scrollVector.y);
+        HandleMouseScroll(Mouse.current.scroll.ReadValue().y);
     }
 
     private void LateUpdate()

@@ -60,7 +60,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 20
-  count: 56
+  count: 21
 --- !u!1001 &4508243351037198277
 PrefabInstance:
   m_ObjectHideFlags: 0

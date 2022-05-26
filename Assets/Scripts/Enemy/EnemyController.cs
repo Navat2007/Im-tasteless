@@ -21,6 +21,7 @@ public class EnemyController : MonoBehaviour
     private AnimationController _animationController;
     private Rigidbody _rigidbody;
     private NavMeshAgent _navMeshAgent;
+    private Camera _camera;
 
     private float _bonusSpeed;
     private float _minBonusSpeed = -2.75f;
@@ -33,6 +34,7 @@ public class EnemyController : MonoBehaviour
         _animationController = GetComponent<AnimationController>();
         _rigidbody = GetComponent<Rigidbody>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
+        _camera = Camera.main;
     }
     
     private void OnDisable()
@@ -183,7 +185,7 @@ public class EnemyController : MonoBehaviour
         {
             System.Random random = new System.Random();
 
-            var position = new Vector3(Camera.main.transform.localPosition.x + random.Next(-30, 30), 0, (Camera.main.transform.localPosition.z + 10) + random.Next(-30, 30));
+            var position = new Vector3(_camera.transform.localPosition.x + random.Next(-30, 30), 0, (_camera.transform.localPosition.z + 10) + random.Next(-30, 30));
             
             if(_navMeshAgent != null)
                 _navMeshAgent.SetDestination(position);

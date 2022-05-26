@@ -23,7 +23,7 @@ public class PauseManager : MonoBehaviour
         GameManager.SetGameState(GameManager.GameState.PAUSE);
     }
     
-    public void StopPause(bool smooth = true)
+    public void StopPause(bool smooth = false)
     {
         if(smooth)
             StartCoroutine(SmoothPause());
@@ -42,6 +42,7 @@ public class PauseManager : MonoBehaviour
         
         while (Time.timeScale < 1)
         {
+            print(Time.timeScale);
             Time.timeScale += 0.001f * stopPauseSpeed;
             yield return null;
         }

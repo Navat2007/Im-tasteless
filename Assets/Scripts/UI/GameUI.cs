@@ -451,7 +451,6 @@ public class GameUI : MonoBehaviour
     
     private void OnMaxHealthChange(float maxHealth)
     {
-        //print($"OnMaxHealthChange: {maxHealth}");
         if (healthText != null)
         {
             healthText.SetText($"{Math.Round(ControllerManager.healthSystem.CurrentHealth)} / {Math.Round(maxHealth)}");
