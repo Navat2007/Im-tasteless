@@ -47,6 +47,12 @@ public class EnemyController : MonoBehaviour
     {
         try
         {
+            if (transform.position.y <= -3)
+            {
+                transform.position = new Vector3(transform.position.x, 1.5f, transform.position.z);
+                return;
+            }
+            
             if(ControllerManager.player == null && !isWalking && !isDead)
             {
                 isWalking = true;
