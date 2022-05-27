@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using Managers;
 using Skills;
 using TMPro;
@@ -210,7 +211,8 @@ public class GameUI : MonoBehaviour
             timer.OnTimerChange += (sender, time) =>
             {
                 TimeSpan timeSpan = TimeSpan.FromSeconds(time);
-                timerText.text = $"{timeSpan:m\\:ss}";
+                string formattedTimeSpan = string.Format("{0:D2} : {1:D2}", timeSpan.Minutes, timeSpan.Seconds);
+                timerText.text = formattedTimeSpan;
             };
         }
     }

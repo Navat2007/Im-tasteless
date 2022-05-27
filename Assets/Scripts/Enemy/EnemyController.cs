@@ -200,17 +200,25 @@ public class EnemyController : MonoBehaviour
         {
             timer += 1;
 
-            System.Random random = new System.Random();
-            if (timer >= random.Next(30, 60))
+            try
             {
-                timer = 0;
-                SetNewDestination();
-            }
+                System.Random random = new System.Random();
+                if (timer >= random.Next(30, 60))
+                {
+                    timer = 0;
+                    SetNewDestination();
+                }
             
-            if(_navMeshAgent != null & _navMeshAgent.remainingDistance <= 1f)
-                _animationController.SetState(AnimationState.IDLE);
-            else if(_navMeshAgent != null & _navMeshAgent.remainingDistance > 1f)
-                _animationController.SetState(AnimationState.WALK);
+                if(_navMeshAgent != null & _navMeshAgent.remainingDistance <= 1f)
+                    _animationController.SetState(AnimationState.IDLE);
+                else if(_navMeshAgent != null & _navMeshAgent.remainingDistance > 1f)
+                    _animationController.SetState(AnimationState.WALK);
+            }
+            catch (Exception e)
+            {
+                _navMeshAgent.enabled = false;
+                _navMeshAgent.enabled = true;
+            }
 
             yield return new WaitForSeconds(1);
         }

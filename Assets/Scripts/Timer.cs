@@ -8,38 +8,27 @@ public class Timer : MonoBehaviour
 
     public EventHandler<float> OnTimerChange;
 
+    private float _nextTime;
     private float _scoreTimerMax = 1f;
     private float _scoreTimer = 0;
 
-    private void OnEnable()
-    {
-        //GameManager.LevelManager.OnExit += Reset;
-    }
-    
-    private void OnDisable()
-    {
-        //GameManager.LevelManager.OnExit -= Reset;
-    }
-
     private void Update()
     {
-        /*
-        if (GameManager.Instance.GetState == GameState.PLAY)
+        if (Time.time > _nextTime)
         {
+            _nextTime = Time.time + 1;
             
+            currentTime += 1;
+            OnTimerChange?.Invoke(this, currentTime);
+
+            _scoreTimer += 1;
+
+            if (_scoreTimer >= _scoreTimerMax)
+            {
+                _scoreTimer = 0;
+            }
         }
-        */
         
-        currentTime += Time.deltaTime;
-        OnTimerChange?.Invoke(this, currentTime);
-
-        _scoreTimer += Time.deltaTime;
-
-        if (_scoreTimer >= _scoreTimerMax)
-        {
-            _scoreTimer = 0;
-            //CurrencyManager.Instance.AddCurrency(Currency.SCORE, scoreOnTime);
-        }
     }
 
     public void Reset()
