@@ -135,6 +135,15 @@ public class GameUI : MonoBehaviour
     [SerializeField] private BuffIconStruct attackSpeedBuffIconStruct;
     [SerializeField] private BuffIconStruct moveSpeedBuffIconStruct;
     [SerializeField] private BuffIconStruct armorBuffIconStruct;
+    
+    [Header("Ability")] 
+    [SerializeField] private Transform abilityPanel;
+    [SerializeField] private TMP_Text abilityTimer;
+    [SerializeField] private Image abilityImage;
+    [SerializeField] private Image abilityFadeImage;
+    [Space(10)]
+    [SerializeField] private Transform abilitySprintIcon;
+    [SerializeField] private Transform abilitySprintText;
 
     [Header("Weapon")] 
     [SerializeField] private Transform bulletsPanel;
@@ -296,6 +305,12 @@ public class GameUI : MonoBehaviour
         {
             ControllerManager.playerInput.actions["FPS"].performed += ShowFpsPanel;
         }
+        
+        if (ControllerManager.playerAbilityController != null)
+        {
+            ControllerManager.playerAbilityController.OnAbilitySet += OnAbilitySet;
+            ControllerManager.playerAbilityController.OnAbilityUse += OnAbilityUse;
+        }
     }
 
     private void Unsubscribe()
@@ -342,6 +357,12 @@ public class GameUI : MonoBehaviour
         {
             ControllerManager.playerInput.actions["FPS"].performed -= ShowFpsPanel;
         }
+        
+        if (ControllerManager.playerAbilityController != null)
+        {
+            ControllerManager.playerAbilityController.OnAbilitySet -= OnAbilitySet;
+            ControllerManager.playerAbilityController.OnAbilityUse -= OnAbilityUse;
+        }
     }
 
     private void GetFPS()
@@ -356,6 +377,61 @@ public class GameUI : MonoBehaviour
         {
             fpsPanel.gameObject.SetActive(!fpsPanel.gameObject.activeSelf);
         }
+    }
+    
+    private void OnAbilitySet(Ability ability)
+    {
+        abilityPanel.gameObject.SetActive(true);
+        abilityImage.sprite = ability.GetImage;
+    }
+    
+    private void OnAbilityUse(float reuseDuration, Ability ability)
+    {
+        IEnumerator AbilityDurationTimer()
+        {
+            float _timer = 0;
+            
+            abilitySprintIcon.gameObject.SetActive(true);
+
+            while (_timer <= reuseDuration)
+            {
+                _timer += Time.deltaTime;
+                TimeSpan timeSpan = TimeSpan.FromSeconds(reuseDuration - _timer);
+                string formattedTimeSpan = timeSpan.Seconds.ToString();
+                abilityTimer.text = formattedTimeSpan;
+                abilityFadeImage.fillAmount = ((reuseDuration - _timer) * 100 / reuseDuration) / 100;
+                
+                yield return null;
+            }
+        }
+        
+        IEnumerator AbilityReuseTimer()
+        {
+            float _timer = 0;
+            
+            abilityFadeImage.gameObject.SetActive(true);
+            abilityFadeImage.fillAmount = 1;
+
+            while (_timer <= reuseDuration)
+            {
+                _timer += Time.deltaTime;
+                TimeSpan timeSpan = TimeSpan.FromSeconds(reuseDuration - _timer);
+                string formattedTimeSpan = timeSpan.Seconds.ToString();
+                abilityTimer.text = formattedTimeSpan;
+                abilityFadeImage.fillAmount = ((reuseDuration - _timer) * 100 / reuseDuration) / 100;
+                
+                yield return null;
+            }
+            
+            abilityFadeImage.gameObject.SetActive(false);
+        }
+
+        if (ability is id_2_SprintAbility)
+        {
+            Debug.Log("Sprint");
+        }
+
+        StartCoroutine(AbilityReuseTimer());
     }
 
     private void OnEquipWeapon(WeaponType weaponType)

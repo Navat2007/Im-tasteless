@@ -208,10 +208,22 @@ public class SkillController : MonoBehaviour
         AddToSkillsList(uncommonSkills[2]);
     }
     
-    [ContextMenu("Получить health скилл в списке необычных")]
+    [ContextMenu("Получить health скилл")]
     private void Get3Skill()
     {
         AddToSkillsList(uncommonSkills[4]);
+    }
+    
+    [ContextMenu("Knock скилл")]
+    private void GetKnockSkill()
+    {
+        AddToSkillsList(rareSkills[1]);
+    }
+    
+    [ContextMenu("Sprint скилл")]
+    private void GetSprintSkill()
+    {
+        AddToSkillsList(rareSkills[0]);
     }
 
     #endregion

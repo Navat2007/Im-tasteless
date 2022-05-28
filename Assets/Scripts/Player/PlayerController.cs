@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
     {
         ControllerManager.playerController = null;
         ControllerManager.playerInput = null;
-        
+
         _playerInput.actions["Move"].performed -= OnMove;
         _playerInput.actions["Move"].canceled -= OnMove;
         _playerInput.actions["Escape"].performed -= OnEscape;

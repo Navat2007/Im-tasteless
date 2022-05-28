@@ -4,6 +4,7 @@ public static class ControllerManager
 {
     public static Player player;
     public static PlayerController playerController;
+    public static PlayerAbilityController playerAbilityController;
     public static PlayerInput playerInput;
     public static SkillController skillController;
     public static WeaponController weaponController;
