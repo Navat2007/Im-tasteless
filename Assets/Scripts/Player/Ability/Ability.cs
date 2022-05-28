@@ -12,6 +12,7 @@ public abstract class Ability: MonoBehaviour
 
     public abstract void Activate();
 
+    public float GetDuration => duration;
     public float GetReuseTimer => reuseTimer;
     public Sprite GetImage => image;
 }

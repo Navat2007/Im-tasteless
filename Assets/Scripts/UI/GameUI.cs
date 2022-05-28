@@ -143,7 +143,7 @@ public class GameUI : MonoBehaviour
     [SerializeField] private Image abilityFadeImage;
     [Space(10)]
     [SerializeField] private Transform abilitySprintIcon;
-    [SerializeField] private Transform abilitySprintText;
+    [SerializeField] private TMP_Text abilitySprintText;
 
     [Header("Weapon")] 
     [SerializeField] private Transform bulletsPanel;
@@ -390,19 +390,21 @@ public class GameUI : MonoBehaviour
         IEnumerator AbilityDurationTimer()
         {
             float _timer = 0;
+            float duration = ability.GetDuration;
             
             abilitySprintIcon.gameObject.SetActive(true);
 
-            while (_timer <= reuseDuration)
+            while (_timer <= duration)
             {
                 _timer += Time.deltaTime;
-                TimeSpan timeSpan = TimeSpan.FromSeconds(reuseDuration - _timer);
+                TimeSpan timeSpan = TimeSpan.FromSeconds(duration - _timer);
                 string formattedTimeSpan = timeSpan.Seconds.ToString();
-                abilityTimer.text = formattedTimeSpan;
-                abilityFadeImage.fillAmount = ((reuseDuration - _timer) * 100 / reuseDuration) / 100;
+                abilitySprintText.text = formattedTimeSpan;
                 
                 yield return null;
             }
+            
+            abilitySprintIcon.gameObject.SetActive(false);
         }
         
         IEnumerator AbilityReuseTimer()
@@ -428,7 +430,7 @@ public class GameUI : MonoBehaviour
 
         if (ability is id_2_SprintAbility)
         {
-            Debug.Log("Sprint");
+            StartCoroutine(AbilityDurationTimer());
         }
 
         StartCoroutine(AbilityReuseTimer());
