@@ -610,6 +610,8 @@ GameObject:
   - component: {fileID: 4814742620544880133}
   - component: {fileID: 4814742620544880132}
   - component: {fileID: 1702127141632124091}
+  - component: {fileID: 6893600879574787413}
+  - component: {fileID: -7325125868158836640}
   m_Layer: 6
   m_Name: Enemy Standard
   m_TagString: Enemy
@@ -771,6 +773,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <ZombieType>k__BackingField: 0
+  <Renderer>k__BackingField: {fileID: 0}
+  <SkinRendererList>k__BackingField: []
   <Health>k__BackingField: 30
   <Damage>k__BackingField: 10
   <CriticalChance>k__BackingField: 0
@@ -782,18 +786,6 @@ MonoBehaviour:
   <XpOnDeath>k__BackingField: 50
   <Color>k__BackingField: {r: 1, g: 0, b: 0, a: 0}
   <Size>k__BackingField: {x: 1, y: 1, z: 1}
-  <IsPower>k__BackingField: 0
-  <PowerHealth>k__BackingField: 400
-  <PowerDamage>k__BackingField: 30
-  <PowerCriticalChance>k__BackingField: 0
-  <PowerCriticalBonus>k__BackingField: 0
-  <PowerAttackDistance>k__BackingField: 3
-  <PowerMsBetweenAttack>k__BackingField: 1000
-  <PowerMoveSpeed>k__BackingField: 4
-  <PowerTurnSpeed>k__BackingField: 120
-  <PowerXpOnDeath>k__BackingField: 1000
-  <PowerColor>k__BackingField: {r: 1, g: 0, b: 0, a: 0}
-  <PowerSize>k__BackingField: {x: 1, y: 1, z: 1}
 --- !u!114 &4814742620544880135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -807,6 +799,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeUpdateSpeed: 0.2
+  target: {fileID: 0}
+  isDead: 0
+  isWalking: 0
 --- !u!114 &1393763479768124120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -837,9 +832,7 @@ MonoBehaviour:
   <HealthInSecond>k__BackingField: 0
   <Armor>k__BackingField: 0
   <InvulnerabilityTime>k__BackingField: 0
-  blinkIntensity: 10
   blinkDuration: 0.1
-  blinkTimer: 0
   floatingTextPrefab: {fileID: 8207889132182933893, guid: 56202c895bbbd2f46a668a38c741d200,
     type: 3}
 --- !u!114 &4814742620544880132
@@ -855,6 +848,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeBetweenSearchTarget: 0.25
+  target: {fileID: 0}
 --- !u!114 &1702127141632124091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -867,8 +861,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63b70566fb60df5429b6ede285b41cdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deathEffectParticlePrefab: {fileID: 1902504369814592601, guid: e231fee14d6bdd84abbc0d1538adc545,
-    type: 3}
+--- !u!114 &6893600879574787413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4814742620544880143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30771920f7976d240b6b8f284ca045cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animatorControllers: []
+--- !u!114 &-7325125868158836640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4814742620544880143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84445bc6a41d8bd43a4f3e5b7bc8cfdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Height: 2
+  m_WalkableMask: -1
+  m_Speed: 3.5
+  m_Acceleration: 8
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_BaseOffset: 1
+  m_ObstacleAvoidanceType: 4
+  m_AvoidancePriority: 50
+  m_TimeToBlock: 1
+  m_UnblockSpeedThreshold: 1
+  m_BlockRefreshInterval: 1
+  m_MinDistanceBoostToStopBlock: 0.5
+  m_MoveThreshold: 0.1
+  m_TimeToStationary: 0.5
+  m_CarveOnlyStationary: 1
+  hiddenAgentGameObject: {fileID: 0}
 --- !u!1 &5887985951224045424
 GameObject:
   m_ObjectHideFlags: 0

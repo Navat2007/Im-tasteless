@@ -11,8 +11,6 @@ using UnityEngine.AI;
 public class EnemyController : MonoBehaviour
 {
     [SerializeField] private float timeUpdateSpeed = 0.1f;
-    [SerializeField] private CapsuleCollider capsuleCollider;
-    [SerializeField] private CapsuleCollider capsuleCollider2;
     [SerializeField] private GameObject target;
     [SerializeField] private bool isDead;
     [SerializeField] private bool isWalking;
@@ -22,6 +20,7 @@ public class EnemyController : MonoBehaviour
     private Rigidbody _rigidbody;
     private NavMeshAgent _navMeshAgent;
     private Camera _camera;
+    private Collider _collider;
 
     private float _bonusSpeed;
     private float _minBonusSpeed = -2.75f;
@@ -35,6 +34,7 @@ public class EnemyController : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _camera = Camera.main;
+        _collider = GetComponent<Collider>();
     }
     
     private void OnDisable()
@@ -107,9 +107,9 @@ public class EnemyController : MonoBehaviour
         
         _navMeshAgent.enabled = true;
         _navMeshAgent.isStopped = false;
-        
-        capsuleCollider.enabled = true;
-        capsuleCollider2.enabled = false;
+
+        _collider.enabled = true;
+        _rigidbody.isKinematic = false;
         
         _animationController.Init();
         
@@ -128,11 +128,11 @@ public class EnemyController : MonoBehaviour
             _navMeshAgent.isStopped = true;
             _navMeshAgent.enabled = false;
         }
-        
-        capsuleCollider.enabled = false;
-        capsuleCollider2.enabled = true;
-        
+
         _animationController.SetState(AnimationState.DIE);
+        
+        _rigidbody.isKinematic = true;
+        _collider.enabled = false;
     }
     
     public void AddSpeed(float value)

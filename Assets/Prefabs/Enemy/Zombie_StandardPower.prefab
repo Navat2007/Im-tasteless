@@ -8237,7 +8237,6 @@ GameObject:
   - component: {fileID: 8075979695828029038}
   - component: {fileID: 8075979695828029037}
   - component: {fileID: 8075979695828029036}
-  - component: {fileID: 8075979695828029034}
   - component: {fileID: 8075979695828029030}
   - component: {fileID: 8075979695828029026}
   - component: {fileID: 8075979695828029027}
@@ -8359,7 +8358,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 116
   m_CollisionDetection: 0
 --- !u!136 &8075979695828029036
 CapsuleCollider:
@@ -8373,20 +8372,6 @@ CapsuleCollider:
   m_Enabled: 1
   m_Radius: 0.4
   m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
---- !u!136 &8075979695828029034
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8162478327193078022}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  m_Radius: 0.1
-  m_Height: 0.1
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!95 &8075979695828029030
@@ -8543,8 +8528,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeUpdateSpeed: 0.1
-  capsuleCollider: {fileID: 8075979695828029036}
-  capsuleCollider2: {fileID: 8075979695828029034}
   target: {fileID: 0}
   isDead: 0
   isWalking: 0
