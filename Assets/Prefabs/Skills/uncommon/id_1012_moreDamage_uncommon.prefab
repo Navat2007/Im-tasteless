@@ -46,12 +46,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 1012
   skillImage: {fileID: 21300000, guid: 1b0ce65312c81c74b9dd2e3a140bca73, type: 3}
-  skillName: "\u0417\u0430\u0440\u044F\u0436\u0435\u043D\u043D\u043E\u043C\u0443
-    \u0442\u0430\u043D\u043A\u0443 \u0432 \u0434\u0443\u043B\u043E \u043D\u0435 \u0441\u043C\u043E\u0442\u0440\u044F\u0442"
+  skillName: "\u0421\u0442\u0435\u043A\u043B\u044F\u043D\u043D\u0430\u044F \u043F\u0443\u0448\u043A\u0430"
   skillDescription: "+20% \u0443\u0440\u043E\u043D\u0443, \u043D\u043E -10% \u043A
     \u043C\u0430\u043A\u0441\u0438\u043C\u0430\u043B\u044C\u043D\u043E\u043C\u0443
     \u0437\u0434\u043E\u0440\u043E\u0432\u044C\u044E"
   skillRarity: 1
   maxLevel: 1
+  exceptedSkills: []
   damage: 20
   maxHealth: -10

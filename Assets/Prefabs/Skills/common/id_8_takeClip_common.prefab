@@ -46,9 +46,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 8
   skillImage: {fileID: 21300000, guid: a2a65ae2018ff42298435920ce8c1620, type: 3}
-  skillName: "\u041D\u0443 \u0442\u0435\u043F\u0435\u0440\u044C \u043F\u043E\u0441\u0442\u0440\u0435\u043B\u044F\u0435\u043C"
+  skillName: "\u041F\u043E\u0441\u0442\u0440\u0435\u043B\u044F\u0435\u043C?"
   skillDescription: "+1 \u043F\u043E\u0434\u0431\u0438\u0440\u0430\u0435\u043C\u0430\u044F
     \u043E\u0431\u043E\u0439\u043C\u0430"
   skillRarity: 0
   maxLevel: 3
+  exceptedSkills: []
   bonusTakeClip: 1

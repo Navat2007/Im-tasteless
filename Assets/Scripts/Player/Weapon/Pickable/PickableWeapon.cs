@@ -6,7 +6,7 @@ public abstract class PickableWeapon : MonoBehaviour, IPickable
     [Header("Скорость вращения")]
     [field: SerializeField] protected float speed = 20;
     
-    [Header("Колличество предметов")]
+    [Header("Колличество предметов (патронов)")]
     [field: SerializeField] protected int count;
     
     protected WeaponController weaponController;
