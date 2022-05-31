@@ -94,5 +94,11 @@ public class PlayerController : MonoBehaviour
         GameUI.instance.ClosePanel(true);
     }
 
+    public void SendImpulse(Vector3 direction)
+    {
+        _rigidbody.AddForce(direction, ForceMode.Impulse);
+    }
+
     public Vector3 GetMoveVelocity => _moveVelocity;
+    public Transform GetCrossHair => crosshair;
 }

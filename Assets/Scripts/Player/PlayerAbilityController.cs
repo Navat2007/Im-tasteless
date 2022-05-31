@@ -56,4 +56,18 @@ public class PlayerAbilityController : MonoBehaviour
 
         StartCoroutine(Sprint());
     }
+    
+    public void ActivateDash(float speed)
+    {
+        var moveVelocity = ControllerManager.playerController.GetMoveVelocity;
+        ControllerManager.playerController.SendImpulse(moveVelocity * speed);
+    }
+    
+    public void ActivateBounce(float speed)
+    {
+        var playerTransform = ControllerManager.player.transform.position;
+        var crossHairTransform = ControllerManager.playerController.GetCrossHair.position;
+        
+        ControllerManager.playerController.SendImpulse((playerTransform - crossHairTransform).normalized * speed);
+    }
 }

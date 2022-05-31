@@ -213,9 +213,16 @@ public class SkillController : MonoBehaviour
     {
         AddToSkillsList(uncommonSkills[4]);
     }
+
+
+    [ContextMenu("Dash скилл")]
+    private void GetDashSkill()
+    {
+        AddToSkillsList(rareSkills[0]);
+    }
     
-    [ContextMenu("Knock скилл")]
-    private void GetKnockSkill()
+    [ContextMenu("Bounce скилл")]
+    private void GetBounceSkill()
     {
         AddToSkillsList(rareSkills[1]);
     }
@@ -223,7 +230,7 @@ public class SkillController : MonoBehaviour
     [ContextMenu("Sprint скилл")]
     private void GetSprintSkill()
     {
-        AddToSkillsList(rareSkills[0]);
+        AddToSkillsList(rareSkills[2]);
     }
 
     #endregion

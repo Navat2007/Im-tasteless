@@ -2,8 +2,10 @@
 
 public class id_4_BounceAbility : Ability
 {
+    [SerializeField] private float speed = 5;
+    
     public override void Activate()
     {
-        Debug.Log("Bounce");
+        ControllerManager.playerAbilityController.ActivateBounce(speed);
     }
 }
