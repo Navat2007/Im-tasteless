@@ -288,7 +288,7 @@ public class WeaponController : MonoBehaviour
                         .SetDamage(_equippedWeapon.Damage + (_equippedWeapon.Damage / 100 * _bonusDamagePercent))
                         .SetCriticalChance(_equippedWeapon.CriticalChance + _bonusCriticalChance)
                         .SetCriticalBonus(_equippedWeapon.CriticalBonus + _bonusCriticalBonus)
-                        .SetPeriodDamage(_equippedWeapon.PeriodDamage)
+                        .SetPeriodDamage(_equippedWeapon.PeriodDamage + (_equippedWeapon.PeriodDamage / 100 * _bonusDamagePercent))
                         .SetPeriodDuration(_equippedWeapon.PeriodDamageDuration)
                         .SetPeriodTick(_equippedWeapon.PeriodDamageTick)
                         .SetKnockBack(_equippedWeapon.KnockBack)
