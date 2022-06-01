@@ -10,16 +10,14 @@ namespace Skills.rare
         public override void Activate()
         {
             base.Activate();
-            
-            Debug.Log("more");
 
             var pistol = ControllerManager.weaponController.GetWeapon(WeaponType.PISTOL);
             var shotgun = ControllerManager.weaponController.GetWeapon(WeaponType.SHOTGUN);
             var rifle = ControllerManager.weaponController.GetWeapon(WeaponType.RIFLE);
             
-            pistol.SetProjectilePerClip(pistol.ProjectilePerClip + (int)(pistol.ProjectilePerClip / 100 * moreAmmoInClipPercent));
-            shotgun.SetProjectilePerClip(shotgun.ProjectilePerClip + (int)(shotgun.ProjectilePerClip / 100 * moreAmmoInClipPercent));
-            rifle.SetProjectilePerClip(rifle.ProjectilePerClip + (int)(rifle.ProjectilePerClip / 100 * moreAmmoInClipPercent));
+            pistol.SetProjectilePerClip(pistol.ProjectilePerClip + (int)(Convert.ToDouble(pistol.ProjectilePerClip) / 100 * moreAmmoInClipPercent));
+            shotgun.SetProjectilePerClip(shotgun.ProjectilePerClip + (int)(Convert.ToDouble(shotgun.ProjectilePerClip) / 100 * moreAmmoInClipPercent));
+            rifle.SetProjectilePerClip(rifle.ProjectilePerClip + (int)(Convert.ToDouble(rifle.ProjectilePerClip) / 100 * moreAmmoInClipPercent));
             
             ControllerManager.weaponController.SetHalfMaxAmmo(true);
         }

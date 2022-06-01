@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Skills.rare
@@ -14,9 +15,9 @@ namespace Skills.rare
             var shotgun = ControllerManager.weaponController.GetWeapon(WeaponType.SHOTGUN);
             var rifle = ControllerManager.weaponController.GetWeapon(WeaponType.RIFLE);
             
-            pistol.SetProjectilePerClip(pistol.ProjectilePerClip - (int)(pistol.ProjectilePerClip / 100 * lessAmmoInClipPercent));
-            shotgun.SetProjectilePerClip(shotgun.ProjectilePerClip - (int)(shotgun.ProjectilePerClip / 100 * lessAmmoInClipPercent));
-            rifle.SetProjectilePerClip(rifle.ProjectilePerClip - (int)(rifle.ProjectilePerClip / 100 * lessAmmoInClipPercent));
+            pistol.SetProjectilePerClip(pistol.ProjectilePerClip - (int)(Convert.ToDouble(pistol.ProjectilePerClip) / 100 * lessAmmoInClipPercent));
+            shotgun.SetProjectilePerClip(shotgun.ProjectilePerClip - (int)(Convert.ToDouble(shotgun.ProjectilePerClip) / 100 * lessAmmoInClipPercent));
+            rifle.SetProjectilePerClip(rifle.ProjectilePerClip - (int)(Convert.ToDouble(rifle.ProjectilePerClip) / 100 * lessAmmoInClipPercent));
             
             ControllerManager.weaponController.SetDoubleMaxAmmo(true);
         }
