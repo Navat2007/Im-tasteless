@@ -117,10 +117,11 @@ public class Grenade : MonoBehaviour
                     var heading = nearbyObjects.transform.position - transform.position;
                     var distance = heading.magnitude;
                     var direction = heading / distance;
+                    var player = nearbyObjects.gameObject.GetComponent<Player>();
                     
                     healthSystem.TakeDamage(new ProjectileHitInfo
                     {
-                        damage = nearbyObjects.gameObject.GetComponent<Player>() != null ? damage / 2 : damage,
+                        damage = player != null ? (damage - (damage / 100 * player.ExplosiveResist)) : damage,
                         isCritical = Helper.IsCritical(0),
                         criticalBonus = 0,
                         hitPoint = nearbyObjects.transform.position,

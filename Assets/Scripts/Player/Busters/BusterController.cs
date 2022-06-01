@@ -57,6 +57,9 @@ public class BusterController : MonoBehaviour
     
     public void PickClip(int count)
     {
+        if(ControllerManager.player.HealOnTakeAmmoPercent != 0)
+            ControllerManager.healthSystem.AddHealthPercent(ControllerManager.player.HealOnTakeAmmoPercent);
+        
         foreach (WeaponType weapon in Enum.GetValues(typeof(WeaponType)))
         {
             switch (weapon)

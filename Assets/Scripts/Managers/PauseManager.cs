@@ -42,7 +42,6 @@ public class PauseManager : MonoBehaviour
         
         while (Time.timeScale < 1)
         {
-            print(Time.timeScale);
             Time.timeScale += 0.001f * stopPauseSpeed;
             yield return null;
         }

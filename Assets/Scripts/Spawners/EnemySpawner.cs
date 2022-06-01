@@ -29,11 +29,11 @@ public class EnemySpawner : MonoBehaviour
     [Header("Шанс спавна бустеров")]
     [SerializeField] private float standardBusterSpawnChance = 5.0f;
 
-    [SerializeField] private float powerStandardBusterSpawnChance = 100.0f;
+    [SerializeField] private float powerStandardBusterSpawnChance = 50.0f;
     [SerializeField] private float fastBusterSpawnChance = 10.0f;
-    [SerializeField] private float powerFastBusterSpawnChance = 50.0f;
+    [SerializeField] private float powerFastBusterSpawnChance = 25.0f;
     [SerializeField] private float fatBusterSpawnChance = 15.0f;
-    [SerializeField] private float powerFatBusterSpawnChance = 100.0f;
+    [SerializeField] private float powerFatBusterSpawnChance = 50.0f;
 
     private float _bonusPowerEnemySpawnChance;
 
@@ -362,6 +362,15 @@ public class EnemySpawner : MonoBehaviour
     public void AddPowerEnemySpawnChance(float value)
     {
         _bonusPowerEnemySpawnChance += value;
+    }
+
+    public void AddBonusBusterChance(float percent)
+    {
+        powerStandardBusterSpawnChance += powerStandardBusterSpawnChance / 100 * percent;
+        fastBusterSpawnChance += fastBusterSpawnChance / 100 * percent;
+        powerFastBusterSpawnChance += powerFastBusterSpawnChance / 100 * percent;
+        fatBusterSpawnChance += fatBusterSpawnChance / 100 * percent;
+        powerFatBusterSpawnChance += powerFatBusterSpawnChance / 100 * percent;
     }
 
     public List<Enemy> GetEnemyList()

@@ -173,6 +173,16 @@ public class EnemyController : MonoBehaviour
     {
         StartCoroutine(Wait(time));
     }
+    
+    public void SendImpulse(Vector3 direction)
+    {
+        _rigidbody.AddForce(direction, ForceMode.Impulse);
+    }
+    
+    public void SendForce(Vector3 direction)
+    {
+        _rigidbody.AddForce(direction);
+    }
 
     private IEnumerator Wait(float time)
     {

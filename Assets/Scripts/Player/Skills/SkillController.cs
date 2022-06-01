@@ -189,48 +189,34 @@ public class SkillController : MonoBehaviour
     }
 
     #region Test
-
-    [ContextMenu("Получить healthRestore скилл в списке обычных")]
-    private void Get11Skill()
+    [ContextMenu("2 Grenade скилл")]
+    private void GetGoldenEagleSkill()
     {
-        AddToSkillsList(commonSkills[9]);
+        AddToSkillsList(rareSkills[3]);
     }
     
-    [ContextMenu("Получить maxClip скилл в списке обычных")]
-    private void Get1Skill()
+    [ContextMenu("Shotgun knock скилл")]
+    private void GetFireBulletsSkill()
     {
-        AddToSkillsList(commonSkills[6]);
+        AddToSkillsList(rareSkills[15]);
     }
-    
-    [ContextMenu("Получить skillDouble скилл в списке необычных")]
-    private void Get2Skill()
-    {
-        AddToSkillsList(uncommonSkills[2]);
-    }
-    
-    [ContextMenu("Получить health скилл")]
-    private void Get3Skill()
-    {
-        AddToSkillsList(uncommonSkills[4]);
-    }
-
 
     [ContextMenu("Dash скилл")]
     private void GetDashSkill()
     {
-        AddToSkillsList(rareSkills[0]);
+        AddToSkillsList(rareSkills[10]);
     }
     
     [ContextMenu("Bounce скилл")]
     private void GetBounceSkill()
     {
-        AddToSkillsList(rareSkills[1]);
+        AddToSkillsList(rareSkills[11]);
     }
     
     [ContextMenu("Sprint скилл")]
     private void GetSprintSkill()
     {
-        AddToSkillsList(rareSkills[2]);
+        AddToSkillsList(rareSkills[12]);
     }
 
     #endregion

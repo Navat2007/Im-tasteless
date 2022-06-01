@@ -11,6 +11,8 @@ public class Player : MonoBehaviour, IHealth, IDamageable
     [field: SerializeField] public float Health { get; set; } = 20;
     [field: SerializeField] public float MoveSpeed { get; private set; } = 5;
     [field: SerializeField] public float BonusMoveSpeed { get; private set; }
+    [field: SerializeField] public float ExplosiveResist { get; private set; } = 50;
+    [field: SerializeField] public float HealOnTakeAmmoPercent { get; private set; }
     [field: SerializeField] public Renderer Renderer { get; private set; }
     
     private AudioListener _cameraAudioListener;
@@ -66,5 +68,20 @@ public class Player : MonoBehaviour, IHealth, IDamageable
     public void AddBonusMoveSpeed(float value)
     {
         BonusMoveSpeed += value;
+    }
+    
+    public void AddExplosiveResist(float value)
+    {
+        ExplosiveResist += value;
+    }
+    
+    public void SetExplosiveResist(float value)
+    {
+        ExplosiveResist = value;
+    }
+    
+    public void AddHealOnTakeAmmoPercent(float value)
+    {
+        HealOnTakeAmmoPercent = value;
     }
 }

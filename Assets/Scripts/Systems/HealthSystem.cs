@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Interface;
 using Pools;
 using UnityEngine;
@@ -35,6 +36,9 @@ public class HealthSystem : MonoBehaviour
     private bool _isDeath;
     private float _nextInvulnerabilityTime;
     private float _nextHealthInSecondTickTime;
+    private Dictionary<PeriodDamageSource, ProjectileHitInfo> _periodDamages = new ();
+    private Dictionary<PeriodDamageSource, float> _periodDamageTimers = new ();
+    private Dictionary<PeriodDamageSource, float> _periodDamageDurations = new ();
 
     private void Awake()
     {
@@ -57,6 +61,36 @@ public class HealthSystem : MonoBehaviour
             
             if(ControllerManager.playerController != null && ControllerManager.playerController.GetMoveVelocity == Vector3.zero)
                 AddHealth(HealthInSecond);
+        }
+        
+        foreach (var item in _periodDamages)
+        {
+            if (_periodDamageDurations[item.Key] > 0)
+            {
+                var timer = _periodDamageTimers[item.Key];
+                if (Time.time > timer)
+                {
+                    _periodDamageTimers[item.Key] = Time.time + item.Value.periodDamageStruct.tick;
+                    _periodDamageDurations[item.Key] -= item.Value.periodDamageStruct.tick;
+                    
+                    TakeDamage(new ProjectileHitInfo
+                    {
+                        damage = item.Value.periodDamageStruct.damage,
+                        isCritical = item.Value.isCritical,
+                        criticalBonus = item.Value.criticalBonus,
+                        hitDirection = item.Value.hitDirection,
+                        hitPoint = transform.position,
+                        periodDamageStruct = new PeriodDamageStruct()
+                    }, false);
+                }
+            }
+            else
+            {
+                _periodDamages.Remove(item.Key);
+                _periodDamageTimers.Remove(item.Key);
+                _periodDamageDurations.Remove(item.Key);
+                break;
+            }
         }
     }
 
@@ -95,6 +129,21 @@ public class HealthSystem : MonoBehaviour
             StopCoroutine(HealOverTime(amount, tickTimePeriod, tickAmount));
 
         StartCoroutine(HealOverTime(amount, tickTimePeriod, tickAmount));
+    }
+    
+    public void AddHealthPercent(float percent)
+    {
+        var prevHealth = CurrentHealth;
+        
+        CurrentHealth += MaxHealth / 100 * percent;
+
+        if (CurrentHealth > MaxHealth)
+            CurrentHealth = MaxHealth;
+        
+        OnHealed?.Invoke(CurrentHealth);
+        
+        if(prevHealth < MaxHealth)
+            OnHealthChange?.Invoke(CurrentHealth);
     }
 
     public void AddMaxHealth(float value)
@@ -160,8 +209,9 @@ public class HealthSystem : MonoBehaviour
         _nextInvulnerabilityTime = Time.time + time;
     }
     
-    public void TakeDamage(ProjectileHitInfo projectileHitInfo)
+    public void TakeDamage(ProjectileHitInfo projectileHitInfo, bool playHitAnimation = true)
     {
+        //TODO make refactor
         IEnumerator Blink(float time)
         {
             if (_renderer == null)
@@ -189,10 +239,24 @@ public class HealthSystem : MonoBehaviour
         StopCoroutine(Blink(blinkDuration));
         StartCoroutine(Blink(blinkDuration));
 
-        _animationController.SetState(AnimationState.HIT);
-        
-        if(projectileHitInfo.isCritical)
+        if(playHitAnimation)
+            _animationController.SetState(AnimationState.HIT);
+
+        if (projectileHitInfo.isCritical)
+        {
             projectileHitInfo.MakeDamageCritical();
+            projectileHitInfo.MakePeriodDamageCritical();
+        }
+
+        if (projectileHitInfo.periodDamageStruct.damage > 0)
+        {
+            if (!_periodDamages.ContainsKey(projectileHitInfo.periodDamageStruct.source))
+            {
+                _periodDamages.Add(projectileHitInfo.periodDamageStruct.source, projectileHitInfo);
+                _periodDamageTimers.Add(projectileHitInfo.periodDamageStruct.source, Time.time + projectileHitInfo.periodDamageStruct.tick);
+                _periodDamageDurations.Add(projectileHitInfo.periodDamageStruct.source, projectileHitInfo.periodDamageStruct.duration);
+            }
+        }
 
         if (floatingTextPrefab != null)
         {
@@ -252,4 +316,19 @@ public class HealthSystem : MonoBehaviour
     }
 
     #endregion
+}
+
+public struct PeriodDamageStruct
+{
+    public PeriodDamageSource source;
+    public float damage;
+    public float duration;
+    public float tick;
+}
+
+public enum PeriodDamageSource
+{
+    PROJECTILE,
+    GRENADE,
+    ABILITY
 }

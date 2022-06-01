@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3532300777685523058
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2550992103489983124}
+  - component: {fileID: 6527138561144092010}
+  m_Layer: 0
+  m_Name: id_2008_moreShotgunRange_rare
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2550992103489983124
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3532300777685523058}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6527138561144092010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3532300777685523058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7095d22dac324a1db4e6e81c60d1e7f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 2008
+  skillImage: {fileID: 21300000, guid: 677a57188cf84184da1ebcd88352ef57, type: 3}
+  skillName: "\u0414\u0440\u043E\u0431\u043E\u0432\u0438\u043A \"\u0412\u0435\u043F\u0440\u044C\""
+  skillDescription: "+ 8 \u0434\u0440\u043E\u0431\u0438\u043D\u043E\u043A \u0432
+    \u043F\u0430\u0442\u0440\u043E\u043D, - 3 \u0432\u044B\u0441\u0442\u0440\u0435\u043B\u0430
+    \u0432 \u043E\u0431\u043E\u0439\u043C\u0435"
+  skillRarity: 2
+  maxLevel: 1
+  exceptedSkills:
+  - {fileID: 8434962028780647049, guid: 5af0a4fbff420be4eaa686b1f503f364, type: 3}
+  moreBulletsToShoot: 8
+  lessAmmoInClip: 3

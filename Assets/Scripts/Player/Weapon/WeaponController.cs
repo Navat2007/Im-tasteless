@@ -20,9 +20,7 @@ public class WeaponController : MonoBehaviour
     public event Action<WeaponType> OnEquipWeapon;
 
     public Transform GetWeaponHold => weaponHold;
-    
-    [field: SerializeField] public float KillChance { get; private set; }
-    [field: SerializeField] public int PenetrateCount { get; private set; }
+
     [SerializeField] private WeaponType startingWeapon;
     
     [Header("Hold")]
@@ -37,6 +35,7 @@ public class WeaponController : MonoBehaviour
     [Header("Grenade")] 
     [SerializeField] private GameObject grenadePrefab;
     [SerializeField] private bool infiniteGrenade;
+    [SerializeField] private bool doubleGrenade;
     [SerializeField] private int grenadeCount;
     [SerializeField] private int grenadeMaxCount = 10;
     [SerializeField] private float grenadeCooldownMs = 800;
@@ -72,6 +71,15 @@ public class WeaponController : MonoBehaviour
     private float _bonusCriticalBonus;
     private int _bonusMaxClip;
     private int _bonusTakeClip;
+    private int _bonusPenetrateCount;
+    private float _bonusKillChance;
+
+    private bool _halfMaxClip;
+    private bool _doubleMaxClip;
+    
+    public Weapon GetEquippedWeapon => _equippedWeapon;
+    public int GetPenetrateCount => _equippedWeapon.PenetrateCount + _bonusPenetrateCount;
+    public float GetKillChance => _equippedWeapon.KillChance + _bonusKillChance;
 
     private void Awake()
     {
@@ -126,7 +134,7 @@ public class WeaponController : MonoBehaviour
         //_recoilAngle = Mathf.SmoothDamp(_recoilAngle, 0, ref _recoilRotationSmoothDampVelocity, .1f);
         //_equippedWeapon.transform.localEulerAngles += Vector3.left * _recoilAngle;
 
-        if (!_isReloading && _equippedWeapon.ProjectileInClip <= 0 && (_equippedWeapon.CurrentProjectileAmount > 0 || _equippedWeapon.infiniteProjectile))
+        if (!_isReloading && _equippedWeapon.ProjectileInClip <= 0 && (_equippedWeapon.CurrentProjectileAmount > 0 || _equippedWeapon.InfiniteProjectile))
         {
             Reload();
         }
@@ -271,19 +279,26 @@ public class WeaponController : MonoBehaviour
         {
             foreach (var point in _equippedWeapon.ProjectileSpawnPoint)
             {
-                var projectile = BulletPool.Instance.Get(_equippedWeapon.ProjectileType)
-                    .SetPosition(point.position)
-                    .SetRotation(point.rotation)
-                    .SetSpeed(_equippedWeapon.MuzzleVelocity)
-                    .SetDamage(_equippedWeapon.Damage + (_equippedWeapon.Damage / 100 * _bonusDamagePercent))
-                    .SetCriticalChance(_equippedWeapon.CriticalChance + _bonusCriticalChance)
-                    .SetCriticalBonus(_equippedWeapon.CriticalBonus + _bonusCriticalBonus);
+                if (point.gameObject.activeSelf)
+                {
+                    var projectile = BulletPool.Instance.Get(_equippedWeapon.ProjectileType)
+                        .SetPosition(point.position)
+                        .SetRotation(point.rotation)
+                        .SetSpeed(_equippedWeapon.MuzzleVelocity)
+                        .SetDamage(_equippedWeapon.Damage + (_equippedWeapon.Damage / 100 * _bonusDamagePercent))
+                        .SetCriticalChance(_equippedWeapon.CriticalChance + _bonusCriticalChance)
+                        .SetCriticalBonus(_equippedWeapon.CriticalBonus + _bonusCriticalBonus)
+                        .SetPeriodDamage(_equippedWeapon.PeriodDamage)
+                        .SetPeriodDuration(_equippedWeapon.PeriodDamageDuration)
+                        .SetPeriodTick(_equippedWeapon.PeriodDamageTick)
+                        .SetKnockBack(_equippedWeapon.KnockBack);
                 
-                projectile.gameObject.SetActive(true);
+                    projectile.gameObject.SetActive(true);
+                }
             }
 
             _equippedWeapon.ProjectileInClip--;
-            OnAmmoChange?.Invoke(_equippedWeapon.ProjectileInClip, _equippedWeapon.CurrentProjectileAmount, _equippedWeapon.infiniteProjectile, _equippedWeapon.CurrentWeaponType);
+            OnAmmoChange?.Invoke(_equippedWeapon.ProjectileInClip, _equippedWeapon.CurrentProjectileAmount, _equippedWeapon.InfiniteProjectile, _equippedWeapon.CurrentWeaponType);
             _equippedWeapon.MuzzleParticleSystem.Play();
         }
         
@@ -322,51 +337,41 @@ public class WeaponController : MonoBehaviour
     {
         _nextThrowingTime = Time.time + grenadeCooldownMs / 1000;
 
-        if(!infiniteGrenade)
-            grenadeCount--;
-        
-        OnAmmoChange?.Invoke(grenadeCount, grenadeMaxCount, infiniteGrenade, WeaponType.GRENADE);
-
         var distanceToCrosshair = Mathf.Clamp(Vector3.Distance(_crosshairPosition, leftHandHold.position), 0, grenadeMaxThrowingForce);
 
-        var grenade = GrenadetPool.Instance.Get();
-        grenade.gameObject.SetActive(true);
-        grenade.Setup(leftHandHold.position, leftHandHold.rotation, transform.forward * distanceToCrosshair + transform.up * grenadeThrowingUpwardForce);
+        if (!doubleGrenade || grenadeCount < 2)
+        {
+            if(!infiniteGrenade)
+                grenadeCount--;
+            
+            var grenade = GrenadetPool.Instance.Get();
+            grenade.gameObject.SetActive(true);
+            grenade.Setup(leftHandHold.position, leftHandHold.rotation, transform.forward * distanceToCrosshair + transform.up * grenadeThrowingUpwardForce);
+        }
+        else if(doubleGrenade && grenadeCount >= 2)
+        {
+            if(!infiniteGrenade)
+                grenadeCount -= 2;
+
+            leftHandHold.transform.Rotate(new Vector3(0, 10, 0));
+            
+            var grenade = GrenadetPool.Instance.Get();
+            grenade.gameObject.SetActive(true);
+            grenade.Setup(leftHandHold.position, leftHandHold.rotation, leftHandHold.transform.forward * distanceToCrosshair + leftHandHold.transform.up * grenadeThrowingUpwardForce);
+            
+            leftHandHold.transform.Rotate(new Vector3(0, -20, 0));
+            
+            var grenade2 = GrenadetPool.Instance.Get();
+            grenade2.gameObject.SetActive(true);
+            grenade2.Setup(leftHandHold.position, leftHandHold.rotation, leftHandHold.transform.forward * distanceToCrosshair + leftHandHold.transform.up * grenadeThrowingUpwardForce);
+            
+            leftHandHold.transform.Rotate(new Vector3(0, 10, 0));
+        }
+        
+        OnAmmoChange?.Invoke(grenadeCount, grenadeMaxCount, infiniteGrenade, WeaponType.GRENADE);
     }
     
-    public void EquipWeapon(WeaponType weaponType)
-    {
-        _isReloading = false;
-
-        if (_equippedWeapon != null)
-        {
-            _equippedWeapon.transform.localEulerAngles = _initialRotation;
-            _equippedWeapon.gameObject.SetActive(false);
-        }
-        
-        switch (weaponType)
-        {
-            case WeaponType.PISTOL:
-                _equippedWeapon = pistol;
-                break;
-            case WeaponType.SHOTGUN:
-                _equippedWeapon = shotgun;
-                break;
-            case WeaponType.RIFLE:
-                _equippedWeapon = rifle;
-                break;
-        }
-        
-        _equippedWeapon.gameObject.SetActive(true);
-        _initialRotation = _equippedWeapon.transform.localEulerAngles;
-        
-        OnEquipWeapon?.Invoke(weaponType);
-        OnAmmoChange?.Invoke(_equippedWeapon.ProjectileInClip, _equippedWeapon.CurrentProjectileAmount, _equippedWeapon.infiniteProjectile, _equippedWeapon.CurrentWeaponType);
-    }
-
-    public Weapon GetEquippedWeapon => _equippedWeapon;
-
-    public void Reload()
+    private void Reload()
     {
         IEnumerator AnimateReload()
         {
@@ -404,7 +409,7 @@ public class WeaponController : MonoBehaviour
             
             if(_equippedWeapon.CurrentProjectileAmount >= _equippedWeapon.ProjectilePerClip)
             {
-                if(!_equippedWeapon.infiniteProjectile)
+                if(!_equippedWeapon.InfiniteProjectile)
                     _equippedWeapon.CurrentProjectileAmount -= _equippedWeapon.ProjectilePerClip - _equippedWeapon.ProjectileInClip;
                 
                 _equippedWeapon.ProjectileInClip = _equippedWeapon.ProjectilePerClip;
@@ -413,19 +418,64 @@ public class WeaponController : MonoBehaviour
             {
                 _equippedWeapon.ProjectileInClip = _equippedWeapon.CurrentProjectileAmount;
                 
-                if(!_equippedWeapon.infiniteProjectile)
+                if(!_equippedWeapon.InfiniteProjectile)
                     _equippedWeapon.CurrentProjectileAmount -= _equippedWeapon.CurrentProjectileAmount;
             }
             
-            OnAmmoChange?.Invoke(_equippedWeapon.ProjectileInClip, _equippedWeapon.CurrentProjectileAmount, _equippedWeapon.infiniteProjectile, _equippedWeapon.CurrentWeaponType);
+            OnAmmoChange?.Invoke(_equippedWeapon.ProjectileInClip, _equippedWeapon.CurrentProjectileAmount, _equippedWeapon.InfiniteProjectile, _equippedWeapon.CurrentWeaponType);
         }
         
-        if(_equippedWeapon.ProjectileInClip == _equippedWeapon.ProjectilePerClip || (_equippedWeapon.CurrentProjectileAmount <= 0 && !_equippedWeapon.infiniteProjectile))
+        if(_equippedWeapon.ProjectileInClip == _equippedWeapon.ProjectilePerClip || (_equippedWeapon.CurrentProjectileAmount <= 0 && !_equippedWeapon.InfiniteProjectile))
             return;
 
         _isReloading = true;
 
         StartCoroutine(AnimateReload());
+    }
+    
+    private void EquipWeapon(WeaponType weaponType)
+    {
+        _isReloading = false;
+
+        if (_equippedWeapon != null)
+        {
+            _equippedWeapon.transform.localEulerAngles = _initialRotation;
+            _equippedWeapon.gameObject.SetActive(false);
+        }
+        
+        switch (weaponType)
+        {
+            case WeaponType.PISTOL:
+                _equippedWeapon = pistol;
+                break;
+            case WeaponType.SHOTGUN:
+                _equippedWeapon = shotgun;
+                break;
+            case WeaponType.RIFLE:
+                _equippedWeapon = rifle;
+                break;
+        }
+        
+        _equippedWeapon.gameObject.SetActive(true);
+        _initialRotation = _equippedWeapon.transform.localEulerAngles;
+        
+        OnEquipWeapon?.Invoke(weaponType);
+        OnAmmoChange?.Invoke(_equippedWeapon.ProjectileInClip, _equippedWeapon.CurrentProjectileAmount, _equippedWeapon.InfiniteProjectile, _equippedWeapon.CurrentWeaponType);
+    }
+
+    public Weapon GetWeapon(WeaponType weaponType)
+    {
+        switch (weaponType)
+        {
+            case WeaponType.PISTOL:
+                return pistol;
+            case WeaponType.SHOTGUN:
+                return shotgun;
+            case WeaponType.RIFLE:
+                return rifle;
+            default:
+                return pistol;
+        }
     }
 
     public void Aim(Vector3 point)
@@ -524,7 +574,7 @@ public class WeaponController : MonoBehaviour
                 if (shotgun.CurrentProjectileAmount > shotgun.MaxProjectileAmount)
                     shotgun.CurrentProjectileAmount = shotgun.MaxProjectileAmount;
                 
-                OnAmmoChange?.Invoke(shotgun.ProjectileInClip, shotgun.CurrentProjectileAmount, shotgun.infiniteProjectile, WeaponType.SHOTGUN);
+                OnAmmoChange?.Invoke(shotgun.ProjectileInClip, shotgun.CurrentProjectileAmount, shotgun.InfiniteProjectile, WeaponType.SHOTGUN);
                 break;
             case WeaponType.RIFLE:
                 if (activateWeapon && !_isRifleActive)
@@ -539,7 +589,7 @@ public class WeaponController : MonoBehaviour
                 if (rifle.CurrentProjectileAmount > rifle.MaxProjectileAmount)
                     rifle.CurrentProjectileAmount = rifle.MaxProjectileAmount;
                 
-                OnAmmoChange?.Invoke(rifle.ProjectileInClip, rifle.CurrentProjectileAmount, rifle.infiniteProjectile, WeaponType.RIFLE);
+                OnAmmoChange?.Invoke(rifle.ProjectileInClip, rifle.CurrentProjectileAmount, rifle.InfiniteProjectile, WeaponType.RIFLE);
                 break;
             case WeaponType.GRENADE:
                 if (activateWeapon && !_isGrenadeActive)
@@ -587,9 +637,21 @@ public class WeaponController : MonoBehaviour
     public void AddBonusMaxClip(int value)
     {
         _bonusMaxClip += value;
+        
+        shotgun.MaxProjectileAmount += shotgun.ProjectilePerClip * _bonusMaxClip;
+        rifle.MaxProjectileAmount += rifle.ProjectilePerClip * _bonusMaxClip;
 
-        shotgun.MaxProjectileAmount += shotgun.ProjectilePerClip * value;
-        rifle.MaxProjectileAmount += rifle.ProjectilePerClip * value;
+        if (_halfMaxClip)
+        {
+            shotgun.MaxProjectileAmount /= 2;
+            rifle.MaxProjectileAmount /= 2;
+        }
+        
+        if (_doubleMaxClip)
+        {
+            shotgun.MaxProjectileAmount *= 2;
+            rifle.MaxProjectileAmount *= 2;
+        }
     }
     
     public void AddBonusTakeClip(int value)
@@ -599,12 +661,27 @@ public class WeaponController : MonoBehaviour
     
     public void AddPenetrateCount(int value)
     {
-        PenetrateCount += value;
+        _bonusPenetrateCount += value;
     }
     
     public void AddKillChance(float value)
     {
-        KillChance += value;
+        _bonusKillChance += value;
+    }
+
+    public void SetDoubleGrenade(bool value)
+    {
+        doubleGrenade = value;
+    }
+    
+    public void SetHalfMaxAmmo(bool value)
+    {
+        _halfMaxClip = value;
+    }
+    
+    public void SetDoubleMaxAmmo(bool value)
+    {
+        _doubleMaxClip = value;
     }
 }
 

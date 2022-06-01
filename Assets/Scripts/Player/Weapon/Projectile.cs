@@ -7,6 +7,9 @@ public class Projectile : MonoBehaviour
     [SerializeField] private ProjectileType projectileType;
     [SerializeField] private float speed = 10;
     [SerializeField] private float damage = 1;
+    [SerializeField] private float periodDamage = 0;
+    [SerializeField] private float periodDuration = 0;
+    [SerializeField] private float periodTick = 0;
     [SerializeField] private float criticalChance = 10;
     [SerializeField] private float criticalBonus = 100;
     [SerializeField] private float timeToDestroy = 2;
@@ -15,6 +18,7 @@ public class Projectile : MonoBehaviour
     private BoxCollider _boxCollider;
     private float _timer;
     private int _currentPenetrate;
+    private bool _knockBack;
 
     private void Awake()
     {
@@ -25,8 +29,9 @@ public class Projectile : MonoBehaviour
 
     private void OnEnable()
     {
-        _currentPenetrate = ControllerManager.weaponController.PenetrateCount;
-        
+        if(ControllerManager.weaponController != null)
+            _currentPenetrate = ControllerManager.weaponController.GetPenetrateCount;
+
         _timer = Time.time + timeToDestroy;
         _trailRenderer.enabled = true;
         _boxCollider.enabled = true;
@@ -42,30 +47,46 @@ public class Projectile : MonoBehaviour
     {
         float moveDistance = speed * Time.deltaTime;
         transform.Translate(Vector3.forward * moveDistance);
-        
-        if(Time.time > _timer)
+
+        if (Time.time > _timer)
             BulletPool.Instance.ReturnToPool(this);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         var enemy = other.gameObject;
-        
+
         if (enemy.GetComponent<IDamageable>() != null && enemy.TryGetComponent(out HealthSystem healthSystem))
         {
             if (healthSystem.enabled)
             {
-                var damageToAdd = enemy.GetComponent<Enemy>() != null && ControllerManager.weaponController != null && Helper.IsCritical(ControllerManager.weaponController.KillChance) ? healthSystem.MaxHealth : damage;
-                
+                var damageToAdd =
+                    enemy.GetComponent<Enemy>() != null && ControllerManager.weaponController != null &&
+                    Helper.IsCritical(ControllerManager.weaponController.GetKillChance)
+                        ? healthSystem.MaxHealth
+                        : damage;
+
                 healthSystem.TakeDamage(new ProjectileHitInfo
                 {
-                    damage =  damageToAdd,
+                    damage = damageToAdd,
+                    periodDamageStruct = new PeriodDamageStruct
+                    {
+                        source = PeriodDamageSource.PROJECTILE,
+                        damage = periodDamage,
+                        duration = periodDuration,
+                        tick = periodTick
+                    },
                     isCritical = Helper.IsCritical(criticalChance),
                     criticalBonus = criticalBonus,
                     hitPoint = other.ClosestPoint(transform.position),
                     hitDirection = transform.forward
                 });
-                
+
+                if (_knockBack && enemy.TryGetComponent(out EnemyController controller))
+                {
+                    controller.SendForce(transform.forward.normalized * 50);
+                }
+
                 _currentPenetrate--;
 
                 if (_currentPenetrate <= 0)
@@ -73,25 +94,24 @@ public class Projectile : MonoBehaviour
                     _boxCollider.enabled = false;
                     BulletPool.Instance.ReturnToPool(this);
                 }
-                    
             }
         }
     }
 
     public ProjectileType GetProjectileType => projectileType;
-    
+
     public Projectile SetProjectileType(ProjectileType projectileType)
     {
         this.projectileType = projectileType;
         return this;
     }
-    
+
     public Projectile SetPosition(Vector3 position)
     {
         transform.position = position;
         return this;
     }
-    
+
     public Projectile SetRotation(Quaternion rotation)
     {
         transform.rotation = rotation;
@@ -103,22 +123,46 @@ public class Projectile : MonoBehaviour
         speed = value;
         return this;
     }
-    
+
     public Projectile SetDamage(float value)
     {
         damage = value;
         return this;
     }
     
+    public Projectile SetPeriodDamage(float value)
+    {
+        periodDamage = value;
+        return this;
+    }
+    
+    public Projectile SetPeriodDuration(float value)
+    {
+        periodDuration = value;
+        return this;
+    }
+    
+    public Projectile SetPeriodTick(float value)
+    {
+        periodTick = value;
+        return this;
+    }
+
     public Projectile SetCriticalChance(float value)
     {
         criticalChance = value;
         return this;
     }
-    
+
     public Projectile SetCriticalBonus(float value)
     {
         criticalBonus = value;
+        return this;
+    }
+    
+    public Projectile SetKnockBack(bool value)
+    {
+        _knockBack = value;
         return this;
     }
 }
@@ -132,6 +176,7 @@ public enum ProjectileType
 public struct ProjectileHitInfo
 {
     public float damage;
+    public PeriodDamageStruct periodDamageStruct;
     public bool isCritical;
     public float criticalBonus;
     public Vector3 hitPoint;
@@ -140,5 +185,10 @@ public struct ProjectileHitInfo
     public void MakeDamageCritical()
     {
         damage += damage / 100 * criticalBonus;
+    }
+    
+    public void MakePeriodDamageCritical()
+    {
+        periodDamageStruct.damage += periodDamageStruct.damage / 100 * criticalBonus;
     }
 }

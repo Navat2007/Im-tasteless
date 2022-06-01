@@ -9878,6 +9878,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <CurrentWeaponType>k__BackingField: 0
   <Damage>k__BackingField: 10
+  <PeriodDamage>k__BackingField: 0
+  <PeriodDamageTick>k__BackingField: 0
+  <PeriodDamageDuration>k__BackingField: 0
   <CriticalChance>k__BackingField: 10
   <CriticalBonus>k__BackingField: 100
   <ReloadSpeed>k__BackingField: 1.5
@@ -9887,16 +9890,19 @@ MonoBehaviour:
     type: 3}
   <EmptyAmmoClip>k__BackingField: {fileID: 8300000, guid: 50737f391152e2c489084469d5bab5e7,
     type: 3}
-  <infiniteProjectile>k__BackingField: 1
+  <InfiniteProjectile>k__BackingField: 1
+  <KnockBack>k__BackingField: 0
   <ProjectileType>k__BackingField: 0
   <ProjectileSpawnPoint>k__BackingField:
   - {fileID: 6452119763916350822}
+  <ShootPointCount>k__BackingField: 0
   <ProjectilePerClip>k__BackingField: 8
   <ProjectileInClip>k__BackingField: 8
   <CurrentProjectileAmount>k__BackingField: 200
   <MaxProjectileAmount>k__BackingField: 200
-  <Shell>k__BackingField: {fileID: 7224235566629462241, guid: be5257153bc31b94f8db78e819ee903a,
-    type: 3}
+  <PenetrateCount>k__BackingField: 0
+  <KillChance>k__BackingField: 0
+  <ShellType>k__BackingField: 0
   <ShellSpawnPoint>k__BackingField: {fileID: 8684184513158523718}
   <MuzzleParticleSystem>k__BackingField: {fileID: 4574509387063462637}
   <MuzzlePoint>k__BackingField: {fileID: 8746887457398723358}
