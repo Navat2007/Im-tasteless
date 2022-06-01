@@ -10,6 +10,8 @@ namespace Skills.rare
         public override void Activate()
         {
             base.Activate();
+            
+            Debug.Log("more");
 
             var pistol = ControllerManager.weaponController.GetWeapon(WeaponType.PISTOL);
             var shotgun = ControllerManager.weaponController.GetWeapon(WeaponType.SHOTGUN);

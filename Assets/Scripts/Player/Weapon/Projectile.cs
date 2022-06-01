@@ -29,9 +29,6 @@ public class Projectile : MonoBehaviour
 
     private void OnEnable()
     {
-        if(ControllerManager.weaponController != null)
-            _currentPenetrate = ControllerManager.weaponController.GetPenetrateCount;
-
         _timer = Time.time + timeToDestroy;
         _trailRenderer.enabled = true;
         _boxCollider.enabled = true;
@@ -60,6 +57,7 @@ public class Projectile : MonoBehaviour
         {
             if (healthSystem.enabled)
             {
+                //TODO добавить значок убийства с 1 выстрела
                 var damageToAdd =
                     enemy.GetComponent<Enemy>() != null && ControllerManager.weaponController != null &&
                     Helper.IsCritical(ControllerManager.weaponController.GetKillChance)
@@ -87,22 +85,25 @@ public class Projectile : MonoBehaviour
                     controller.SendForce(transform.forward.normalized * 50);
                 }
 
-                _currentPenetrate--;
-
                 if (_currentPenetrate <= 0)
                 {
                     _boxCollider.enabled = false;
                     BulletPool.Instance.ReturnToPool(this);
                 }
+                
+                _currentPenetrate--;
+                damage /= 2;
             }
         }
     }
 
     public ProjectileType GetProjectileType => projectileType;
 
-    public Projectile SetProjectileType(ProjectileType projectileType)
+    #region Setters
+
+    public Projectile SetProjectileType(ProjectileType type)
     {
-        this.projectileType = projectileType;
+        projectileType = type;
         return this;
     }
 
@@ -165,6 +166,15 @@ public class Projectile : MonoBehaviour
         _knockBack = value;
         return this;
     }
+
+    public Projectile SetPenetrateCount(int value)
+    {
+        _currentPenetrate = value;
+        return this;
+    }
+
+    #endregion
+
 }
 
 public enum ProjectileType

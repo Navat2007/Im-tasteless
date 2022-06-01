@@ -189,16 +189,16 @@ public class SkillController : MonoBehaviour
     }
 
     #region Test
-    [ContextMenu("2 Grenade скилл")]
+    [ContextMenu("More in clip скилл")]
     private void GetGoldenEagleSkill()
     {
-        AddToSkillsList(rareSkills[3]);
+        AddToSkillsList(rareSkills[0]);
     }
     
-    [ContextMenu("Shotgun knock скилл")]
+    [ContextMenu("Less in clip скилл")]
     private void GetFireBulletsSkill()
     {
-        AddToSkillsList(rareSkills[15]);
+        AddToSkillsList(rareSkills[1]);
     }
 
     [ContextMenu("Dash скилл")]
@@ -217,6 +217,12 @@ public class SkillController : MonoBehaviour
     private void GetSprintSkill()
     {
         AddToSkillsList(rareSkills[12]);
+    }
+    
+    [ContextMenu("Penetrate скилл")]
+    private void GetPenetrateSkill()
+    {
+        AddToSkillsList(uncommonSkills[3]);
     }
 
     #endregion

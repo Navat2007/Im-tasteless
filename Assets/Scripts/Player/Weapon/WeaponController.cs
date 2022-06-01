@@ -291,7 +291,8 @@ public class WeaponController : MonoBehaviour
                         .SetPeriodDamage(_equippedWeapon.PeriodDamage)
                         .SetPeriodDuration(_equippedWeapon.PeriodDamageDuration)
                         .SetPeriodTick(_equippedWeapon.PeriodDamageTick)
-                        .SetKnockBack(_equippedWeapon.KnockBack);
+                        .SetKnockBack(_equippedWeapon.KnockBack)
+                        .SetPenetrateCount(_equippedWeapon.PenetrateCount + _bonusPenetrateCount);
                 
                     projectile.gameObject.SetActive(true);
                 }
