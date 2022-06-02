@@ -41,6 +41,8 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private float grenadeCooldownMs = 800;
     [SerializeField] private float grenadeMaxThrowingForce = 15;
     [SerializeField] private float grenadeThrowingUpwardForce = 4;
+    [Space(20)]
+    [SerializeField] private float currentFireRate;
 
     private GameUI _gameUI;
     private PlayerInput _playerInput;
@@ -73,7 +75,7 @@ public class WeaponController : MonoBehaviour
     private int _bonusTakeClip;
     private int _bonusPenetrateCount;
     private float _bonusKillChance;
-    private float _currentFireRate;
+    
 
     private bool _halfMaxClip;
     private bool _doubleMaxClip;
@@ -324,9 +326,12 @@ public class WeaponController : MonoBehaviour
         {
             _audioManager.PlaySound(_equippedWeapon.ShootClip, _equippedWeapon.MuzzlePoint.position);
         }
+
+        var shootInSecond = 1 / (_equippedWeapon.MsBetweenShots / 1000);
+        var secondBetweenShoots = _equippedWeapon.MsBetweenShots / 1000;
         
-        _nextShootTime = Time.time + (_equippedWeapon.MsBetweenShots - (_equippedWeapon.MsBetweenShots / 100 * _bonusAttackSpeedPercent)) / 1000;
-        _currentFireRate = 1 / ((_equippedWeapon.MsBetweenShots - (_equippedWeapon.MsBetweenShots / 100 * _bonusAttackSpeedPercent)) / 1000);
+        _nextShootTime = Time.time + (secondBetweenShoots / (1 + _bonusAttackSpeedPercent / 100));
+        currentFireRate = shootInSecond + shootInSecond / 100 * _bonusAttackSpeedPercent;
         
         _animator?.SetTrigger("Attack");
         
