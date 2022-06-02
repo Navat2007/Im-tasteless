@@ -73,6 +73,7 @@ public class WeaponController : MonoBehaviour
     private int _bonusTakeClip;
     private int _bonusPenetrateCount;
     private float _bonusKillChance;
+    private float _currentFireRate;
 
     private bool _halfMaxClip;
     private bool _doubleMaxClip;
@@ -325,6 +326,7 @@ public class WeaponController : MonoBehaviour
         }
         
         _nextShootTime = Time.time + (_equippedWeapon.MsBetweenShots - (_equippedWeapon.MsBetweenShots / 100 * _bonusAttackSpeedPercent)) / 1000;
+        _currentFireRate = 1 / ((_equippedWeapon.MsBetweenShots - (_equippedWeapon.MsBetweenShots / 100 * _bonusAttackSpeedPercent)) / 1000);
         
         _animator?.SetTrigger("Attack");
         
