@@ -56,4 +56,4 @@ MonoBehaviour:
   maxLevel: 1
   exceptedSkills:
   - {fileID: 8874134290843226264, guid: 9989713c5c5e68e41af37dce8c7ce47b, type: 3}
-  lessAmmoInClipPercent: 100
+  lessAmmoInClipPercent: 50

@@ -5,6 +5,7 @@ using System.Text;
 using Managers;
 using Skills;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -48,7 +49,10 @@ public struct SkillPanelStruct
 {
     [Header("Первый скилл для выбора")]
     public Button skill1Button;
-    public Image skill1FrameImage;
+    public GameObject skill1CommonEffect;
+    public GameObject skill1UncommonEffect;
+    public GameObject skill1RareEffect;
+    public GameObject skill1UniqueEffect;
     public Image skill1Image;
     public TMP_Text skill1ImageText;
     public TMP_Text skill1Text;
@@ -57,7 +61,10 @@ public struct SkillPanelStruct
     
     [Header("Второй скилл для выбора")]
     public Button skill2Button;
-    public Image skill2FrameImage;
+    public GameObject skill2CommonEffect;
+    public GameObject skill2UncommonEffect;
+    public GameObject skill2RareEffect;
+    public GameObject skill2UniqueEffect;
     public Image skill2Image;
     public TMP_Text skill2ImageText;
     public TMP_Text skill2Text;
@@ -66,7 +73,10 @@ public struct SkillPanelStruct
     
     [Header("Третий скилл для выбора")]
     public Button skill3Button;
-    public Image skill3FrameImage;
+    public GameObject skill3CommonEffect;
+    public GameObject skill3UncommonEffect;
+    public GameObject skill3RareEffect;
+    public GameObject skill3UniqueEffect;
     public Image skill3Image;
     public TMP_Text skill3ImageText;
     public TMP_Text skill3Text;
@@ -172,15 +182,7 @@ public class GameUI : MonoBehaviour
     [SerializeField] private Transform skillChoicePanel;
     [SerializeField] private TMP_Text skillChoiceLevelText;
     [SerializeField] private SkillPanelStruct skillPanelStruct;
-    [Space(10)] 
-    [SerializeField] private Sprite frameWhiteSprite;
-    [SerializeField] private Sprite frameRedSprite;
-    [SerializeField] private Sprite frameOrangeSprite;
-    [SerializeField] private Sprite frameGraySprite;
-    [SerializeField] private Sprite framePurpleSprite;
-    [SerializeField] private Sprite frameBlueSprite;
-    [SerializeField] private Sprite frameGreenSprite;
-
+    
     private float _maximumFade = 0.75f;
     
     private Stack<PanelUIStruct> _panelStack = new ();
@@ -872,21 +874,84 @@ public class GameUI : MonoBehaviour
                     }
                 }
 
-                void SetFrameColor(Image image, Skill skill)
+                void HideAllRarityFrames()
+                {
+                    skillPanelStruct.skill1CommonEffect.gameObject.SetActive(false);
+                    skillPanelStruct.skill2CommonEffect.gameObject.SetActive(false);
+                    skillPanelStruct.skill3CommonEffect.gameObject.SetActive(false);
+                    
+                    skillPanelStruct.skill1UncommonEffect.gameObject.SetActive(false);
+                    skillPanelStruct.skill2UncommonEffect.gameObject.SetActive(false);
+                    skillPanelStruct.skill3UncommonEffect.gameObject.SetActive(false);
+                    
+                    skillPanelStruct.skill1RareEffect.gameObject.SetActive(false);
+                    skillPanelStruct.skill2RareEffect.gameObject.SetActive(false);
+                    skillPanelStruct.skill3RareEffect.gameObject.SetActive(false);
+                    
+                    skillPanelStruct.skill1UniqueEffect.gameObject.SetActive(false);
+                    skillPanelStruct.skill2UniqueEffect.gameObject.SetActive(false);
+                    skillPanelStruct.skill3UniqueEffect.gameObject.SetActive(false);
+                }
+
+                void SetRarityFrame(int skillSlot, Skill skill)
                 {
                     switch (skill.GetSkillRarity)
                     {
                         case SkillRarity.COMMON:
-                            image.sprite = frameWhiteSprite;
+                            switch (skillSlot)
+                            {
+                                case 1:
+                                    skillPanelStruct.skill1CommonEffect.gameObject.SetActive(true);
+                                    break;
+                                case 2:
+                                    skillPanelStruct.skill2CommonEffect.gameObject.SetActive(true);
+                                    break;
+                                case 3:
+                                    skillPanelStruct.skill3CommonEffect.gameObject.SetActive(true);
+                                    break;
+                            }
                             break;
                         case SkillRarity.UNCOMMON:
-                            image.sprite = frameGreenSprite;
+                            switch (skillSlot)
+                            {
+                                case 1:
+                                    skillPanelStruct.skill1UncommonEffect.gameObject.SetActive(true);
+                                    break;
+                                case 2:
+                                    skillPanelStruct.skill2UncommonEffect.gameObject.SetActive(true);
+                                    break;
+                                case 3:
+                                    skillPanelStruct.skill3UncommonEffect.gameObject.SetActive(true);
+                                    break;
+                            }
                             break;
                         case SkillRarity.RARE:
-                            image.sprite = frameBlueSprite;
+                            switch (skillSlot)
+                            {
+                                case 1:
+                                    skillPanelStruct.skill1RareEffect.gameObject.SetActive(true);
+                                    break;
+                                case 2:
+                                    skillPanelStruct.skill2RareEffect.gameObject.SetActive(true);
+                                    break;
+                                case 3:
+                                    skillPanelStruct.skill3RareEffect.gameObject.SetActive(true);
+                                    break;
+                            }
                             break;
                         case SkillRarity.UNIQUE:
-                            image.sprite = frameOrangeSprite;
+                            switch (skillSlot)
+                            {
+                                case 1:
+                                    skillPanelStruct.skill1UniqueEffect.gameObject.SetActive(true);
+                                    break;
+                                case 2:
+                                    skillPanelStruct.skill2UniqueEffect.gameObject.SetActive(true);
+                                    break;
+                                case 3:
+                                    skillPanelStruct.skill3UniqueEffect.gameObject.SetActive(true);
+                                    break;
+                            }
                             break;
                     }
                 }
@@ -894,14 +959,16 @@ public class GameUI : MonoBehaviour
                 var skill1 = ControllerManager.skillController.GetRandomSkill();
                 var skill2 = ControllerManager.skillController.GetRandomSkill();
                 var skill3 = ControllerManager.skillController.GetRandomSkill();
+
+                HideAllRarityFrames();
                 
                 SetPanelStruct(1, skill1);
                 SetPanelStruct(2, skill2);
                 SetPanelStruct(3, skill3);
                 
-                SetFrameColor(skillPanelStruct.skill1FrameImage, skill1);
-                SetFrameColor(skillPanelStruct.skill2FrameImage, skill2);
-                SetFrameColor(skillPanelStruct.skill3FrameImage, skill3);
+                SetRarityFrame(1, skill1);
+                SetRarityFrame(2, skill2);
+                SetRarityFrame(3, skill3);
 
                 _panelStack.Push(new PanelUIStruct
                 {

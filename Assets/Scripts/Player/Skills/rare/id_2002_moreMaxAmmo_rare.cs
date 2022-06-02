@@ -5,7 +5,7 @@ namespace Skills.rare
 {
     internal class id_2002_moreMaxAmmo_rare : Skill
     {
-        [SerializeField] private float lessAmmoInClipPercent = 100;
+        [SerializeField] private float lessAmmoInClipPercent = 50;
         
         public override void Activate()
         {
