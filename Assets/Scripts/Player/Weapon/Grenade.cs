@@ -70,6 +70,7 @@ public class Grenade : MonoBehaviour
         _isExploded = false;
         transform.position = position;
         transform.rotation = rotation;
+        _rigidbody.velocity = Vector3.zero;
 
         _countdown = delay;
 

@@ -261,7 +261,7 @@ public class HealthSystem : MonoBehaviour
         if (floatingTextPrefab != null)
         {
             var floatingText = FloatingTextPool.Instance.Get();
-           floatingText.Setup(projectileHitInfo.damage.ToString(), projectileHitInfo.isCritical, Armor > 0, transform.position);
+           floatingText.Setup(Math.Round(projectileHitInfo.damage, 1).ToString(), projectileHitInfo.isCritical, Armor > 0, transform.position);
            floatingText.gameObject.SetActive(true);
         }
 
