@@ -43,7 +43,7 @@ public class ExperienceSystem : MonoBehaviour
         Level = 1;
         Xp = 0;
         NextLevelXp = levelList[0];
-        MaxLevel = levelList.Count + 1;
+        //MaxLevel = levelList.Count + 1;
         OnNextLevelXpChange?.Invoke(NextLevelXp);
         OnXpChange?.Invoke(Xp);
     }
