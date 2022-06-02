@@ -50,17 +50,16 @@ public class ExperienceSystem : MonoBehaviour
 
     public void AddXp(float amount)
     {
-        if (Level < MaxLevel)
-        {
-            Xp += amount + (amount / 100 * _bonusExperiencePercent);
-
-            if (Xp >= NextLevelXp)
-            {
-                LevelUp();
-            }
+        if (Level >= MaxLevel) return;
         
-            OnXpChange?.Invoke(Xp);
+        Xp += amount + (amount / 100 * _bonusExperiencePercent);
+
+        if (Xp >= NextLevelXp)
+        {
+            LevelUp();
         }
+        
+        OnXpChange?.Invoke(Xp);
     }
 
     public void AddBonusXpPercent(float value)
@@ -76,6 +75,8 @@ public class ExperienceSystem : MonoBehaviour
     [ContextMenu("Level Up")]
     private void LevelUp()
     {
+        if (Level >= MaxLevel) return;
+        
         Level++;
 
         Xp = 0;

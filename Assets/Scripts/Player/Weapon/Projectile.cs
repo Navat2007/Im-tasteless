@@ -82,7 +82,7 @@ public class Projectile : MonoBehaviour
 
                 if (_knockBack && enemy.TryGetComponent(out EnemyController controller))
                 {
-                    controller.SendForce(transform.forward.normalized * 50);
+                    controller.SendForce(transform.forward.normalized * 150);
                 }
 
                 if (_currentPenetrate <= 0)

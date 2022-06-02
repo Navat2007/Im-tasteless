@@ -59,8 +59,8 @@ MonoBehaviour:
   - {fileID: -2516872832994460910, guid: 14e9416d7002380449ab278570a42d71, type: 3}
   audioClip: {fileID: 8300000, guid: e38c798d480d27745817cb2939e64abb, type: 3}
   bonusAmmoInClip: 1
-  bonusDamagePercent: 15
-  bonusCriticalChancePercent: 10
-  bonusCriticalBonusPercent: 10
+  bonusDamagePercent: 25
+  bonusCriticalChancePercent: 25
+  bonusCriticalBonusPercent: 25
   bonusAttackSpeed: -5
   bonusReloadSpeed: -5

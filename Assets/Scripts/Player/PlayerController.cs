@@ -96,6 +96,7 @@ public class PlayerController : MonoBehaviour
 
     public void SendImpulse(Vector3 direction)
     {
+        _moveVelocity = Vector3.zero;
         _rigidbody.AddForce(direction, ForceMode.Impulse);
     }
 

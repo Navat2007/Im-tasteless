@@ -2,7 +2,7 @@
 
 public class id_3_DashAbility : Ability
 {
-    [SerializeField] private float speed = 5;
+    [SerializeField] private float speed = 50;
     
     public override void Activate()
     {
