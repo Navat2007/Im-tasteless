@@ -163,6 +163,7 @@ public class EnemyController : MonoBehaviour
     {
         if (_navMeshAgent.enabled)
         {
+            _rigidbody.velocity = Vector3.zero;
             _navMeshAgent.isStopped = true;
             _navMeshAgent.enabled = false;
             _animationController.SetState(AnimationState.IDLE);

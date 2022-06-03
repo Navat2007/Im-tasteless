@@ -82,6 +82,8 @@ public class Projectile : MonoBehaviour
 
                 if (_knockBack && enemy.TryGetComponent(out EnemyController controller))
                 {
+                    controller.StopNavMeshAgent();
+                    controller.StartNavMeshAgent(0.5f);
                     controller.SendForce(transform.forward.normalized * 100);
                 }
 

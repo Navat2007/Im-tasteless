@@ -200,6 +200,12 @@ public class SkillController : MonoBehaviour
     {
         AddToSkillsList(rareSkills[1]);
     }
+    
+    [ContextMenu("Shotgun скилл")]
+    private void GetShotgunSkill()
+    {
+        AddToSkillsList(rareSkills[14]);
+    }
 
     [ContextMenu("Dash скилл")]
     private void GetDashSkill()
