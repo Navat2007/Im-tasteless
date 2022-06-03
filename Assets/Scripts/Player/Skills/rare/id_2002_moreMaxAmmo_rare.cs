@@ -19,7 +19,8 @@ namespace Skills.rare
             shotgun.SetProjectilePerClip(shotgun.ProjectilePerClip - (int)(Convert.ToDouble(shotgun.ProjectilePerClip) / 100 * lessAmmoInClipPercent));
             rifle.SetProjectilePerClip(rifle.ProjectilePerClip - (int)(Convert.ToDouble(rifle.ProjectilePerClip) / 100 * lessAmmoInClipPercent));
             
-            ControllerManager.weaponController.SetDoubleMaxAmmo(true);
+            shotgun.SeMaxAmount(shotgun.MaxProjectileAmount * 2);
+            rifle.SeMaxAmount(shotgun.MaxProjectileAmount * 2);
         }
     }
 }

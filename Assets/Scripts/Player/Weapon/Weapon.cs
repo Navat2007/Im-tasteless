@@ -104,6 +104,11 @@ public class Weapon : MonoBehaviour
         ProjectilePerClip = value;
     }
     
+    public void SeMaxAmount(int value)
+    {
+        MaxProjectileAmount = value;
+    }
+    
     public void SetAudioClip(AudioClip clip)
     {
         ShootClip = clip;

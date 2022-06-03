@@ -75,11 +75,7 @@ public class WeaponController : MonoBehaviour
     private int _bonusTakeClip;
     private int _bonusPenetrateCount;
     private float _bonusKillChance;
-    
 
-    private bool _halfMaxClip;
-    private bool _doubleMaxClip;
-    
     public Weapon GetEquippedWeapon => _equippedWeapon;
     public int GetPenetrateCount => _equippedWeapon.PenetrateCount + _bonusPenetrateCount;
     public float GetKillChance => _equippedWeapon.KillChance + _bonusKillChance;
@@ -579,8 +575,10 @@ public class WeaponController : MonoBehaviour
                 var percentShotgunCount = Convert.ToInt32(Math.Round((double)shotgun.MaxProjectileAmount / 100 * (double)count, 0));
                 shotgun.CurrentProjectileAmount += isCountPercent ? percentShotgunCount : count;
                 
-                if (shotgun.CurrentProjectileAmount > shotgun.MaxProjectileAmount)
-                    shotgun.CurrentProjectileAmount = shotgun.MaxProjectileAmount;
+                var maxShotgunAmount = shotgun.MaxProjectileAmount + (_bonusMaxClip * shotgun.ProjectilePerClip);
+                
+                if (shotgun.CurrentProjectileAmount > maxShotgunAmount)
+                    shotgun.CurrentProjectileAmount = maxShotgunAmount;
                 
                 OnAmmoChange?.Invoke(shotgun.ProjectileInClip, shotgun.CurrentProjectileAmount, shotgun.InfiniteProjectile, WeaponType.SHOTGUN);
                 break;
@@ -594,8 +592,10 @@ public class WeaponController : MonoBehaviour
                 var percentRifleCount = Convert.ToInt32(Math.Round((double)rifle.MaxProjectileAmount / 100 * (double)count, 0));
                 rifle.CurrentProjectileAmount += isCountPercent ? percentRifleCount : count;
                 
-                if (rifle.CurrentProjectileAmount > rifle.MaxProjectileAmount)
-                    rifle.CurrentProjectileAmount = rifle.MaxProjectileAmount;
+                var maxRifleAmount = rifle.MaxProjectileAmount + (_bonusMaxClip * rifle.ProjectilePerClip);
+                
+                if (rifle.CurrentProjectileAmount > maxRifleAmount)
+                    rifle.CurrentProjectileAmount = maxRifleAmount;
                 
                 OnAmmoChange?.Invoke(rifle.ProjectileInClip, rifle.CurrentProjectileAmount, rifle.InfiniteProjectile, WeaponType.RIFLE);
                 break;
@@ -645,21 +645,6 @@ public class WeaponController : MonoBehaviour
     public void AddBonusMaxClip(int value)
     {
         _bonusMaxClip += value;
-        
-        shotgun.MaxProjectileAmount += shotgun.ProjectilePerClip * _bonusMaxClip;
-        rifle.MaxProjectileAmount += rifle.ProjectilePerClip * _bonusMaxClip;
-
-        if (_halfMaxClip)
-        {
-            shotgun.MaxProjectileAmount /= 2;
-            rifle.MaxProjectileAmount /= 2;
-        }
-        
-        if (_doubleMaxClip)
-        {
-            shotgun.MaxProjectileAmount *= 2;
-            rifle.MaxProjectileAmount *= 2;
-        }
     }
     
     public void AddBonusTakeClip(int value)
@@ -682,15 +667,6 @@ public class WeaponController : MonoBehaviour
         doubleGrenade = value;
     }
     
-    public void SetHalfMaxAmmo(bool value)
-    {
-        _halfMaxClip = value;
-    }
-    
-    public void SetDoubleMaxAmmo(bool value)
-    {
-        _doubleMaxClip = value;
-    }
 }
 
 public struct WeaponInfo
