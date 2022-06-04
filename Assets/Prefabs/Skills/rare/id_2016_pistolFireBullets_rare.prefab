@@ -61,6 +61,6 @@ MonoBehaviour:
   exceptedSkills:
   - {fileID: 5974963835821535575, guid: 7ed92042c7fa783499c8aa90ab74b27a, type: 3}
   bonusDamagePercent: -25
-  bonusPeriodDamagePercent: 25
+  bonusPeriodDamagePercent: 33
   bonusPeriodDamageTick: 0.5
   bonusPeriodDamageDuration: 2

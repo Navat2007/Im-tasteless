@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4159991901258556030}
   - component: {fileID: 4159991901258556031}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: AttackSector
   m_TagString: Untagged
   m_Icon: {fileID: 0}

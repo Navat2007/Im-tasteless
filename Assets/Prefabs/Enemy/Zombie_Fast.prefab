@@ -2131,7 +2131,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1560192269280841135}
   - component: {fileID: 1560192269280841120}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: AttackSector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
