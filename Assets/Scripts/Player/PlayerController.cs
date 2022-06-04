@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -96,7 +97,15 @@ public class PlayerController : MonoBehaviour
 
     public void SendImpulse(Vector3 direction)
     {
-        _moveVelocity = Vector3.zero;
+        IEnumerator Resume()
+        {
+            var prevVelocity = _moveVelocity;
+            _moveVelocity = Vector3.zero;
+            yield return new WaitForSeconds(.3f);
+            _moveVelocity = prevVelocity;
+        }
+
+        StartCoroutine(Resume());
         _rigidbody.AddForce(direction, ForceMode.Impulse);
     }
 
