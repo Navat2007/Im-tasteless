@@ -60,6 +60,7 @@ public class PlayerController : MonoBehaviour
             if (groundPlane.Raycast(ray, out var rayDistance))
             {
                 Vector3 point = ray.GetPoint(rayDistance);
+                
                 crosshair.position = point;
                 LookAt(point);
                 
