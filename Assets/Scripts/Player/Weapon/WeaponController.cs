@@ -382,8 +382,8 @@ public class WeaponController : MonoBehaviour
             OnReloadStart?.Invoke();
             yield return new WaitForSeconds(.2f);
 
-            float reloadSpeed = 1 / (_equippedWeapon.ReloadSpeed - (_equippedWeapon.ReloadSpeed / (100 * _bonusReloadSpeedPercent)));
-            //float reloadSpeed = _equippedWeapon.ReloadSpeed / (1 + _bonusReloadSpeedPercent / 100);
+            //float reloadSpeed = 1 / (_equippedWeapon.ReloadSpeed - (_equippedWeapon.ReloadSpeed / 100 * _bonusReloadSpeedPercent));
+            float reloadSpeed = (1 / _equippedWeapon.ReloadSpeed) + ((1 / _equippedWeapon.ReloadSpeed) / 100 * _bonusReloadSpeedPercent);
             float percent = 0;
             float maxReloadAngle = 40;
 
