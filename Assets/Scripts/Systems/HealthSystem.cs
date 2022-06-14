@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Interface;
 using Pools;
 using UnityEngine;
 
@@ -29,7 +28,6 @@ public class HealthSystem : MonoBehaviour
     [SerializeField] private GameObject floatingTextPrefab;
 
     private AnimationController _animationController;
-    
     private Renderer _renderer;
     private Color _startColor;
     private bool _isOverTimeHealActive;
@@ -39,6 +37,8 @@ public class HealthSystem : MonoBehaviour
     private Dictionary<PeriodDamageSource, ProjectileHitInfo> _periodDamages = new ();
     private Dictionary<PeriodDamageSource, float> _periodDamageTimers = new ();
     private Dictionary<PeriodDamageSource, float> _periodDamageDurations = new ();
+
+    private float _bonusHealPercent;
 
     private void Awake()
     {
@@ -108,11 +108,17 @@ public class HealthSystem : MonoBehaviour
         _startColor = _renderer.material.color;
     }
 
+    public float GetPercentCurrentMax()
+    {
+        var percent = CurrentHealth * 100 / MaxHealth;
+        return percent;
+    }
+
     public void AddHealth(float amount)
     {
         var prevHealth = CurrentHealth;
         
-        CurrentHealth += amount;
+        CurrentHealth += amount + (amount / 100 * _bonusHealPercent);
 
         if (CurrentHealth > MaxHealth)
             CurrentHealth = MaxHealth;
@@ -208,6 +214,11 @@ public class HealthSystem : MonoBehaviour
     {
         _nextInvulnerabilityTime = Time.time + time;
     }
+
+    public void AddBonusHealPercent(float value)
+    {
+        _bonusHealPercent += value;
+    }
     
     public void TakeDamage(ProjectileHitInfo projectileHitInfo, bool playHitAnimation = true)
     {
@@ -269,6 +280,7 @@ public class HealthSystem : MonoBehaviour
         {
             Armor = 0;
             OnArmorChange?.Invoke(Armor);
+            OnTakeDamage?.Invoke(projectileHitInfo.damage, CurrentHealth, MaxHealth);
             return;
         }
 

@@ -8383,7 +8383,7 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: b20a3c10714a6ac439af479e3273de65, type: 3}
   m_Controller: {fileID: 9100000, guid: 73a1baa9df657234e98745e4a618f377, type: 2}
-  m_CullingMode: 1
+  m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
@@ -8570,7 +8570,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   showVelocity: 0
   showDesiredVelocity: 0
-  showPath: 0
+  showPath: 1
 --- !u!1 &8162674906898496630
 GameObject:
   m_ObjectHideFlags: 0

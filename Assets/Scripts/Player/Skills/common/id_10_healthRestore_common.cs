@@ -33,8 +33,8 @@ namespace Skills.common
                 }
             }
             
-            ControllerManager.healthSystem.AddHealth(ControllerManager.healthSystem.MaxHealth);
-            ControllerManager.healthSystem.AddNextInvulnerabilityTime(ControllerManager.skillController.IsNextDouble 
+            ControllerManager.playerHealthSystem.AddHealth(ControllerManager.playerHealthSystem.MaxHealth);
+            ControllerManager.playerHealthSystem.AddNextInvulnerabilityTime(ControllerManager.skillController.IsNextDouble 
                 ? invulnerabilityTime * 2 : invulnerabilityTime);
 
             AddForce();

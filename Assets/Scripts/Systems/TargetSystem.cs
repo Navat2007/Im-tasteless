@@ -1,54 +1,37 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using Random = System.Random;
 
 public class TargetSystem : MonoBehaviour
 {
     public event Action<GameObject> OnTargetChange;
     public event Action<Vector3, GameObject> OnTargetPositionChange;
 
-    [SerializeField] private float timeBetweenSearchTarget = 0.5f;
+    [SerializeField] private float timeBetweenSearchTarget = 1f;
     
     [SerializeField] private GameObject target;
+
+    private GameObject _player;
+    private Vector3 _prevPlayerPosition;
 
     private void SetTarget(GameObject target)
     {
         this.target = target;
         OnTargetChange?.Invoke(this.target);
-        
-        StartCoroutine(FindTargetPosition());
     }
 
-    private IEnumerator FindTarget()
+    private void FindTarget()
     {
-        while (target == null && ControllerManager.player != null)
-        {
-            var player = ControllerManager.player.gameObject;
-                
-            if(player != null)
-                SetTarget(player);
-
-            yield return new WaitForSeconds(timeBetweenSearchTarget);
-        }
-    }
-    
-    private IEnumerator FindTargetPosition()
-    {
-        while (target != null && target.activeSelf)
-        {
-            Vector3 position = new Vector3(target.transform.position.x, 0, target.transform.position.z);
-            OnTargetPositionChange?.Invoke(position, target);
-
-            yield return new WaitForSeconds(timeBetweenSearchTarget);
-        }
-        
-        StartCoroutine(FindTarget());
+        if(_player != null && target == null)
+            SetTarget(_player);
     }
 
     public void Init()
     {
         target = null;
-        StartCoroutine(FindTarget());
+        _player = ControllerManager.player.gameObject;
+        InvokeRepeating(nameof(FindTarget), 0, timeBetweenSearchTarget);
     }
 
     public GameObject GetTarget()

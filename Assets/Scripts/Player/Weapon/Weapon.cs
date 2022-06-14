@@ -153,6 +153,11 @@ public class Weapon : MonoBehaviour
     {
         KnockBack = value;
     }
+
+    public void SetInfinite(bool value)
+    {
+        InfiniteProjectile = value;
+    }
 }
 
 public enum WeaponType

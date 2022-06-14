@@ -70,7 +70,7 @@ public class WeaponController : MonoBehaviour
     private float _bonusAttackSpeedPercent;
     private float _bonusReloadSpeedPercent;
     private float _bonusCriticalChance;
-    private float _bonusCriticalBonus;
+    private float _bonusCriticalPower;
     private int _bonusMaxClip;
     private int _bonusTakeClip;
     private int _bonusPenetrateCount;
@@ -286,7 +286,7 @@ public class WeaponController : MonoBehaviour
                         .SetSpeed(_equippedWeapon.MuzzleVelocity)
                         .SetDamage(_equippedWeapon.Damage + (_equippedWeapon.Damage / 100 * _bonusDamagePercent))
                         .SetCriticalChance(_equippedWeapon.CriticalChance + _bonusCriticalChance)
-                        .SetCriticalBonus(_equippedWeapon.CriticalBonus + _bonusCriticalBonus)
+                        .SetCriticalBonus(_equippedWeapon.CriticalBonus + _bonusCriticalPower)
                         .SetPeriodDamage(_equippedWeapon.PeriodDamage + (_equippedWeapon.PeriodDamage / 100 * _bonusDamagePercent))
                         .SetPeriodDuration(_equippedWeapon.PeriodDamageDuration)
                         .SetPeriodTick(_equippedWeapon.PeriodDamageTick)
@@ -638,9 +638,9 @@ public class WeaponController : MonoBehaviour
         _bonusCriticalChance += value;
     }
     
-    public void AddBonusCriticalBonus(float value)
+    public void AddBonusCriticalPower(float value)
     {
-        _bonusCriticalBonus += value;
+        _bonusCriticalPower += value;
     }
     
     public void AddBonusMaxClip(int value)
@@ -666,6 +666,22 @@ public class WeaponController : MonoBehaviour
     public void SetDoubleGrenade(bool value)
     {
         doubleGrenade = value;
+    }
+
+    public void SetInfinite(WeaponType weaponType)
+    {
+        switch (weaponType)
+        {
+            case WeaponType.SHOTGUN:
+                shotgun.SetInfinite(true);
+                break;
+            case WeaponType.RIFLE:
+                rifle.SetInfinite(true);
+                break;
+            case WeaponType.GRENADE:
+                infiniteGrenade = true;
+                break;
+        }
     }
     
 }

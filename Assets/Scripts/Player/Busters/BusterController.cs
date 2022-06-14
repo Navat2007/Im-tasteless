@@ -45,20 +45,20 @@ public class BusterController : MonoBehaviour
 
     public void PickFirstAidKit(int count, float percent)
     {
-        float healthToAdd = ControllerManager.healthSystem.MaxHealth / 100 * percent;
-        ControllerManager.healthSystem.AddHealth(healthToAdd);
+        float healthToAdd = ControllerManager.playerHealthSystem.MaxHealth / 100 * percent;
+        ControllerManager.playerHealthSystem.AddHealth(healthToAdd);
     }
     
     public void PickBandage(int count, float percent, float tickTimePeriod, int tickAmount)
     {
-        float healthToAdd = ControllerManager.healthSystem.MaxHealth / 100 * percent;
-        ControllerManager.healthSystem.AddHealth(healthToAdd, tickTimePeriod, tickAmount);
+        float healthToAdd = ControllerManager.playerHealthSystem.MaxHealth / 100 * percent;
+        ControllerManager.playerHealthSystem.AddHealth(healthToAdd, tickTimePeriod, tickAmount);
     }
     
     public void PickClip(int count)
     {
         if(ControllerManager.player.HealOnTakeAmmoPercent != 0)
-            ControllerManager.healthSystem.AddHealthPercent(ControllerManager.player.HealOnTakeAmmoPercent);
+            ControllerManager.playerHealthSystem.AddHealthPercent(ControllerManager.player.HealOnTakeAmmoPercent);
         
         foreach (WeaponType weapon in Enum.GetValues(typeof(WeaponType)))
         {
@@ -89,7 +89,7 @@ public class BusterController : MonoBehaviour
     
     public void PickBodyArmor(int count)
     {
-        ControllerManager.healthSystem.AddArmor(count);
+        ControllerManager.playerHealthSystem.AddArmor(count);
     }
     
     public void PickDamage(int count, float duration, float damagePercent)

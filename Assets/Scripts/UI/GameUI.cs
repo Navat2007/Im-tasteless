@@ -271,13 +271,13 @@ public class GameUI : MonoBehaviour
             ControllerManager.enemySpawner.OnEnemyCountChange += EnemySpawnerOnEnemyCountChange;
         }
 
-        if (ControllerManager.healthSystem != null)
+        if (ControllerManager.playerHealthSystem != null)
         {
-            ControllerManager.healthSystem.OnDeath += OnGameOver;
-            ControllerManager.healthSystem.OnTakeDamage += OnDamaged;
-            ControllerManager.healthSystem.OnHealed += OnHealed;
-            ControllerManager.healthSystem.OnMaxHealthChange += OnMaxHealthChange;
-            ControllerManager.healthSystem.OnArmorChange += OnArmorChange;
+            ControllerManager.playerHealthSystem.OnDeath += OnGameOver;
+            ControllerManager.playerHealthSystem.OnTakeDamage += OnDamaged;
+            ControllerManager.playerHealthSystem.OnHealed += OnHealed;
+            ControllerManager.playerHealthSystem.OnMaxHealthChange += OnMaxPlayerHealthChange;
+            ControllerManager.playerHealthSystem.OnArmorChange += OnArmorChange;
         }
         
         if (ControllerManager.experienceSystem != null)
@@ -323,13 +323,13 @@ public class GameUI : MonoBehaviour
             ControllerManager.enemySpawner.OnEnemyCountChange -= EnemySpawnerOnEnemyCountChange;
         }
 
-        if (ControllerManager.healthSystem != null)
+        if (ControllerManager.playerHealthSystem != null)
         {
-            ControllerManager.healthSystem.OnDeath -= OnGameOver;
-            ControllerManager.healthSystem.OnTakeDamage -= OnDamaged;
-            ControllerManager.healthSystem.OnHealed -= OnHealed;
-            ControllerManager.healthSystem.OnMaxHealthChange -= OnMaxHealthChange;
-            ControllerManager.healthSystem.OnArmorChange -= OnArmorChange;
+            ControllerManager.playerHealthSystem.OnDeath -= OnGameOver;
+            ControllerManager.playerHealthSystem.OnTakeDamage -= OnDamaged;
+            ControllerManager.playerHealthSystem.OnHealed -= OnHealed;
+            ControllerManager.playerHealthSystem.OnMaxHealthChange -= OnMaxPlayerHealthChange;
+            ControllerManager.playerHealthSystem.OnArmorChange -= OnArmorChange;
         }
 
         if (ControllerManager.experienceSystem != null)
@@ -513,10 +513,10 @@ public class GameUI : MonoBehaviour
     {
         if (healthText != null)
         {
-            healthText.SetText($"{Math.Round(currentHealth)} / {Math.Round(ControllerManager.healthSystem.MaxHealth)}");
+            healthText.SetText($"{Math.Round(currentHealth)} / {Math.Round(ControllerManager.playerHealthSystem.MaxHealth)}");
         }
 
-        healthBarImage.fillAmount = currentHealth / ControllerManager.healthSystem.MaxHealth;
+        healthBarImage.fillAmount = currentHealth / ControllerManager.playerHealthSystem.MaxHealth;
         healthDamagedBarImage.fillAmount = healthBarImage.fillAmount;
     }
     
@@ -531,14 +531,14 @@ public class GameUI : MonoBehaviour
         healthBarImage.fillAmount = currentHealth / maxHealth;
     }
     
-    private void OnMaxHealthChange(float maxHealth)
+    private void OnMaxPlayerHealthChange(float maxHealth)
     {
         if (healthText != null)
         {
-            healthText.SetText($"{Math.Round(ControllerManager.healthSystem.CurrentHealth)} / {Math.Round(maxHealth)}");
+            healthText.SetText($"{Math.Round(ControllerManager.playerHealthSystem.CurrentHealth)} / {Math.Round(maxHealth)}");
         }
 
-        healthBarImage.fillAmount = (float)ControllerManager.healthSystem.CurrentHealth / ControllerManager.healthSystem.MaxHealth;
+        healthBarImage.fillAmount = (float)ControllerManager.playerHealthSystem.CurrentHealth / ControllerManager.playerHealthSystem.MaxHealth;
         healthDamagedBarImage.fillAmount = healthBarImage.fillAmount;
     }
     

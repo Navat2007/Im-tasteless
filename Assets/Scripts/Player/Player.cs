@@ -29,7 +29,7 @@ public class Player : MonoBehaviour, IHealth, IDamageable
     private void OnEnable()
     {
         ControllerManager.player = this;
-        ControllerManager.healthSystem = _healthSystem;
+        ControllerManager.playerHealthSystem = _healthSystem;
 
         _healthSystem.OnDeath += OnDeath;
         SetCameraAudioListener(false);
@@ -43,7 +43,7 @@ public class Player : MonoBehaviour, IHealth, IDamageable
     private void OnDisable()
     {
         ControllerManager.player = null;
-        ControllerManager.healthSystem = null;
+        ControllerManager.playerHealthSystem = null;
         
         _healthSystem.OnDeath -= OnDeath;
         SetCameraAudioListener(true);

@@ -10,7 +10,7 @@ public static class ControllerManager
     public static WeaponController weaponController;
     public static BusterController busterController;
     public static ExperienceSystem experienceSystem;
-    public static HealthSystem healthSystem;
+    public static HealthSystem playerHealthSystem;
 
     public static EnemySpawner enemySpawner;
     public static CrateSpawner crateSpawner;

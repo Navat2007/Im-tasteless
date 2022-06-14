@@ -8,9 +8,9 @@ namespace Skills.uncommon
         
         public override void Activate()
         {
-            var valueToAdd = ControllerManager.healthSystem.MaxHealth / 100 * healthPercent;
+            var valueToAdd = ControllerManager.playerHealthSystem.MaxHealth / 100 * healthPercent;
             
-            ControllerManager.healthSystem.AddHealthInSecond(ControllerManager.skillController.IsNextDouble 
+            ControllerManager.playerHealthSystem.AddHealthInSecond(ControllerManager.skillController.IsNextDouble 
                 ? valueToAdd * 2 : valueToAdd);
         }
     }

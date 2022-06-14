@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = System.Random;
 
 [RequireComponent(typeof(Enemy))]
 [RequireComponent(typeof(AnimationController))]
@@ -10,15 +11,17 @@ using UnityEngine.AI;
 [RequireComponent(typeof(TargetSystem))]
 public class EnemyController : MonoBehaviour
 {
-    [SerializeField] private float timeUpdateSpeed = 0.1f;
+    [SerializeField] private float randomPointRadius = 10f;
     [SerializeField] private GameObject target;
     [SerializeField] private bool isDead;
     [SerializeField] private bool isWalking;
-    
+    [SerializeField] private float distance;
+
     private Enemy _enemy;
     private AnimationController _animationController;
     private Rigidbody _rigidbody;
     private NavMeshAgent _navMeshAgent;
+    private NavMeshPath _navMeshPath;
     private Camera _camera;
     private Collider _collider;
 
@@ -36,89 +39,38 @@ public class EnemyController : MonoBehaviour
         _camera = Camera.main;
         _collider = GetComponent<Collider>();
     }
-    
+
     private void OnDisable()
     {
         _enemy.GetEnemyTargetSystem.OnTargetChange -= OnTargetChange;
-        _enemy.GetEnemyTargetSystem.OnTargetPositionChange -= OnTargetPositionChange;
-    }
-
-    private void Update()
-    {
-        try
-        {
-            if (transform.position.y <= -3)
-            {
-                transform.position = new Vector3(transform.position.x, 1.5f, transform.position.z);
-                return;
-            }
-            
-            if(ControllerManager.player == null && !isWalking && !isDead)
-            {
-                isWalking = true;
-                _navMeshAgent.enabled = true;
-                _navMeshAgent.isStopped = false;
-                _navMeshAgent.speed = 1f;
-                _animationController.SetState(AnimationState.WALK);
-                StartCoroutine(TurnOnWalking());
-            }
-            
-            if (Time.time > _nextTimeUpdateSpeed && _navMeshAgent.enabled && !isWalking && !isDead)
-            {
-                _nextTimeUpdateSpeed = Time.time + timeUpdateSpeed;
-                _navMeshAgent.angularSpeed = _enemy.TurnSpeed + _bonusTurnSpeed;
-                _navMeshAgent.speed = _enemy.MoveSpeed + _bonusSpeed;
-
-                if (target != null && Vector3.Distance(target.transform.position, _enemy.transform.position) <=
-                    _navMeshAgent.stoppingDistance)
-                {
-                    _navMeshAgent.isStopped = true;
-                    _animationController.SetState(AnimationState.IDLE);
-                }
-                else
-                {
-                    _navMeshAgent.isStopped = false;
-                    _animationController.SetState(AnimationState.RUN);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            _navMeshAgent.enabled = false;
-            _navMeshAgent.enabled = true;
-        }
     }
 
     private void OnTargetChange(GameObject target)
     {
         this.target = target;
     }
-    
-    private void OnTargetPositionChange(Vector3 position, GameObject target)
-    {
-        if(_navMeshAgent != null && _navMeshAgent.enabled)
-            _navMeshAgent.SetDestination(position);
-    }
-    
+
     public void Init()
     {
         isDead = false;
         isWalking = false;
-        
+
         _navMeshAgent.enabled = true;
         _navMeshAgent.isStopped = false;
 
         _collider.enabled = true;
         _rigidbody.isKinematic = false;
-        
+
         _animationController.Init();
-        
+
+        _navMeshPath = new NavMeshPath();
         _navMeshAgent.speed = _enemy.MoveSpeed;
-        
+
         _enemy.GetEnemyTargetSystem.OnTargetChange += OnTargetChange;
-        _enemy.GetEnemyTargetSystem.OnTargetPositionChange += OnTargetPositionChange;
+
+        StartCoroutine(Move());
     }
-    
+
     public void OnDeath()
     {
         isDead = true;
@@ -130,11 +82,11 @@ public class EnemyController : MonoBehaviour
         }
 
         _animationController.SetState(AnimationState.DIE);
-        
+
         _rigidbody.isKinematic = true;
         _collider.enabled = false;
     }
-    
+
     public void AddSpeed(float value)
     {
         _bonusSpeed += value;
@@ -147,7 +99,7 @@ public class EnemyController : MonoBehaviour
     {
         return _bonusSpeed;
     }
-    
+
     public void AddTurnSpeed(float value)
     {
         _bonusTurnSpeed += value;
@@ -169,17 +121,17 @@ public class EnemyController : MonoBehaviour
             _animationController.SetState(AnimationState.IDLE);
         }
     }
-    
+
     public void StartNavMeshAgent(float time)
     {
         StartCoroutine(Wait(time));
     }
-    
+
     public void SendImpulse(Vector3 direction)
     {
         _rigidbody.AddForce(direction, ForceMode.Impulse);
     }
-    
+
     public void SendForce(Vector3 direction)
     {
         _rigidbody.AddForce(direction);
@@ -188,11 +140,103 @@ public class EnemyController : MonoBehaviour
     private IEnumerator Wait(float time)
     {
         yield return new WaitForSeconds(time);
-        
+
         if (!isDead)
         {
             _navMeshAgent.enabled = true;
             _navMeshAgent.isStopped = false;
+        }
+    }
+
+    private IEnumerator Move()
+    {
+        Vector3 GetRandomPoint()
+        {
+            int count = 0;
+            bool isCorrectPoint = false;
+            Vector3 randomPoint = Vector3.zero;
+
+            while (!isCorrectPoint && count < 10000)
+            {
+                NavMeshHit navMeshHit;
+                NavMesh.SamplePosition(
+                    UnityEngine.Random.insideUnitSphere * randomPointRadius + target.transform.position, out navMeshHit,
+                    randomPointRadius, NavMesh.AllAreas);
+                randomPoint = navMeshHit.position;
+
+                if (randomPoint.y > -10000 && randomPoint.y < 10000)
+                {
+                    _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
+                    if (_navMeshPath.status == NavMeshPathStatus.PathComplete &&
+                        !NavMesh.Raycast(target.transform.position, randomPoint, out navMeshHit, NavMesh.AllAreas))
+                        isCorrectPoint = true;
+                }
+
+                count++;
+            }
+
+            return randomPoint;
+        }
+        
+        Vector3 movePosition = Vector3.zero;
+        Vector3 prevMovePosition = Vector3.zero;
+
+        while (ControllerManager.player != null && _navMeshAgent != null && _navMeshAgent.enabled)
+        {
+            if (target != null)
+            {
+                distance = Vector3.Distance(transform.position, target.transform.position);
+                
+                if(_navMeshAgent.angularSpeed != _enemy.TurnSpeed + _bonusTurnSpeed)
+                    _navMeshAgent.angularSpeed = _enemy.TurnSpeed + _bonusTurnSpeed;
+            
+                if(_navMeshAgent.speed != _enemy.MoveSpeed + _bonusSpeed)
+                    _navMeshAgent.speed = _enemy.MoveSpeed + _bonusSpeed;
+
+                if (Vector3.Distance(transform.position, target.transform.position) > randomPointRadius)
+                {
+                    if (Vector3.Distance(movePosition, target.transform.position) > randomPointRadius)
+                    {
+                        movePosition = GetRandomPoint();
+                        _navMeshAgent.isStopped = false;
+                        _animationController.SetState(AnimationState.RUN);
+                    }
+                }
+                else
+                {
+                    movePosition = target.transform.position;
+                
+                    if (target != null && Vector3.Distance(target.transform.position, _enemy.transform.position) <=
+                        _navMeshAgent.stoppingDistance)
+                    {
+                        _navMeshAgent.isStopped = true;
+                        _animationController.SetState(AnimationState.IDLE);
+                    }
+                    else
+                    {
+                        _navMeshAgent.isStopped = false;
+                        _animationController.SetState(AnimationState.RUN);
+                    }
+                }
+
+                if (_navMeshAgent != null && _navMeshAgent.enabled && movePosition != prevMovePosition)
+                {
+                    prevMovePosition = movePosition;
+                    _navMeshAgent.SetDestination(movePosition);  
+                }
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        if (ControllerManager.player == null && !isWalking && !isDead)
+        {
+            isWalking = true;
+            _navMeshAgent.enabled = true;
+            _navMeshAgent.isStopped = false;
+            _navMeshAgent.speed = 1f;
+            _animationController.SetState(AnimationState.WALK);
+            StartCoroutine(TurnOnWalking());
         }
     }
 
@@ -202,33 +246,31 @@ public class EnemyController : MonoBehaviour
         {
             System.Random random = new System.Random();
 
-            var position = new Vector3(_camera.transform.localPosition.x + random.Next(-30, 30), 0, (_camera.transform.localPosition.z + 10) + random.Next(-30, 30));
-            
-            if(_navMeshAgent != null)
+            var position = new Vector3(_camera.transform.localPosition.x + random.Next(-30, 30), 0,
+                (_camera.transform.localPosition.z + 10) + random.Next(-30, 30));
+
+            if (_navMeshAgent != null)
                 _navMeshAgent.SetDestination(position);
         }
-        
-        yield return new WaitForSeconds(1);
-        SetNewDestination();
 
-        float timer = 0;
-        
+        yield return new WaitForSeconds(1);
+
+        float nextDestinationTime = 0;
+
         while (true)
         {
-            timer += 1;
+            if (Time.time > nextDestinationTime)
+            {
+                System.Random random = new System.Random();
+                nextDestinationTime = Time.time + random.Next(30, 60);
+                SetNewDestination();
+            }
 
             try
             {
-                System.Random random = new System.Random();
-                if (timer >= random.Next(30, 60))
-                {
-                    timer = 0;
-                    SetNewDestination();
-                }
-            
-                if(_navMeshAgent != null & _navMeshAgent.remainingDistance <= 1f)
+                if (_navMeshAgent != null & _navMeshAgent.remainingDistance <= 1f)
                     _animationController.SetState(AnimationState.IDLE);
-                else if(_navMeshAgent != null & _navMeshAgent.remainingDistance > 1f)
+                else if (_navMeshAgent != null & _navMeshAgent.remainingDistance > 1f)
                     _animationController.SetState(AnimationState.WALK);
             }
             catch (Exception e)

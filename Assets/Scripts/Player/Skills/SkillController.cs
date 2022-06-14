@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Skills;
 using Skills.uncommon;
 using UnityEngine;
@@ -159,7 +158,8 @@ public class SkillController : MonoBehaviour
                 level = 1,
                 skill = skill
             });
-            skill.Activate();
+            var skillGo = Instantiate(skill, transform);
+            skillGo.Activate();
         }
         else
         {
@@ -229,6 +229,18 @@ public class SkillController : MonoBehaviour
     private void GetPenetrateSkill()
     {
         AddToSkillsList(uncommonSkills[3]);
+    }
+    
+    [ContextMenu("MoreHealth unique скилл")]
+    private void GetMoreHealthSkill()
+    {
+        AddToSkillsList(uniqueSkills[0]);
+    }
+    
+    [ContextMenu("Shield unique скилл")]
+    private void GetShieldSkill()
+    {
+        AddToSkillsList(uniqueSkills[1]);
     }
 
     #endregion
