@@ -41,6 +41,14 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private float grenadeCooldownMs = 800;
     [SerializeField] private float grenadeMaxThrowingForce = 15;
     [SerializeField] private float grenadeThrowingUpwardForce = 4;
+    
+    [Header("Flask")]
+    [SerializeField] private bool isFlaskActive;
+    [SerializeField] private float flaskReuseTime;
+    [SerializeField] private float flaskHealthPercent;
+    [SerializeField] private float flaskBusterPercent;
+    [SerializeField] private float flaskBusterDuration;
+    
     [Space(20)]
     [SerializeField] private float currentFireRate;
 
@@ -339,40 +347,59 @@ public class WeaponController : MonoBehaviour
 
     private void Throw()
     {
-        _nextThrowingTime = Time.time + grenadeCooldownMs / 1000;
-
-        var distanceToCrosshair = Mathf.Clamp(Vector3.Distance(_crosshairPosition, leftHandHold.position), 0, grenadeMaxThrowingForce);
-
-        if (!doubleGrenade || grenadeCount < 2)
+        if (isFlaskActive)
         {
-            if(!infiniteGrenade)
-                grenadeCount--;
+            IEnumerator ActivateBuster()
+            {
+                yield break;
+            }
             
-            var grenade = GrenadetPool.Instance.Get();
-            grenade.gameObject.SetActive(true);
-            grenade.Setup(leftHandHold.position, leftHandHold.rotation, transform.forward * distanceToCrosshair + transform.up * grenadeThrowingUpwardForce);
+            _nextThrowingTime = Time.time + flaskReuseTime;
+            
+            ControllerManager.playerHealthSystem.AddHealthPercent(flaskHealthPercent);
+
+            StartCoroutine(ActivateBuster());
+            
+            grenadeCount--;
         }
-        else if(doubleGrenade && grenadeCount >= 2)
+        else
         {
-            if(!infiniteGrenade)
-                grenadeCount -= 2;
+            _nextThrowingTime = Time.time + grenadeCooldownMs / 1000;
 
-            leftHandHold.transform.Rotate(new Vector3(0, 10, 0));
+            var distanceToCrosshair = Mathf.Clamp(Vector3.Distance(_crosshairPosition, leftHandHold.position), 0, grenadeMaxThrowingForce);
+
+            if (!doubleGrenade || grenadeCount < 2)
+            {
+                if(!infiniteGrenade)
+                    grenadeCount--;
             
-            var grenade = GrenadetPool.Instance.Get();
-            grenade.gameObject.SetActive(true);
-            grenade.Setup(leftHandHold.position, leftHandHold.rotation, leftHandHold.transform.forward * distanceToCrosshair + leftHandHold.transform.up * grenadeThrowingUpwardForce);
+                var grenade = GrenadetPool.Instance.Get();
+                grenade.gameObject.SetActive(true);
+                grenade.Setup(leftHandHold.position, leftHandHold.rotation, transform.forward * distanceToCrosshair + transform.up * grenadeThrowingUpwardForce);
+            }
+            else if(doubleGrenade && grenadeCount >= 2)
+            {
+                if(!infiniteGrenade)
+                    grenadeCount -= 2;
+
+                leftHandHold.transform.Rotate(new Vector3(0, 10, 0));
             
-            leftHandHold.transform.Rotate(new Vector3(0, -20, 0));
+                var grenade = GrenadetPool.Instance.Get();
+                grenade.gameObject.SetActive(true);
+                grenade.Setup(leftHandHold.position, leftHandHold.rotation, leftHandHold.transform.forward * distanceToCrosshair + leftHandHold.transform.up * grenadeThrowingUpwardForce);
             
-            var grenade2 = GrenadetPool.Instance.Get();
-            grenade2.gameObject.SetActive(true);
-            grenade2.Setup(leftHandHold.position, leftHandHold.rotation, leftHandHold.transform.forward * distanceToCrosshair + leftHandHold.transform.up * grenadeThrowingUpwardForce);
+                leftHandHold.transform.Rotate(new Vector3(0, -20, 0));
             
-            leftHandHold.transform.Rotate(new Vector3(0, 10, 0));
+                var grenade2 = GrenadetPool.Instance.Get();
+                grenade2.gameObject.SetActive(true);
+                grenade2.Setup(leftHandHold.position, leftHandHold.rotation, leftHandHold.transform.forward * distanceToCrosshair + leftHandHold.transform.up * grenadeThrowingUpwardForce);
+            
+                leftHandHold.transform.Rotate(new Vector3(0, 10, 0));
+            }
         }
         
         OnAmmoChange?.Invoke(grenadeCount, grenadeMaxCount, infiniteGrenade, WeaponType.GRENADE);
+        
     }
     
     private void Reload()
@@ -683,7 +710,16 @@ public class WeaponController : MonoBehaviour
                 break;
         }
     }
-    
+
+    public void SetFlaskParameters(bool active, float reuseTime, float healthPercent, float busterPercent, float busterDuration)
+    {
+        isFlaskActive = active;
+        flaskReuseTime = reuseTime;
+        flaskHealthPercent = healthPercent;
+        flaskBusterPercent = busterPercent;
+        flaskBusterDuration = busterDuration;
+    }
+
 }
 
 public struct WeaponInfo

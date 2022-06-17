@@ -1,11 +1,9 @@
 using System;
-using Interface;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [SelectionBase]
 [RequireComponent(typeof(HealthSystem))]
-public class Enemy : MonoBehaviour, IHealth, IDamageable
+public class Enemy : Character.Character
 {
     public event Action<Vector3> OnDeath;
     
@@ -14,7 +12,7 @@ public class Enemy : MonoBehaviour, IHealth, IDamageable
     [field: SerializeField] public Renderer[] SkinRendererList { get; private set; }
     
     [field: Header("Стандартные параметры")]
-    [field: SerializeField] public float Health { get; set; }
+    [field: SerializeField] public override float Health { get; set; }
     [field: SerializeField] public float Damage { get; private set; }
     [field: SerializeField] public float CriticalChance { get; private set; }
     [field: SerializeField] public float CriticalBonus { get; private set; }

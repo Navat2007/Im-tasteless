@@ -1,14 +1,12 @@
-using System;
-using Interface;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerController))]
 [RequireComponent(typeof(WeaponController))]
 [RequireComponent(typeof(BusterController))]
 [RequireComponent(typeof(HealthSystem))]
-public class Player : MonoBehaviour, IHealth, IDamageable
+public class Player : Character.Character
 {
-    [field: SerializeField] public float Health { get; set; } = 20;
+    [field: SerializeField] public override float Health { get; set; } = 20;
     [field: SerializeField] public float MoveSpeed { get; private set; } = 5;
     [field: SerializeField] public float BonusMoveSpeed { get; private set; }
     [field: SerializeField] public float ExplosiveResist { get; private set; } = 50;

@@ -139,17 +139,7 @@ public class HealthSystem : MonoBehaviour
     
     public void AddHealthPercent(float percent)
     {
-        var prevHealth = CurrentHealth;
-        
-        CurrentHealth += MaxHealth / 100 * percent;
-
-        if (CurrentHealth > MaxHealth)
-            CurrentHealth = MaxHealth;
-        
-        OnHealed?.Invoke(CurrentHealth);
-        
-        if(prevHealth < MaxHealth)
-            OnHealthChange?.Invoke(CurrentHealth);
+        AddHealth(MaxHealth / 100 * percent);
     }
 
     public void AddMaxHealth(float value)
