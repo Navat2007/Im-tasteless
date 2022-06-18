@@ -636,7 +636,7 @@ public class WeaponController : MonoBehaviour
                 }
                 break;
             case WeaponType.GRENADE:
-                if (activateWeapon && isGrenadeActive)
+                if (activateWeapon && !isGrenadeActive)
                 {
                     isGrenadeActive = true;
                     _gameUI.SetSlot(4, true);

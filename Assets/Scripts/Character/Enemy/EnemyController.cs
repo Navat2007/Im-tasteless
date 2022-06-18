@@ -75,7 +75,7 @@ public class EnemyController : MonoBehaviour
     public void OnDeath()
     {
         isDead = true;
-
+        
         if (_navMeshAgent.enabled)
         {
             _navMeshAgent.isStopped = true;
@@ -166,11 +166,14 @@ public class EnemyController : MonoBehaviour
                 randomPoint = navMeshHit.position;
                 randomPoint.y = 0;
 
-                _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
-                if (_navMeshPath.status == NavMeshPathStatus.PathComplete &&
-                    !NavMesh.Raycast(target.transform.position, randomPoint, out navMeshHit, NavMesh.AllAreas))
-                    isCorrectPoint = true;
-                
+                if (randomPoint.x > -10000 && randomPoint.x < 10000)
+                {
+                    _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
+                    if (_navMeshPath.status == NavMeshPathStatus.PathComplete &&
+                        !NavMesh.Raycast(target.transform.position, randomPoint, out navMeshHit, NavMesh.AllAreas))
+                        isCorrectPoint = true;
+                }
+
                 count++;
             }
 
@@ -185,20 +188,25 @@ public class EnemyController : MonoBehaviour
 
             while (!isCorrectPoint && count < 10000)
             {
-                NavMeshHit navMeshHit;
-                NavMesh.SamplePosition(
-                    UnityEngine.Random.onUnitSphere * maxDistance + target.transform.position, out navMeshHit,
-                    maxDistance, NavMesh.AllAreas);
-                randomPoint = navMeshHit.position;
-                randomPoint.y = 0.15f;
+                var randomDirection = (UnityEngine.Random.insideUnitCircle * new Vector2(target.transform.position.x, target.transform.position.z)).normalized;
+                var randomDistance = UnityEngine.Random.Range(maxDistance, maxDistance);
+                var point = new Vector2(target.transform.position.x, target.transform.position.z) + randomDirection * randomDistance;
 
-                _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
-                if (_navMeshPath.status == NavMeshPathStatus.PathComplete &&
-                    !NavMesh.Raycast(target.transform.position, randomPoint, out navMeshHit, NavMesh.AllAreas))
-                    isCorrectPoint = true;
+                randomPoint = new Vector3(point.x, 0, point.y);
+
+                if (randomPoint.x > -10000 && randomPoint.x < 10000)
+                {
+                    _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
+                    if (_navMeshPath.status == NavMeshPathStatus.PathComplete)
+                        isCorrectPoint = true;
+                }
 
                 count++;
             }
+            
+            randomPoint.y = 0.03f;
+            
+            //Debug.Log($"Send zombie to point: {randomPoint}. Player position: {target.transform.position}");
 
             return randomPoint;
         }

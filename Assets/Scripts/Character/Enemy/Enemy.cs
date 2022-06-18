@@ -29,6 +29,7 @@ public class Enemy : Character.Character
     private EnemyAttackController _attackController;
     private EnemyController _enemyController;
     private EnemyDeathEffect _enemyDeathEffect;
+    private Rigidbody _rigidbody;
 
     private Color _baseColor;
 
@@ -41,6 +42,7 @@ public class Enemy : Character.Character
         _attackController = GetComponent<EnemyAttackController>();
         _enemyController = GetComponent<EnemyController>();
         _enemyDeathEffect = GetComponent<EnemyDeathEffect>();
+        _rigidbody = GetComponent<Rigidbody>();
 
         _isPower = GetComponent<EnemyPowerSkin>() != null;
         
@@ -101,6 +103,7 @@ public class Enemy : Character.Character
 
     public void Die()
     {
+        
         OnDeath?.Invoke(transform.position);
         Renderer.material.color = _baseColor;
         EnemyPool.Instance.ReturnToPool(this);
