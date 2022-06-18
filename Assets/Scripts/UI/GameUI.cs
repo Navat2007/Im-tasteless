@@ -1,11 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using Managers;
 using Skills;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -90,7 +88,8 @@ public enum PanelType
     RESULT,
     PAUSE,
     SETTINGS,
-    SKILLS
+    SKILLS,
+    RANDOM_SKILLS
 }
 
 public class GameUI : MonoBehaviour
@@ -162,6 +161,8 @@ public class GameUI : MonoBehaviour
     [SerializeField] private TMP_Text shotgunAmmoText;
     [SerializeField] private TMP_Text rifleAmmoText;
     [SerializeField] private TMP_Text grenadeAmmoText;
+    [SerializeField] private Image grenadeImage;
+    [SerializeField] private Sprite grenadePotionSprite;
 
     [Header("Reload")] 
     [SerializeField] private Transform reloadPanel;
@@ -182,6 +183,11 @@ public class GameUI : MonoBehaviour
     [SerializeField] private Transform skillChoicePanel;
     [SerializeField] private TMP_Text skillChoiceLevelText;
     [SerializeField] private SkillPanelStruct skillPanelStruct;
+    
+    [Header("Random Skill panel")] 
+    [SerializeField] private Transform randomSkillPanel;
+    [SerializeField] private Button randomSkillPanelCloseButton;
+    [SerializeField] private SkillPanelStruct randomSkillPanelStruct;
     
     private float _maximumFade = 0.75f;
     
@@ -695,7 +701,7 @@ public class GameUI : MonoBehaviour
         TimeSpan timeSpan = TimeSpan.FromSeconds(time);
         attackSpeedBuffIconStruct.timerText.text = $"{timeSpan:m\\:ss}";
     }
-
+    
     private IEnumerator Fade(Color from, Color to, float time)
     {
         float speed = 1 / time;
@@ -981,6 +987,21 @@ public class GameUI : MonoBehaviour
                 StartCoroutine(MakeButtonsInteractable());
                 
                 break;
+            case PanelType.RANDOM_SKILLS:
+                
+                if (randomSkillPanel == null) throw new NotImplementedException("Панель рандомных скилов не назначена");
+                
+                ControllerManager.pauseManager.StartPause();
+                
+                _panelStack.Push(new PanelUIStruct
+                {
+                    panel = randomSkillPanel,
+                    panelType = PanelType.RANDOM_SKILLS,
+                    callback = () => {}
+                });
+                randomSkillPanel.gameObject.SetActive(true);
+
+                break;
         }
     }
     
@@ -1005,5 +1026,99 @@ public class GameUI : MonoBehaviour
                 ControllerManager.pauseManager.StopPause();
             }
         }
+    }
+    
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+
+    public void SetGrenadeToPotion()
+    {
+        grenadeImage.sprite = grenadePotionSprite;
+    }
+
+    public void ShowRandomSkillPanel(Skill skill1, Skill skill2)
+    {
+        void SetRarityFrame(int skillSlot, Skill skill)
+                {
+                    switch (skill.GetSkillRarity)
+                    {
+                        case SkillRarity.COMMON:
+                            switch (skillSlot)
+                            {
+                                case 1:
+                                    randomSkillPanelStruct.skill1CommonEffect.gameObject.SetActive(true);
+                                    break;
+                                case 2:
+                                    randomSkillPanelStruct.skill2CommonEffect.gameObject.SetActive(true);
+                                    break;
+                                case 3:
+                                    randomSkillPanelStruct.skill3CommonEffect.gameObject.SetActive(true);
+                                    break;
+                            }
+                            break;
+                        case SkillRarity.UNCOMMON:
+                            switch (skillSlot)
+                            {
+                                case 1:
+                                    randomSkillPanelStruct.skill1UncommonEffect.gameObject.SetActive(true);
+                                    break;
+                                case 2:
+                                    randomSkillPanelStruct.skill2UncommonEffect.gameObject.SetActive(true);
+                                    break;
+                                case 3:
+                                    randomSkillPanelStruct.skill3UncommonEffect.gameObject.SetActive(true);
+                                    break;
+                            }
+                            break;
+                        case SkillRarity.RARE:
+                            switch (skillSlot)
+                            {
+                                case 1:
+                                    randomSkillPanelStruct.skill1RareEffect.gameObject.SetActive(true);
+                                    break;
+                                case 2:
+                                    randomSkillPanelStruct.skill2RareEffect.gameObject.SetActive(true);
+                                    break;
+                                case 3:
+                                    randomSkillPanelStruct.skill3RareEffect.gameObject.SetActive(true);
+                                    break;
+                            }
+                            break;
+                        case SkillRarity.UNIQUE:
+                            switch (skillSlot)
+                            {
+                                case 1:
+                                    randomSkillPanelStruct.skill1UniqueEffect.gameObject.SetActive(true);
+                                    break;
+                                case 2:
+                                    randomSkillPanelStruct.skill2UniqueEffect.gameObject.SetActive(true);
+                                    break;
+                                case 3:
+                                    randomSkillPanelStruct.skill3UniqueEffect.gameObject.SetActive(true);
+                                    break;
+                            }
+                            break;
+                    }
+                }
+        
+        var skill1Struct = ControllerManager.skillController.GetSkillByID(skill1.GetID);
+        var skill2Struct = ControllerManager.skillController.GetSkillByID(skill2.GetID);
+        
+        randomSkillPanelStruct.skill1Image.sprite = skill1.GetImage;
+        randomSkillPanelStruct.skill1ImageText.SetText($"{skill1Struct.level + 1} уровень");
+        randomSkillPanelStruct.skill1Text.SetText(skill1.GetName);
+        randomSkillPanelStruct.skill1Description.SetText(skill1.GetDescription);
+        
+        randomSkillPanelStruct.skill2Image.sprite = skill2.GetImage;
+        randomSkillPanelStruct.skill2ImageText.SetText($"{skill2Struct.level + 1} уровень");
+        randomSkillPanelStruct.skill2Text.SetText(skill2.GetName);
+        randomSkillPanelStruct.skill2Description.SetText(skill2.GetDescription);
+        
+        SetRarityFrame(1, skill1);
+        SetRarityFrame(2, skill2);
+        
+        OpenPanel(PanelType.RANDOM_SKILLS);
     }
 }

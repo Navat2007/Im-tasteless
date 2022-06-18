@@ -32,6 +32,8 @@ public class BusterController : MonoBehaviour
     
     private bool _isAttackSpeedBusterActive;
     private float _attackSpeedTimer;
+
+    private bool _isDoubleBuster;
     
     private void OnEnable()
     {
@@ -46,13 +48,13 @@ public class BusterController : MonoBehaviour
     public void PickFirstAidKit(int count, float percent)
     {
         float healthToAdd = ControllerManager.playerHealthSystem.MaxHealth / 100 * percent;
-        ControllerManager.playerHealthSystem.AddHealth(healthToAdd);
+        ControllerManager.playerHealthSystem.AddHealth(_isDoubleBuster ? healthToAdd * 2 : healthToAdd);
     }
     
     public void PickBandage(int count, float percent, float tickTimePeriod, int tickAmount)
     {
         float healthToAdd = ControllerManager.playerHealthSystem.MaxHealth / 100 * percent;
-        ControllerManager.playerHealthSystem.AddHealth(healthToAdd, tickTimePeriod, tickAmount);
+        ControllerManager.playerHealthSystem.AddHealth(_isDoubleBuster ? healthToAdd * 2 : healthToAdd, tickTimePeriod, tickAmount);
     }
     
     public void PickClip(int count)
@@ -68,14 +70,14 @@ public class BusterController : MonoBehaviour
                     if(ControllerManager.weaponController.IsWeaponActive(WeaponType.SHOTGUN))
                     {
                         var ammoPerClip = ControllerManager.weaponController.GetWeaponInfo(WeaponType.SHOTGUN).GetAmmoPerClip();
-                        ControllerManager.weaponController.AddAmmo(ammoPerClip, WeaponType.SHOTGUN, false);
+                        ControllerManager.weaponController.AddAmmo(_isDoubleBuster ? ammoPerClip * 2 : ammoPerClip, WeaponType.SHOTGUN, false);
                     }    
                     break;
                 case WeaponType.RIFLE:
                     if (ControllerManager.weaponController.IsWeaponActive(WeaponType.RIFLE))
                     {
                         var ammoPerClip = ControllerManager.weaponController.GetWeaponInfo(WeaponType.RIFLE).GetAmmoPerClip();
-                        ControllerManager.weaponController.AddAmmo(ammoPerClip, WeaponType.RIFLE, false);
+                        ControllerManager.weaponController.AddAmmo(_isDoubleBuster ? ammoPerClip * 2 : ammoPerClip, WeaponType.RIFLE, false);
                     }
                     break;
             }
@@ -84,7 +86,7 @@ public class BusterController : MonoBehaviour
     
     public void PickGrenade(int count)
     {
-        ControllerManager.weaponController.AddAmmo(count, WeaponType.GRENADE, true);
+        ControllerManager.weaponController.AddAmmo(_isDoubleBuster ? count * 2 : count, WeaponType.GRENADE, true);
     }
     
     public void PickBodyArmor(int count)
@@ -97,7 +99,7 @@ public class BusterController : MonoBehaviour
         IEnumerator Activate()
         {
             _isDamageBusterActive = true;
-            ControllerManager.weaponController.AddBonusDamagePercent(damagePercent);
+            ControllerManager.weaponController.AddBonusDamagePercent(_isDoubleBuster ? damagePercent * 2 : damagePercent);
 
             while (_damageTimer > 0)
             {
@@ -107,10 +109,10 @@ public class BusterController : MonoBehaviour
             }
 
             _isDamageBusterActive = false;
-            ControllerManager.weaponController.AddBonusDamagePercent(-damagePercent);
+            ControllerManager.weaponController.AddBonusDamagePercent(_isDoubleBuster ? -damagePercent * 2 : -damagePercent);
         }
         
-        _damageTimer = duration;
+        _damageTimer = _isDoubleBuster ? duration * 2 : duration;
         
         if(!_isDamageBusterActive)
             StartCoroutine(Activate());
@@ -121,8 +123,8 @@ public class BusterController : MonoBehaviour
         IEnumerator Activate()
         {
             _isAttackSpeedBusterActive = true;
-            ControllerManager.weaponController.AddBonusAttackSpeedPercent(speedPercent);
-            ControllerManager.weaponController.AddBonusReloadSpeedPercent(speedPercent);
+            ControllerManager.weaponController.AddBonusAttackSpeedPercent(_isDoubleBuster ? speedPercent * 2 : speedPercent);
+            ControllerManager.weaponController.AddBonusReloadSpeedPercent(_isDoubleBuster ? speedPercent * 2 : speedPercent);
 
             while (_attackSpeedTimer > 0)
             {
@@ -132,11 +134,11 @@ public class BusterController : MonoBehaviour
             }
 
             _isAttackSpeedBusterActive = false;
-            ControllerManager.weaponController.AddBonusAttackSpeedPercent(-speedPercent);
-            ControllerManager.weaponController.AddBonusReloadSpeedPercent(-speedPercent);
+            ControllerManager.weaponController.AddBonusAttackSpeedPercent(_isDoubleBuster ? -speedPercent * 2 : -speedPercent);
+            ControllerManager.weaponController.AddBonusReloadSpeedPercent(_isDoubleBuster ? -speedPercent * 2 : -speedPercent);
         }
         
-        _attackSpeedTimer = duration;
+        _attackSpeedTimer = _isDoubleBuster ? duration * 2 : duration;
         
         if(!_isAttackSpeedBusterActive)
             StartCoroutine(Activate());
@@ -148,7 +150,7 @@ public class BusterController : MonoBehaviour
         {
             _isMoveSpeedBusterActive = true;
             float speedToAdd = ControllerManager.player.MoveSpeed / 100 * moveSpeedPercent;
-            ControllerManager.player.AddBonusMoveSpeed(speedToAdd);
+            ControllerManager.player.AddBonusMoveSpeed(_isDoubleBuster ? speedToAdd * 2 : speedToAdd);
 
             while (_moveSpeedTimer > 0)
             {
@@ -158,10 +160,10 @@ public class BusterController : MonoBehaviour
             }
 
             _isMoveSpeedBusterActive = false;
-            ControllerManager.player.AddBonusMoveSpeed(-speedToAdd);
+            ControllerManager.player.AddBonusMoveSpeed(_isDoubleBuster ? -speedToAdd * 2 : -speedToAdd);
         }
         
-        _moveSpeedTimer = duration;
+        _moveSpeedTimer = _isDoubleBuster ? duration * 2 : duration;
         
         if(!_isMoveSpeedBusterActive)
             StartCoroutine(Activate());
@@ -201,5 +203,10 @@ public class BusterController : MonoBehaviour
         var buster = BusterPool.Instance.Get(busterType);
         buster.Setup(new Vector3(position.x, 1, position.z), Quaternion.identity);
         buster.gameObject.SetActive(true);
+    }
+
+    public void SetDoubleBuster(bool value)
+    {
+        _isDoubleBuster = value;
     }
 }

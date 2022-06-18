@@ -12,6 +12,7 @@ namespace Skills.rare
         public override void Activate()
         {
             ControllerManager.weaponController.SetFlaskParameters(true, flaskReuseTime, flaskHealthPercent, flaskBusterPercent, flaskBusterDuration);
+            GameUI.instance.SetGrenadeToPotion();
         }
     }
 }

@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
+    [field: SerializeField] public bool IsActive { get; private set; }
+    [field: SerializeField] public bool IsDisabled { get; private set; }
     [field: SerializeField] public WeaponType CurrentWeaponType { get; private set; }
     [field: SerializeField] public float Damage { get; private set; }
     [field: SerializeField] public float PeriodDamage { get; private set; }
@@ -157,6 +159,16 @@ public class Weapon : MonoBehaviour
     public void SetInfinite(bool value)
     {
         InfiniteProjectile = value;
+    }
+
+    public void SetActive(bool value)
+    {
+        IsActive = value;
+    }
+    
+    public void SetDisabled(bool value)
+    {
+        IsDisabled = value;
     }
 }
 

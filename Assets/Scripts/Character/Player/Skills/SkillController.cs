@@ -242,6 +242,12 @@ public class SkillController : MonoBehaviour
     {
         AddToSkillsList(uniqueSkills[1]);
     }
+    
+    [ContextMenu("Random skill скилл")]
+    private void GetRndSkill()
+    {
+        AddToSkillsList(uniqueSkills[7]);
+    }
 
     #endregion
 }

@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2282087251247314148
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5985258356808172768}
+  - component: {fileID: 6900256486257537150}
+  m_Layer: 0
+  m_Name: id_3010_powerBusters_unique
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5985258356808172768
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2282087251247314148}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6900256486257537150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2282087251247314148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9e46e817a0a4eb0ab3915a42a79ce90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 3010
+  skillImage: {fileID: 21300000, guid: 8dc73df7af3a82e4b83ded17688413f5, type: 3}
+  skillName: "\u0421\u0443\u043F\u0435\u0440 \u0431\u0443\u0441\u0442\u0435\u0440"
+  skillDescription: "  \u0423\u0434\u0432\u0430\u0438\u0432\u0430\u0435\u0442 \u044D\u0444\u0444\u0435\u043A\u0442
+    \u0432\u0441\u0435\u0445 \u0431\u0443\u0441\u0442\u0435\u0440\u043E\u0432, \u0442\u0430\u043A\u0436\u0435
+    \u0443\u0432\u0435\u043B\u0438\u0447\u0438\u0432\u0430\u0435\u0442 \u0432\u0440\u0435\u043C\u044F
+    \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044F \u0432\u0440\u0435\u043C\u0435\u043D\u043D\u044B\u0445
+    \u0431\u0443\u0441\u0442\u0435\u0440\u043E\u0432 \u0432 2 \u0440\u0430\u0437\u0430."
+  skillRarity: 3
+  maxLevel: 1
+  exceptedSkills: []

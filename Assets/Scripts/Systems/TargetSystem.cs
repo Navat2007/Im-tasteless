@@ -30,8 +30,12 @@ public class TargetSystem : MonoBehaviour
     public void Init()
     {
         target = null;
-        _player = ControllerManager.player.gameObject;
-        InvokeRepeating(nameof(FindTarget), 0, timeBetweenSearchTarget);
+
+        if (ControllerManager.player != null)
+        {
+            _player = ControllerManager.player.gameObject;
+            InvokeRepeating(nameof(FindTarget), 0, timeBetweenSearchTarget);
+        }
     }
 
     public GameObject GetTarget()

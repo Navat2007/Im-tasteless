@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = System.Random;
@@ -163,14 +164,38 @@ public class EnemyController : MonoBehaviour
                     UnityEngine.Random.insideUnitSphere * randomPointRadius + target.transform.position, out navMeshHit,
                     randomPointRadius, NavMesh.AllAreas);
                 randomPoint = navMeshHit.position;
+                randomPoint.y = 0;
 
-                if (randomPoint.y > -10000 && randomPoint.y < 10000)
-                {
-                    _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
-                    if (_navMeshPath.status == NavMeshPathStatus.PathComplete &&
-                        !NavMesh.Raycast(target.transform.position, randomPoint, out navMeshHit, NavMesh.AllAreas))
-                        isCorrectPoint = true;
-                }
+                _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
+                if (_navMeshPath.status == NavMeshPathStatus.PathComplete &&
+                    !NavMesh.Raycast(target.transform.position, randomPoint, out navMeshHit, NavMesh.AllAreas))
+                    isCorrectPoint = true;
+                
+                count++;
+            }
+
+            return randomPoint;
+        }
+        
+        Vector3 GetRandomPointAtDistance(float maxDistance)
+        {
+            int count = 0;
+            bool isCorrectPoint = false;
+            Vector3 randomPoint = Vector3.zero;
+
+            while (!isCorrectPoint && count < 10000)
+            {
+                NavMeshHit navMeshHit;
+                NavMesh.SamplePosition(
+                    UnityEngine.Random.onUnitSphere * maxDistance + target.transform.position, out navMeshHit,
+                    maxDistance, NavMesh.AllAreas);
+                randomPoint = navMeshHit.position;
+                randomPoint.y = 0.15f;
+
+                _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
+                if (_navMeshPath.status == NavMeshPathStatus.PathComplete &&
+                    !NavMesh.Raycast(target.transform.position, randomPoint, out navMeshHit, NavMesh.AllAreas))
+                    isCorrectPoint = true;
 
                 count++;
             }
@@ -181,12 +206,12 @@ public class EnemyController : MonoBehaviour
         Vector3 movePosition = Vector3.zero;
         Vector3 prevMovePosition = Vector3.zero;
 
-        while (ControllerManager.player != null && _navMeshAgent != null && _navMeshAgent.enabled)
+        while (ControllerManager.player != null)
         {
-            if (target != null)
+            if (target != null && _navMeshAgent != null && _navMeshAgent.enabled)
             {
                 distance = Vector3.Distance(transform.position, target.transform.position);
-                
+
                 if(_navMeshAgent.angularSpeed != _enemy.TurnSpeed + _bonusTurnSpeed)
                     _navMeshAgent.angularSpeed = _enemy.TurnSpeed + _bonusTurnSpeed;
             
@@ -223,6 +248,11 @@ public class EnemyController : MonoBehaviour
                 {
                     prevMovePosition = movePosition;
                     _navMeshAgent.SetDestination(movePosition);  
+                }
+                
+                if (distance >= 50)
+                {
+                    transform.position = GetRandomPointAtDistance(30);
                 }
             }
 

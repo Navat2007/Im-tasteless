@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerController))]
@@ -51,7 +52,15 @@ public class Player : Character.Character
     {
         SetCameraAudioListener(true);
     }
-    
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, 30);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, 50);
+    }
+
     private void OnDeath(GameObject owner, ProjectileHitInfo obj)
     {
         gameObject.SetActive(false);

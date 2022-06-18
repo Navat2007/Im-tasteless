@@ -31,8 +31,10 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private Weapon pistol;
     [SerializeField] private Weapon shotgun;
     [SerializeField] private Weapon rifle;
+    [SerializeField] private Weapon grenade;
     
     [Header("Grenade")] 
+    [SerializeField] private bool isGrenadeActive;
     [SerializeField] private GameObject grenadePrefab;
     [SerializeField] private bool infiniteGrenade;
     [SerializeField] private bool doubleGrenade;
@@ -58,11 +60,6 @@ public class WeaponController : MonoBehaviour
     private Animator _animator;
     private AudioManager _audioManager;
     private Weapon _equippedWeapon;
-
-    private const bool _isPistolActive = true;
-    private bool _isShogunActive;
-    private bool _isRifleActive;
-    private bool _isGrenadeActive;
 
     private float _nextShootTime;
     private float _nextThrowingTime;
@@ -99,6 +96,7 @@ public class WeaponController : MonoBehaviour
 
     private void Start()
     {
+        pistol.SetActive(true);
         EquipWeapon(startingWeapon);
     }
     
@@ -149,19 +147,19 @@ public class WeaponController : MonoBehaviour
     
     private void HandleSlot1(InputAction.CallbackContext context)
     {
-        if(_isPistolActive)
+        if(pistol.IsActive)
             EquipWeapon(WeaponType.PISTOL);
     }
     
     private void HandleSlot2(InputAction.CallbackContext context)
     {
-        if(_isShogunActive)
+        if(shotgun.IsActive)
             EquipWeapon(WeaponType.SHOTGUN);
     }
     
     private void HandleSlot3(InputAction.CallbackContext context)
     {
-        if(_isRifleActive)
+        if(rifle.IsActive)
             EquipWeapon(WeaponType.RIFLE);
     }
     
@@ -276,7 +274,7 @@ public class WeaponController : MonoBehaviour
     
     private void OnThrowGrenade(InputAction.CallbackContext context)
     {
-        if( Time.time > _nextThrowingTime && _isGrenadeActive && (grenadeCount > 0 || infiniteGrenade))
+        if( Time.time > _nextThrowingTime && isGrenadeActive && (grenadeCount > 0 || infiniteGrenade))
             Throw();
     }
 
@@ -465,7 +463,7 @@ public class WeaponController : MonoBehaviour
         StartCoroutine(AnimateReload());
     }
     
-    private void EquipWeapon(WeaponType weaponType)
+    public void EquipWeapon(WeaponType weaponType)
     {
         _isReloading = false;
 
@@ -520,13 +518,13 @@ public class WeaponController : MonoBehaviour
         switch (weaponType)
         {
             case WeaponType.PISTOL:
-                return _isPistolActive;
+                return pistol.IsActive;
             case WeaponType.SHOTGUN:
-                return _isShogunActive;
+                return shotgun.IsActive;
             case WeaponType.RIFLE:
-                return _isRifleActive;
+                return rifle.IsActive;
             case WeaponType.GRENADE:
-                return _isGrenadeActive;
+                return isGrenadeActive;
         }
 
         return false;
@@ -539,7 +537,8 @@ public class WeaponController : MonoBehaviour
             case WeaponType.PISTOL:
                 return new WeaponInfo
                 {
-                    isActive = _isPistolActive,
+                    isActive = pistol.IsActive,
+                    isDisabled = pistol.IsDisabled,
                     ammoInClip = pistol.ProjectileInClip,
                     ammoPerClip = pistol.ProjectilePerClip,
                     ammoCurrent = pistol.CurrentProjectileAmount,
@@ -550,7 +549,8 @@ public class WeaponController : MonoBehaviour
             case WeaponType.SHOTGUN:
                 return new WeaponInfo
                 {
-                    isActive = _isShogunActive,
+                    isActive = shotgun.IsActive,
+                    isDisabled = shotgun.IsDisabled,
                     ammoInClip = shotgun.ProjectileInClip,
                     ammoPerClip = shotgun.ProjectilePerClip,
                     ammoCurrent = shotgun.CurrentProjectileAmount,
@@ -561,7 +561,8 @@ public class WeaponController : MonoBehaviour
             case WeaponType.RIFLE:
                 return new WeaponInfo
                 {
-                    isActive = _isRifleActive,
+                    isActive = rifle.IsActive,
+                    isDisabled = rifle.IsDisabled,
                     ammoInClip = rifle.ProjectileInClip,
                     ammoPerClip = rifle.ProjectilePerClip,
                     ammoCurrent = rifle.CurrentProjectileAmount,
@@ -572,6 +573,7 @@ public class WeaponController : MonoBehaviour
             case WeaponType.GRENADE:
                 return new WeaponInfo
                 {
+                    isActive = isGrenadeActive,
                     ammoInClip = 1,
                     ammoPerClip = 1,
                     ammoCurrent = grenadeCount,
@@ -594,43 +596,49 @@ public class WeaponController : MonoBehaviour
         switch (weaponType)
         {
             case WeaponType.SHOTGUN:
-                if (activateWeapon && !_isShogunActive)
+                if (activateWeapon && !shotgun.IsActive && !shotgun.IsDisabled)
                 {
-                    _isShogunActive = true;
+                    shotgun.SetActive(true);
                     _gameUI.SetSlot(2, true);
                 }
+
+                if (shotgun.IsActive)
+                {
+                    var percentShotgunCount = Convert.ToInt32(Math.Round((double)shotgun.MaxProjectileAmount / 100 * (double)count, 0));
+                    shotgun.CurrentProjectileAmount += isCountPercent ? percentShotgunCount : count;
                 
-                var percentShotgunCount = Convert.ToInt32(Math.Round((double)shotgun.MaxProjectileAmount / 100 * (double)count, 0));
-                shotgun.CurrentProjectileAmount += isCountPercent ? percentShotgunCount : count;
+                    var maxShotgunAmount = shotgun.MaxProjectileAmount + (_bonusMaxClip * shotgun.ProjectilePerClip);
                 
-                var maxShotgunAmount = shotgun.MaxProjectileAmount + (_bonusMaxClip * shotgun.ProjectilePerClip);
+                    if (shotgun.CurrentProjectileAmount > maxShotgunAmount)
+                        shotgun.CurrentProjectileAmount = maxShotgunAmount;
                 
-                if (shotgun.CurrentProjectileAmount > maxShotgunAmount)
-                    shotgun.CurrentProjectileAmount = maxShotgunAmount;
-                
-                OnAmmoChange?.Invoke(shotgun.ProjectileInClip, shotgun.CurrentProjectileAmount, shotgun.InfiniteProjectile, WeaponType.SHOTGUN);
+                    OnAmmoChange?.Invoke(shotgun.ProjectileInClip, shotgun.CurrentProjectileAmount, shotgun.InfiniteProjectile, WeaponType.SHOTGUN);
+                }
                 break;
             case WeaponType.RIFLE:
-                if (activateWeapon && !_isRifleActive)
+                if (activateWeapon && !rifle.IsActive && !rifle.IsDisabled)
                 {
-                    _isRifleActive = true;
+                    rifle.SetActive(true);
                     _gameUI.SetSlot(3, true);
                 }
+
+                if (rifle.IsActive)
+                {
+                    var percentRifleCount = Convert.ToInt32(Math.Round((double)rifle.MaxProjectileAmount / 100 * (double)count, 0));
+                    rifle.CurrentProjectileAmount += isCountPercent ? percentRifleCount : count;
                 
-                var percentRifleCount = Convert.ToInt32(Math.Round((double)rifle.MaxProjectileAmount / 100 * (double)count, 0));
-                rifle.CurrentProjectileAmount += isCountPercent ? percentRifleCount : count;
+                    var maxRifleAmount = rifle.MaxProjectileAmount + (_bonusMaxClip * rifle.ProjectilePerClip);
                 
-                var maxRifleAmount = rifle.MaxProjectileAmount + (_bonusMaxClip * rifle.ProjectilePerClip);
+                    if (rifle.CurrentProjectileAmount > maxRifleAmount)
+                        rifle.CurrentProjectileAmount = maxRifleAmount;
                 
-                if (rifle.CurrentProjectileAmount > maxRifleAmount)
-                    rifle.CurrentProjectileAmount = maxRifleAmount;
-                
-                OnAmmoChange?.Invoke(rifle.ProjectileInClip, rifle.CurrentProjectileAmount, rifle.InfiniteProjectile, WeaponType.RIFLE);
+                    OnAmmoChange?.Invoke(rifle.ProjectileInClip, rifle.CurrentProjectileAmount, rifle.InfiniteProjectile, WeaponType.RIFLE);
+                }
                 break;
             case WeaponType.GRENADE:
-                if (activateWeapon && !_isGrenadeActive)
+                if (activateWeapon && isGrenadeActive)
                 {
-                    _isGrenadeActive = true;
+                    isGrenadeActive = true;
                     _gameUI.SetSlot(4, true);
                 }
 
@@ -725,6 +733,7 @@ public class WeaponController : MonoBehaviour
 public struct WeaponInfo
 {
     public bool isActive;
+    public bool isDisabled;
     public int ammoInClip;
     public int ammoPerClip;
     public int ammoCurrent;

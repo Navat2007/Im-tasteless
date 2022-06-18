@@ -12,7 +12,6 @@ namespace Skills.rare
                 WeaponType.RIFLE,
             };
             
-            var pistol = ControllerManager.weaponController.GetWeapon(WeaponType.PISTOL);
             var shotgun = ControllerManager.weaponController.GetWeapon(WeaponType.SHOTGUN);
             var rifle = ControllerManager.weaponController.GetWeapon(WeaponType.RIFLE);
             
@@ -24,9 +23,11 @@ namespace Skills.rare
             switch (weapon)
             {
                 case WeaponType.SHOTGUN:
+                    ControllerManager.weaponController.AddAmmo(1, WeaponType.SHOTGUN, true);
                     rifle.SeMaxAmount(rifle.MaxProjectileAmount - (rifle.MaxProjectileAmount / 100 * 10));
                     break;
                 case WeaponType.RIFLE:
+                    ControllerManager.weaponController.AddAmmo(1, WeaponType.RIFLE, true);
                     shotgun.SeMaxAmount(shotgun.MaxProjectileAmount - (shotgun.MaxProjectileAmount / 100 * 10));
                     break;
             }

@@ -4,7 +4,7 @@ namespace Skills.rare
     {
         public override void Activate()
         {
-            
+            ControllerManager.busterController.SetDoubleBuster(true);
         }
     }
 }
