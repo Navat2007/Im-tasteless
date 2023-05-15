@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Pools;
-using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -23,22 +22,37 @@ public class CrateSpawner : MonoBehaviour
 
     private float _nextScanTime;
     private bool _isStartSpawn;
+    private bool _isUIOpen;
 
     private void OnEnable()
     {
+        GameUI.instance.OnUIOpen += OnUIOpen;
+        GameUI.instance.OnUIClose += OnUIClose;
         ControllerManager.crateSpawner = this;
     }
 
     private void OnDisable()
     {
+        GameUI.instance.OnUIOpen -= OnUIOpen;
+        GameUI.instance.OnUIClose -= OnUIClose;
         ControllerManager.crateSpawner = null;
+    }
+    
+    private void OnUIOpen()
+    {
+        _isUIOpen = true;
+    }
+    
+    private void OnUIClose()
+    {
+        _isUIOpen = false;
     }
 
     private void Update()
     {
         if (Time.time > _nextScanTime && ControllerManager.player != null)
         {
-            if (_crateList.Count == 0) return;
+            if (_crateList.Count == 0 || _isUIOpen) return;
             
             _nextScanTime = Time.time + 1;
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
@@ -30,6 +31,7 @@ public class EnemyController : MonoBehaviour
     private float _minBonusSpeed = -2.75f;
     private float _bonusTurnSpeed;
     private float _nextTimeUpdateSpeed;
+    private List<Transform> _teleportPoints;
 
     private void Awake()
     {
@@ -39,6 +41,7 @@ public class EnemyController : MonoBehaviour
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _camera = Camera.main;
         _collider = GetComponent<Collider>();
+        _teleportPoints = ControllerManager.player.GetTeleportPoints;
     }
 
     private void OnDisable()
@@ -188,18 +191,14 @@ public class EnemyController : MonoBehaviour
 
             while (!isCorrectPoint && count < 10000)
             {
-                var randomDirection = (UnityEngine.Random.insideUnitCircle * new Vector2(target.transform.position.x, target.transform.position.z)).normalized;
-                var randomDistance = UnityEngine.Random.Range(maxDistance, maxDistance);
-                var point = new Vector2(target.transform.position.x, target.transform.position.z) + randomDirection * randomDistance;
+                System.Random random = new System.Random();
+                var point = _teleportPoints[random.Next(_teleportPoints.Count)];
 
-                randomPoint = new Vector3(point.x, 0, point.y);
+                randomPoint = point.position;
 
-                if (randomPoint.x > -10000 && randomPoint.x < 10000)
-                {
-                    _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
-                    if (_navMeshPath.status == NavMeshPathStatus.PathComplete)
-                        isCorrectPoint = true;
-                }
+                _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
+                if (_navMeshPath.status == NavMeshPathStatus.PathComplete)
+                    isCorrectPoint = true;
 
                 count++;
             }

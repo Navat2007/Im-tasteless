@@ -15,6 +15,7 @@ public class HealthSystem : MonoBehaviour
     public event Action<int> OnArmorChange;
     
     [field: Header("Настройки здоровья")] 
+    [field: SerializeField] public bool Invulnerability { get; private set; }
     [field: SerializeField] public float CurrentHealth { get; private set; }
     [field: SerializeField] public float MaxHealth { get; private set; }
     [field: SerializeField] public float HealthInSecond { get; private set; }
@@ -236,6 +237,7 @@ public class HealthSystem : MonoBehaviour
         
         if(_isDeath) return;
         if(Time.time < _nextInvulnerabilityTime) return;
+        if(Invulnerability) return;
         
         StopCoroutine(Blink(blinkDuration));
         StartCoroutine(Blink(blinkDuration));

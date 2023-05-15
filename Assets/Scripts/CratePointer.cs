@@ -5,15 +5,20 @@ using UnityEngine.UI;
 
 public class CratePointer : MonoBehaviour
 {
+    public bool IsShow { get; private set; }
+    public bool IsFade { get; private set; }
+
     [SerializeField] private Transform worldPointer;
     [SerializeField] private Image image;
     [SerializeField] private Image backImage;
     [SerializeField] private float fadeTimer = 10;
     
     private Camera _camera;
-    public bool IsShow { get; private set; }
-    public bool IsFade { get; private set; }
-
+    private float _nextUpdateTime;
+    private bool _isUIOpen;
+    private Image _prevImage;
+    private Image _prevBackImage;
+    
     private void Awake()
     {
         _camera = Camera.main;
@@ -24,13 +29,47 @@ public class CratePointer : MonoBehaviour
         IsFade = false;
         IsShow = true;
         
+        GameUI.instance.OnUIOpen += OnUIOpen;
+        GameUI.instance.OnUIClose += OnUIClose;
+        
         StartCoroutine(Fade(new Color(1, 1, 1, 1), new Color(1, 1, 1, 0), fadeTimer));
+    }
+    
+    private void OnDisable()
+    {
+        GameUI.instance.OnUIOpen -= OnUIOpen;
+        GameUI.instance.OnUIClose -= OnUIClose;
+    }
+    
+    private void OnUIOpen()
+    {
+        _isUIOpen = true;
+        _prevImage = image;
+        _prevBackImage = backImage;
+        
+        image.color = new Color(1, 1, 1, 0);
+        backImage.color = new Color(1, 1, 1, 0);
+        
+        Debug.Log("UI open");
+    }
+
+    private void OnUIClose()
+    {
+        _isUIOpen = false;
+        
+        image.color = _prevImage.color;
+        backImage.color = _prevBackImage.color;
+        
+        Debug.Log("UI close");
     }
 
     private void Update()
     {
-        if (ControllerManager.player != null && IsShow)
+        if (Time.time > _nextUpdateTime && ControllerManager.player != null && IsShow)
         {
+            if(_isUIOpen) return;
+
+            _nextUpdateTime = Time.time + 0.1f;
             Vector3 fromPlayerToCrate = transform.position - ControllerManager.player.transform.position;
             Ray ray = new Ray(ControllerManager.player.transform.position, fromPlayerToCrate);
 
@@ -62,6 +101,10 @@ public class CratePointer : MonoBehaviour
 
         while (percent > 0)
         {
+            if(_isUIOpen)
+                yield return null;
+            
+            Debug.Log("Fade");
             percent -= Time.deltaTime * speed;
             image.color = Color.Lerp(to, from, percent);
             backImage.color = Color.Lerp(to, from, percent);

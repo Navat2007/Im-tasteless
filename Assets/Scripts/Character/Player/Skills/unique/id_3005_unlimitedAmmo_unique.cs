@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace Skills.rare
 {
@@ -11,6 +12,8 @@ namespace Skills.rare
                 WeaponType.SHOTGUN,
                 WeaponType.RIFLE,
             };
+            
+            
             
             var shotgun = ControllerManager.weaponController.GetWeapon(WeaponType.SHOTGUN);
             var rifle = ControllerManager.weaponController.GetWeapon(WeaponType.RIFLE);

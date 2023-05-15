@@ -95,6 +95,9 @@ public enum PanelType
 public class GameUI : MonoBehaviour
 {
     public static GameUI instance;
+
+    public event Action OnUIOpen;
+    public event Action OnUIClose;
     
     [SerializeField] private Image fadePanel;
     
@@ -748,6 +751,9 @@ public class GameUI : MonoBehaviour
     
     public void OpenPanel(PanelType panelType)
     {
+        OnUIOpen?.Invoke();
+        ControllerManager.pauseManager.StartPause();
+
         IEnumerator MakeButtonsInteractable()
         {
             yield return new WaitForSecondsRealtime(2);
@@ -768,8 +774,6 @@ public class GameUI : MonoBehaviour
         {
             case PanelType.RESULT:
                 if (resultPanel == null) throw new NotImplementedException("Панель результата не назначена");
-
-                ControllerManager.pauseManager.StartPause();
                 
                 resultPanelStruct.rewardClaimButton.onClick.RemoveAllListeners();
                 resultPanelStruct.reward2XClaimButton.onClick.RemoveAllListeners();
@@ -805,7 +809,6 @@ public class GameUI : MonoBehaviour
             case PanelType.PAUSE:
                 if (pausePanel == null) throw new NotImplementedException("Панель паузы не назначена");
                 
-                ControllerManager.pauseManager.StartPause();
                 _panelStack.Push(new PanelUIStruct
                 {
                     panel = pausePanel,
@@ -827,8 +830,6 @@ public class GameUI : MonoBehaviour
                 break;
             case PanelType.SKILLS:
                 if (skillChoicePanel == null) throw new NotImplementedException("Панель выбора навыков не назначена");
-                
-                ControllerManager.pauseManager.StartPause();
                 
                 skillChoiceLevelText.SetText($"Вы получили {ControllerManager.experienceSystem.Level} уровень");
 
@@ -991,8 +992,6 @@ public class GameUI : MonoBehaviour
                 
                 if (randomSkillPanel == null) throw new NotImplementedException("Панель рандомных скилов не назначена");
                 
-                ControllerManager.pauseManager.StartPause();
-                
                 _panelStack.Push(new PanelUIStruct
                 {
                     panel = randomSkillPanel,
@@ -1013,7 +1012,6 @@ public class GameUI : MonoBehaviour
         if (_panelStack.Count == 0)
         {
             OpenPanel(PanelType.PAUSE);
-            ControllerManager.pauseManager.StartPause();
         }
         else
         {
@@ -1024,6 +1022,7 @@ public class GameUI : MonoBehaviour
             if (_panelStack.Count == 0)
             {
                 ControllerManager.pauseManager.StopPause();
+                OnUIClose?.Invoke();
             }
         }
     }

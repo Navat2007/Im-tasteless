@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerController))]
@@ -13,6 +13,7 @@ public class Player : Character.Character
     [field: SerializeField] public float ExplosiveResist { get; private set; } = 50;
     [field: SerializeField] public float HealOnTakeAmmoPercent { get; private set; }
     [field: SerializeField] public Renderer Renderer { get; private set; }
+    [field: SerializeField] public List<Transform> EnemyTeleportPoints { get; private set; }
     
     private AudioListener _cameraAudioListener;
     private HealthSystem _healthSystem;
@@ -91,4 +92,6 @@ public class Player : Character.Character
     {
         HealOnTakeAmmoPercent = value;
     }
+
+    public List<Transform> GetTeleportPoints => EnemyTeleportPoints;
 }
