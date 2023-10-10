@@ -11,7 +11,7 @@ using Random = System.Random;
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(TargetSystem))]
-public class EnemyController : MonoBehaviour
+public sealed class EnemyController : MonoBehaviour
 {
     [SerializeField] private float randomPointRadius = 10f;
     [SerializeField] private GameObject target;

@@ -1,17 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class EnemySpawner : MonoBehaviour
+public sealed class EnemySpawner : MonoBehaviour
 {
-    public event Action<int, int> OnNewWave;
-    public event Action<int> OnEnemyCountChange;
-    
     [Header("Точки спавна на карте")]
     [SerializeField] private List<SpawnPoint> spawnPoints = new();
 
     [Header("Настройка волн")]
+    [SerializeField] private int _maxActiveEnemy = 40;
     [SerializeField] private List<Wave> waves = new();
 
     [Header("Стандартный враг, если не найдены остальные")]
@@ -36,6 +35,8 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float powerFatBusterSpawnChance = 50.0f;
 
     private float _bonusPowerEnemySpawnChance;
+    private Wave _currentWave;
+    private int _currentWaveIndex = -1;
 
     private void OnEnable()
     {
@@ -47,43 +48,29 @@ public class EnemySpawner : MonoBehaviour
         ControllerManager.enemySpawner = null;
     }
 
+    private void Awake()
+    {
+        
+    }
+
     private void Start()
     {
-        if (waves.Count > 0)
-            ActivateNextWave(waves[0], 0);
+        ActivateNextWave();
     }
 
     private void Update()
     {
-        int GetZombieCountToSpawn(ZombieType zombieType, bool isCritical)
+        foreach (var wave in waves)
         {
-            int count = 1;
-
-            if (zombieType == ZombieType.FAST)
-            {
-                count++;
-
-                if (isCritical)
-                {
-                    count += 2;
-                }
-            }
-
-            return count;
-        }
-        
-        for (int i = 0; i < waves.Count; i++)
-        {
-            Wave wave = waves[i];
-
             if (wave.active && !wave.done && Time.time > wave.GetNextSpawnTime &&
+                GetRemainingAlive() < _maxActiveEnemy &&
                 (wave.GetRemainingToSpawn > 0 || wave.waveStruct.infinite))
             {
                 wave.SetNextSpawnTime(Time.time + wave.waveStruct.timeBetweenSpawn);
 
                 var powerEnemyChanceSO = wave.waveStruct.powerEnemyChance + (wave.waveStruct.powerEnemyChance / 100 * _bonusPowerEnemySpawnChance);
 
-                var zombieType = GetEnemy(wave.waveStruct.enemyList, wave);
+                var zombieType = GetEnemy(wave);
                 var powerEnemyChance = Helper.IsCritical(zombieType == ZombieType.FAST
                                                          || zombieType == ZombieType.FAT
                     ? powerEnemyChanceSO * 2
@@ -91,10 +78,7 @@ public class EnemySpawner : MonoBehaviour
 
                 SpawnEnemy(GetZombieCountToSpawn(zombieType, powerEnemyChance), zombieType, powerEnemyChance, wave);
             }
-
-            if (i < waves.Count - 1 && !waves[i + 1].done && CheckNextWave(waves[i], waves[i + 1]))
-                ActivateNextWave(waves[i + 1], i + 1);
-
+            
             if (CheckWaveDone(wave))
             {
                 wave.done = true;
@@ -106,15 +90,18 @@ public class EnemySpawner : MonoBehaviour
                 }
             }
         }
+
+        if (CheckNextWave())
+            ActivateNextWave();
     }
 
-    private bool CheckNextWave(Wave currentWave, Wave nextWave)
+    private bool CheckNextWave()
     {
         bool FindPowerEnemyInWave()
         {
             int count = 0;
             
-            foreach (var enemy in currentWave.enemies)
+            foreach (var enemy in _currentWave.enemies)
             {
                 if (enemy.IsPower) count++;
             }
@@ -122,10 +109,10 @@ public class EnemySpawner : MonoBehaviour
             return count > 2;
         }
         
-        var percentAlreadySpawned = currentWave.GetAlreadySpawned * 100 / currentWave.waveStruct.enemyCount;
-        var percentRemainingAlive = currentWave.GetRemainingAlive * 100 / currentWave.waveStruct.enemyCount;
+        var percentAlreadySpawned = _currentWave.GetAlreadySpawned * 100 / _currentWave.waveStruct.enemyCount;
+        var percentRemainingAlive = _currentWave.GetRemainingAlive * 100 / _currentWave.waveStruct.enemyCount;
 
-        return percentAlreadySpawned >= 80 && percentRemainingAlive <= 20 && !nextWave.active && !FindPowerEnemyInWave();
+        return percentAlreadySpawned >= 80 && percentRemainingAlive <= 20 && !waves[_currentWaveIndex + 1].active && !FindPowerEnemyInWave();
     }
 
     private bool CheckWaveDone(Wave wave)
@@ -136,42 +123,68 @@ public class EnemySpawner : MonoBehaviour
         return false;
     }
 
-    private void ActivateNextWave(Wave wave, int index)
+    private void ActivateNextWave()
     {
-        OnNewWave?.Invoke(index, wave.waveStruct.enemyCount);
+        if (waves.Count > 0 && waves[_currentWaveIndex + 1] != null)
+        {
+            _currentWaveIndex++;
+            _currentWave = waves[_currentWaveIndex];
+            
+            EventBus.SpawnerEvents.OnNewWave?.Invoke(_currentWaveIndex, _currentWave.waveStruct.enemyCount);
 
-        wave.active = true;
-        wave.SetRemainingToSpawn(wave.waveStruct.enemyCount);
+            _currentWave.active = true;
+            _currentWave.SetRemainingToSpawn(_currentWave.waveStruct.enemyCount);
+        }
+    }
+    
+    private int GetRemainingAlive()
+    {
+        return waves.Sum(wave => wave.GetRemainingAlive);
+    }
+    
+    private int GetZombieCountToSpawn(ZombieType zombieType, bool isCritical)
+    {
+        int count = 1;
+
+        if (zombieType == ZombieType.FAST)
+        {
+            count++;
+
+            if (isCritical)
+            {
+                count += 2;
+            }
+        }
+
+        return count;
     }
 
-    private ZombieType GetEnemy(List<ZombieType> enemyList, Wave wave)
+    private ZombieType GetEnemy(Wave wave)
     {
-        int count = 0;
-
-        while (count < 1000)
-        {
-            System.Random random = new System.Random();
-            var zombieType = enemyList[random.Next(enemyList.Count)];
+        System.Random random = new System.Random();
+        var zombieType = wave.waveStruct.enemyList[random.Next(enemyList.Count)];
             
-            switch (zombieType)
-            {
-                case ZombieType.FAT:
-                    if (wave.GetFatCount < wave.waveStruct.fatMaxCount)
-                    {
-                        return zombieType;
-                    }
-                    break;
-                case ZombieType.FAST:
-                    if (wave.GetFastCount < wave.waveStruct.fastMaxCount)
-                    {
-                        return zombieType;
-                    }
-                    break;
-                case ZombieType.STANDARD:
+        switch (zombieType)
+        {
+            case ZombieType.FAT:
+                if (wave.GetFatCount < wave.waveStruct.fatMaxCount)
+                {
                     return zombieType;
-            }
-
-            count++;
+                }
+                break;
+            
+            case ZombieType.FAST:
+                if (wave.GetFastCount < wave.waveStruct.fastMaxCount)
+                {
+                    return zombieType;
+                }
+                break;
+            
+            case ZombieType.STANDARD:
+                return zombieType;
+            
+            default:
+                return ZombieType.STANDARD;
         }
 
         return ZombieType.STANDARD;
@@ -283,7 +296,7 @@ public class EnemySpawner : MonoBehaviour
             }
 
             enemyList.Remove(spawnedEnemy);
-            OnEnemyCountChange?.Invoke(enemyList.Count);
+            EventBus.EnemyEvents.OnEnemyCountChange?.Invoke(enemyList.Count);
             
             ShowEffect(spawnedEnemy, projectileHitInfo);
 
@@ -331,18 +344,17 @@ public class EnemySpawner : MonoBehaviour
         {
             var enemy = EnemyPool.Instance.Get(zombieType, isPowerZombie);
 
-            enemy
-                .Setup(GetRandomSpawnerPoint(), Quaternion.identity, wave);
+            enemy.Setup(GetRandomSpawnerPoint(), Quaternion.identity, wave);
             
             enemy.gameObject.GetComponent<HealthSystem>().OnDeath += OnEnemyDeath;
 
             switch (zombieType)
             {
                 case ZombieType.FAT:
-                    wave.SetFatCount(wave.GetFatCount + 1);
+                    wave?.SetFatCount(wave.GetFatCount + 1);
                     break;
                 case ZombieType.FAST:
-                    wave.SetFastCount(wave.GetFastCount + (isPowerZombie ? 4 : 2));
+                    wave?.SetFastCount(wave.GetFastCount + (isPowerZombie ? 4 : 2));
                     break;
             }
 
@@ -355,7 +367,7 @@ public class EnemySpawner : MonoBehaviour
                 enemyList.Add(enemy);
             }
             
-            OnEnemyCountChange?.Invoke(enemyList.Count);
+            EventBus.EnemyEvents.OnEnemyCountChange?.Invoke(enemyList.Count);
         }
     }
 

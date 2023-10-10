@@ -79,10 +79,10 @@ public class Enemy : Character.Character
         
         if (wave != null)
         {
-            Health += wave.waveStruct.health;
-            Damage += wave.waveStruct.damage;
-            MoveSpeed += wave.waveStruct.moveSpeed;
-            XpOnDeath += wave.waveStruct.xpOnDeath;
+            Health *= wave.waveStruct.health;
+            Damage *= wave.waveStruct.damage;
+            MoveSpeed *= wave.waveStruct.moveSpeed;
+            XpOnDeath *= wave.waveStruct.xpOnDeath;
         }
         
         gameObject.SetActive(true);

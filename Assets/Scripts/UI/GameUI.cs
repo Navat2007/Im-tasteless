@@ -274,11 +274,8 @@ public class GameUI : MonoBehaviour
 
     private void Subscribe()
     {
-        if (ControllerManager.enemySpawner != null)
-        {
-            ControllerManager.enemySpawner.OnNewWave += OnNewWave;
-            ControllerManager.enemySpawner.OnEnemyCountChange += EnemySpawnerOnEnemyCountChange;
-        }
+        EventBus.SpawnerEvents.OnNewWave += OnNewWave;
+        EventBus.EnemyEvents.OnEnemyCountChange += EnemySpawnerOnEnemyCountChange;
 
         if (ControllerManager.playerHealthSystem != null)
         {
@@ -326,11 +323,8 @@ public class GameUI : MonoBehaviour
 
     private void Unsubscribe()
     {
-        if (ControllerManager.enemySpawner != null)
-        {
-            ControllerManager.enemySpawner.OnNewWave -= OnNewWave;
-            ControllerManager.enemySpawner.OnEnemyCountChange -= EnemySpawnerOnEnemyCountChange;
-        }
+        EventBus.SpawnerEvents.OnNewWave -= OnNewWave;
+        EventBus.EnemyEvents.OnEnemyCountChange -= EnemySpawnerOnEnemyCountChange;
 
         if (ControllerManager.playerHealthSystem != null)
         {
