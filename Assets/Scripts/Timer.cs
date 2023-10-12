@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class Timer : MonoBehaviour
 {
-    [SerializeField] private int scoreOnTime = 5;
     [SerializeField] private float currentTime;
 
     public EventHandler<float> OnTimerChange;

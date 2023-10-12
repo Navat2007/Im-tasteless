@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
 using UnityEngine;
-using Random = System.Random;
 
 public class TargetSystem : MonoBehaviour
 {
     public event Action<GameObject> OnTargetChange;
-    public event Action<Vector3, GameObject> OnTargetPositionChange;
 
     [SerializeField] private float timeBetweenSearchTarget = 1f;
     

@@ -21,22 +21,22 @@ public class SkillController : MonoBehaviour
     
     [Header("Обычные")]
     [SerializeField] private float commonSkillChance = 62;
-    [SerializeField] private int commonSkillMaxCount = 100;
+    //[SerializeField] private int commonSkillMaxCount = 100;
     [SerializeField] private List<Skill> commonSkills = new();
     
     [Header("Необычные")]
     [SerializeField] private float uncommonSkillChance = 25;
-    [SerializeField] private int uncommonSkillMaxCount = 50;
+    //[SerializeField] private int uncommonSkillMaxCount = 50;
     [SerializeField] private List<Skill> uncommonSkills = new();
     
     [Header("Редкие")]
     [SerializeField] private float rareSkillChance = 10;
-    [SerializeField] private int rareSkillMaxCount = 10;
+    //[SerializeField] private int rareSkillMaxCount = 10;
     [SerializeField] private List<Skill> rareSkills = new();
     
     [Header("Уникальные")]
     [SerializeField] private float uniqueSkillChance = 3;
-    [SerializeField] private int uniqueSkillMaxCount = 1;
+    //[SerializeField] private int uniqueSkillMaxCount = 1;
     [SerializeField] private List<Skill> uniqueSkills = new();
 
     private List<int> _exceptedSkills = new();

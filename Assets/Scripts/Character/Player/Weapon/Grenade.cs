@@ -45,6 +45,10 @@ public class Grenade : MonoBehaviour
 
         if (Time.time > _timer && _isExploded)
         {
+            transform.position = Vector3.zero;
+            transform.rotation = Quaternion.identity;
+            _rigidbody.velocity = Vector3.zero;
+            
             ExplosivePool.Instance.ReturnToPool(_explosiveParticleSystem);
             GrenadetPool.Instance.ReturnToPool(this);
         }
@@ -67,24 +71,29 @@ public class Grenade : MonoBehaviour
 
     public void Setup(Vector3 position, Quaternion rotation, Vector3 forceToAdd)
     {
-        _isExploded = false;
         transform.position = position;
         transform.rotation = rotation;
         _rigidbody.velocity = Vector3.zero;
 
         _countdown = delay;
+        
+        gameObject.SetActive(true);
 
+        _rigidbody.AddForce(forceToAdd, ForceMode.Impulse);
+        
         grenade1MeshRenderer.enabled = true;
         grenade2MeshRenderer.enabled = true;
         grenade3MeshRenderer.enabled = true;
         
-        _rigidbody.AddForce(forceToAdd, ForceMode.Impulse);
+        _isExploded = false;
     }
 
     private void Explode()
     {
         if(_isExploded)
             return;
+        
+        _countdown = delay;
 
         _isExploded = true;
         

@@ -86,7 +86,7 @@ public class Enemy : Character.Character
         }
         
         gameObject.SetActive(true);
-        
+
         _healthSystem.enabled = true;
         _targetSystem.enabled = true;
         _attackController.enabled = true;
@@ -103,7 +103,6 @@ public class Enemy : Character.Character
 
     public void Die()
     {
-        
         OnDeath?.Invoke(transform.position);
         Renderer.material.color = _baseColor;
         EnemyPool.Instance.ReturnToPool(this);

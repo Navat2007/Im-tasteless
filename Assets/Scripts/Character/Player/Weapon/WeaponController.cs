@@ -372,7 +372,6 @@ public class WeaponController : MonoBehaviour
                     grenadeCount--;
             
                 var grenade = GrenadetPool.Instance.Get();
-                grenade.gameObject.SetActive(true);
                 grenade.Setup(leftHandHold.position, leftHandHold.rotation, transform.forward * distanceToCrosshair + transform.up * grenadeThrowingUpwardForce);
             }
             else if(doubleGrenade && grenadeCount >= 2)
@@ -383,13 +382,11 @@ public class WeaponController : MonoBehaviour
                 leftHandHold.transform.Rotate(new Vector3(0, 10, 0));
             
                 var grenade = GrenadetPool.Instance.Get();
-                grenade.gameObject.SetActive(true);
                 grenade.Setup(leftHandHold.position, leftHandHold.rotation, leftHandHold.transform.forward * distanceToCrosshair + leftHandHold.transform.up * grenadeThrowingUpwardForce);
             
                 leftHandHold.transform.Rotate(new Vector3(0, -20, 0));
             
                 var grenade2 = GrenadetPool.Instance.Get();
-                grenade2.gameObject.SetActive(true);
                 grenade2.Setup(leftHandHold.position, leftHandHold.rotation, leftHandHold.transform.forward * distanceToCrosshair + leftHandHold.transform.up * grenadeThrowingUpwardForce);
             
                 leftHandHold.transform.Rotate(new Vector3(0, 10, 0));
@@ -397,7 +394,6 @@ public class WeaponController : MonoBehaviour
         }
         
         OnAmmoChange?.Invoke(grenadeCount, grenadeMaxCount, infiniteGrenade, WeaponType.GRENADE);
-        
     }
     
     private void Reload()

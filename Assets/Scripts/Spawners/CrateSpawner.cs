@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Pools;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -77,13 +78,22 @@ public class CrateSpawner : MonoBehaviour
                     }
                 }
             }
-
-            var pointer = _crateList[index].gameObject.GetComponentInChildren<CratePointer>();
-            if (pointer != null && index >= 0)
+            
+            if(index >= 0)
             {
-                pointer.SetVisible();
+                var pointer = _crateList[index].gameObject.GetComponentInChildren<CratePointer>();
+            
+                if (pointer != null && index >= 0)
+                {
+                    pointer.SetVisible();
+                }
             }
         }
+    }
+    
+    private List<SpawnPoint> GetAvailableSpawnPoints()
+    {
+        return spawnPoints.Where(spawnPoint => spawnPoint.available && !_currentSpawnPoints.Contains(spawnPoint)).ToList();
     }
 
     public IEnumerator SpawnCrate(int count, float spawnYPosition, float spawnDelaySeconds, bool airSpawn)
@@ -93,25 +103,11 @@ public class CrateSpawner : MonoBehaviour
             if (spawnPoints.Count == 0)
                 throw new NotImplementedException("Нет точек спавна для ящиков");
             
-            int count = 0;
-            var index = -1;
-
-            while (index == -1 && count < 1000)
-            {
-                System.Random random = new System.Random();
-                var randomIndex = random.Next(spawnPoints.Count);
-                var randomPoint = spawnPoints[randomIndex];
-
-                if (randomPoint.available && !_currentSpawnPoints.Contains(randomPoint))
-                    index = randomIndex;
-
-                count++;
-            }
-
-            if (index == -1)
-                index = 0;
-
-            return spawnPoints[index];
+            var availableSpawnPoints = GetAvailableSpawnPoints();
+            var index = UnityEngine.Random.Range(0, availableSpawnPoints.Count);
+            var spawnPoint = availableSpawnPoints[index];
+            
+            return spawnPoint;
         }
         
         void OnCrateDeath(GameObject owner, ProjectileHitInfo projectileHitInfo)

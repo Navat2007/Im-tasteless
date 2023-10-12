@@ -144,9 +144,12 @@ public class EnemyPool : MonoBehaviour
                     if (_fastZombies.Count == 0) AddEnemy(1, zombieType);
                     return _fastZombies.Dequeue();
                 }
+            
+            default:
+                if (_standardZombies.Count == 0) AddEnemy(1, zombieType);
+                
+                return _standardZombies.Dequeue();
         }
-
-        return null;
     }
 
     public void ReturnToPool(Enemy enemy)

@@ -10,20 +10,16 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
 {
     [field: SerializeField] public float Health { get; set; }
     [field: SerializeField] public Renderer Renderer { get; private set; }
-    [SerializeField] private float spawnHeight = 0.5f;
+    [SerializeField] private float _spawnHeight = 0.5f;
 
     [Header("Дробовик")]
-    [SerializeField] private GameObject shotgunPrefab;
-    [SerializeField] private float shotgunSpawnChance = 40;
+    [SerializeField] private float _shotgunSpawnChance = 40;
     
     [Header("Автомат")]
-    [SerializeField] private GameObject riflePrefab;
-    [SerializeField] private float rifleSpawnChance = 40;
+    [SerializeField] private float _rifleSpawnChance = 40;
     
     [Header("Гранаты")]
-    [SerializeField] private GameObject grenadePrefab;
-    [SerializeField] private float grenadeSpawnChance = 20;
-    [SerializeField] private float grenadePowerCrateCount = 10;
+    [SerializeField] private float _grenadeSpawnChance = 20;
 
     private HealthSystem _healthSystem;
     private bool _spawned;
@@ -42,40 +38,25 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
     {
         WeaponType GetWeaponToSpawn()
         {
-            int count = 0;
+            float[] percentages = { _shotgunSpawnChance / 100, _rifleSpawnChance / 100, _grenadeSpawnChance / 100 };
 
-            while (count < 1000)
+            float totalPercentage = 0f;
+            float randomValue = UnityEngine.Random.value;
+
+            WeaponType selectedValue = WeaponType.SHOTGUN;
+
+            for (int i = 1; i < percentages.Length; i++)
             {
-                Array values = Enum.GetValues(typeof(WeaponType));
-                System.Random random = new System.Random();
-                WeaponType weaponType = (WeaponType)values.GetValue(random.Next(values.Length));
-            
-                switch (weaponType)
-                {
-                    case WeaponType.SHOTGUN:
-                        if (Helper.IsCritical(shotgunSpawnChance))
-                        {
-                            return weaponType;
-                        }
-                        break;
-                    case WeaponType.RIFLE:
-                        if (Helper.IsCritical(rifleSpawnChance))
-                        {
-                            return weaponType;
-                        }
-                        break;
-                    case WeaponType.GRENADE:
-                        if (Helper.IsCritical(grenadeSpawnChance))
-                        {
-                            return weaponType;
-                        }
-                        break;
-                }
+                totalPercentage += percentages[i];
 
-                count++;
+                if (randomValue <= totalPercentage)
+                {
+                    selectedValue = (WeaponType)i;
+                    break;
+                }
             }
         
-            return WeaponType.GRENADE;
+            return selectedValue;
         }
 
         void AddWeaponAmmo()
@@ -111,7 +92,7 @@ public class Crate : MonoBehaviour, IDamageable, IHealth
         {
             var pickableWeapon = PickableWeaponPool.Instance.Get(GetWeaponToSpawn());
             pickableWeapon
-                .Setup(new Vector3(transform.position.x, spawnHeight, transform.position.z), Quaternion.identity)
+                .Setup(new Vector3(transform.position.x, _spawnHeight, transform.position.z), Quaternion.identity)
                 .gameObject.SetActive(true);
         }
         

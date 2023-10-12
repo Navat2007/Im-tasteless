@@ -10,7 +10,6 @@ public class FloatingText : MonoBehaviour
     [SerializeField] private int maxFontSize = 22;
     [SerializeField] private Image armorImage;
     [SerializeField] private TMP_Text text;
-    private float _destroyTime = 3;
     
     private static int _sortingOrder;
     private const float DisappearTimerMax = 1f;

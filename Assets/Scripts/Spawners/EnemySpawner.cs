@@ -35,6 +35,7 @@ public sealed class EnemySpawner : MonoBehaviour
     [SerializeField] private float powerFatBusterSpawnChance = 50.0f;
 
     private float _bonusPowerEnemySpawnChance;
+    private List<SpawnPoint> _availableSpawnPoints;
     private Wave _currentWave;
     private int _currentWaveIndex = -1;
 
@@ -47,12 +48,7 @@ public sealed class EnemySpawner : MonoBehaviour
     {
         ControllerManager.enemySpawner = null;
     }
-
-    private void Awake()
-    {
-        
-    }
-
+    
     private void Start()
     {
         ActivateNextWave();
@@ -108,6 +104,9 @@ public sealed class EnemySpawner : MonoBehaviour
             
             return count > 2;
         }
+
+        if (_currentWaveIndex >= waves.Count - 1)
+            return false;
         
         var percentAlreadySpawned = _currentWave.GetAlreadySpawned * 100 / _currentWave.waveStruct.enemyCount;
         var percentRemainingAlive = _currentWave.GetRemainingAlive * 100 / _currentWave.waveStruct.enemyCount;
@@ -125,7 +124,7 @@ public sealed class EnemySpawner : MonoBehaviour
 
     private void ActivateNextWave()
     {
-        if (waves.Count > 0 && waves[_currentWaveIndex + 1] != null)
+        if (waves.Count > 0 && _currentWaveIndex < waves.Count - 1)
         {
             _currentWaveIndex++;
             _currentWave = waves[_currentWaveIndex];
@@ -162,7 +161,8 @@ public sealed class EnemySpawner : MonoBehaviour
     private ZombieType GetEnemy(Wave wave)
     {
         System.Random random = new System.Random();
-        var zombieType = wave.waveStruct.enemyList[random.Next(enemyList.Count)];
+        int randomNext = random.Next(0, wave.waveStruct.enemyList.Count - 1);
+        var zombieType = wave.waveStruct.enemyList[randomNext];
             
         switch (zombieType)
         {
@@ -189,6 +189,11 @@ public sealed class EnemySpawner : MonoBehaviour
 
         return ZombieType.STANDARD;
     }
+    
+    private List<SpawnPoint> GetAvailableSpawnPoints()
+    {
+        return spawnPoints.Where(spawnPoint => spawnPoint.available).ToList();
+    }
 
     private void SpawnEnemy(int count, ZombieType zombieType, bool isPowerZombie, Wave wave = null)
     {
@@ -196,26 +201,12 @@ public sealed class EnemySpawner : MonoBehaviour
         {
             if (spawnPoints.Count == 0)
                 throw new NotImplementedException("Нет точек спавна для врагов");
+            
+            var availableSpawnPoints = GetAvailableSpawnPoints();
+            var index = UnityEngine.Random.Range(0, availableSpawnPoints.Count);
+            var spawnPoint = availableSpawnPoints[index];
 
-            int count = 0;
-            var index = -1;
-
-            while (index == -1 && count < 1000)
-            {
-                System.Random random = new System.Random();
-                var randomIndex = random.Next(spawnPoints.Count);
-                var randomPoint = spawnPoints[randomIndex];
-
-                if (randomPoint.available)
-                    index = randomIndex;
-
-                count++;
-            }
-
-            if (index == -1)
-                index = 0;
-
-            return spawnPoints[index].transform.position + new Vector3(
+            return spawnPoint.transform.position + new Vector3(
                 UnityEngine.Random.Range(minSpawnDistance, maxSpawnDistance), 0,
                 UnityEngine.Random.Range(minSpawnDistance, maxSpawnDistance));
         }
@@ -344,7 +335,9 @@ public sealed class EnemySpawner : MonoBehaviour
         {
             var enemy = EnemyPool.Instance.Get(zombieType, isPowerZombie);
 
-            enemy.Setup(GetRandomSpawnerPoint(), Quaternion.identity, wave);
+            var spawnPoint = GetRandomSpawnerPoint();
+            
+            enemy.Setup(spawnPoint, Quaternion.identity, wave);
             
             enemy.gameObject.GetComponent<HealthSystem>().OnDeath += OnEnemyDeath;
 

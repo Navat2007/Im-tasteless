@@ -13,7 +13,6 @@ using Random = System.Random;
 [RequireComponent(typeof(TargetSystem))]
 public sealed class EnemyController : MonoBehaviour
 {
-    [SerializeField] private float randomPointRadius = 10f;
     [SerializeField] private GameObject target;
     [SerializeField] private bool isDead;
     [SerializeField] private bool isWalking;
@@ -32,6 +31,10 @@ public sealed class EnemyController : MonoBehaviour
     private float _bonusTurnSpeed;
     private float _nextTimeUpdateSpeed;
     private List<Transform> _teleportPoints;
+    private float randomPointRadius = 3f;
+
+    private Vector3 _testMovePoint;
+    private Vector3 _testTeleportPoint;
 
     private void Awake()
     {
@@ -47,6 +50,21 @@ public sealed class EnemyController : MonoBehaviour
     private void OnDisable()
     {
         _enemy.GetEnemyTargetSystem.OnTargetChange -= OnTargetChange;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (_testMovePoint != Vector3.zero)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(_testMovePoint, .1f);
+        }
+
+        if (_testTeleportPoint != Vector3.zero)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(_testTeleportPoint, .3f);
+        }
     }
 
     private void OnTargetChange(GameObject target)
@@ -78,7 +96,7 @@ public sealed class EnemyController : MonoBehaviour
     public void OnDeath()
     {
         isDead = true;
-        
+
         if (_navMeshAgent.enabled)
         {
             _navMeshAgent.isStopped = true;
@@ -154,62 +172,61 @@ public sealed class EnemyController : MonoBehaviour
 
     private IEnumerator Move()
     {
-        Vector3 GetRandomPoint()
+        Vector3 RandomPointOnXZCircle(Vector3 center, float radius)
         {
-            int count = 0;
-            bool isCorrectPoint = false;
+            float angle = UnityEngine.Random.Range(0, 2f * Mathf.PI);
+            return center + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
+        }
+
+        Vector3? GetRandomPoint()
+        {
             Vector3 randomPoint = Vector3.zero;
 
-            while (!isCorrectPoint && count < 10000)
+            NavMeshHit navMeshHit;
+            Vector3 randomPointOnCircle = UnityEngine.Random.insideUnitCircle;
+
+            NavMesh.SamplePosition(
+                RandomPointOnXZCircle(target.transform.position, randomPointRadius),
+                out navMeshHit,
+                randomPointRadius,
+                NavMesh.AllAreas);
+            randomPoint = navMeshHit.position;
+            randomPoint.y = 0;
+
+            _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
+
+            if ((randomPoint.x is > -10000 and < 10000) &&
+                _navMeshPath.status == NavMeshPathStatus.PathComplete &&
+                !NavMesh.Raycast(target.transform.position, randomPoint, out navMeshHit, NavMesh.AllAreas))
             {
-                NavMeshHit navMeshHit;
-                NavMesh.SamplePosition(
-                    UnityEngine.Random.insideUnitSphere * randomPointRadius + target.transform.position, out navMeshHit,
-                    randomPointRadius, NavMesh.AllAreas);
-                randomPoint = navMeshHit.position;
-                randomPoint.y = 0;
-
-                if (randomPoint.x > -10000 && randomPoint.x < 10000)
-                {
-                    _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
-                    if (_navMeshPath.status == NavMeshPathStatus.PathComplete &&
-                        !NavMesh.Raycast(target.transform.position, randomPoint, out navMeshHit, NavMesh.AllAreas))
-                        isCorrectPoint = true;
-                }
-
-                count++;
+                _testMovePoint = randomPoint;
+                return randomPoint;
             }
 
-            return randomPoint;
+            return null;
         }
-        
-        Vector3 GetRandomPointAtDistance(float maxDistance)
+
+        Vector3? GetRandomPointAtPlayerTeleportPoints()
         {
-            int count = 0;
-            bool isCorrectPoint = false;
             Vector3 randomPoint = Vector3.zero;
 
-            while (!isCorrectPoint && count < 10000)
+            Random random = new Random();
+            var point = _teleportPoints[random.Next(0, _teleportPoints.Count - 1)];
+
+            randomPoint = point.position;
+
+            _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
+
+            if (_navMeshPath.status == NavMeshPathStatus.PathComplete)
             {
-                System.Random random = new System.Random();
-                var point = _teleportPoints[random.Next(_teleportPoints.Count)];
-
-                randomPoint = point.position;
-
-                _navMeshAgent.CalculatePath(randomPoint, _navMeshPath);
-                if (_navMeshPath.status == NavMeshPathStatus.PathComplete)
-                    isCorrectPoint = true;
-
-                count++;
+                randomPoint.y = 0.3f;
+                _testTeleportPoint = randomPoint;
+                return randomPoint;
             }
-            
-            randomPoint.y = 0.03f;
-            
-            //Debug.Log($"Send zombie to point: {randomPoint}. Player position: {target.transform.position}");
 
-            return randomPoint;
+            return null;
         }
-        
+
         Vector3 movePosition = Vector3.zero;
         Vector3 prevMovePosition = Vector3.zero;
 
@@ -219,25 +236,30 @@ public sealed class EnemyController : MonoBehaviour
             {
                 distance = Vector3.Distance(transform.position, target.transform.position);
 
-                if(_navMeshAgent.angularSpeed != _enemy.TurnSpeed + _bonusTurnSpeed)
+                if (_navMeshAgent.angularSpeed != _enemy.TurnSpeed + _bonusTurnSpeed)
                     _navMeshAgent.angularSpeed = _enemy.TurnSpeed + _bonusTurnSpeed;
-            
-                if(_navMeshAgent.speed != _enemy.MoveSpeed + _bonusSpeed)
+
+                if (_navMeshAgent.speed != _enemy.MoveSpeed + _bonusSpeed)
                     _navMeshAgent.speed = _enemy.MoveSpeed + _bonusSpeed;
 
                 if (Vector3.Distance(transform.position, target.transform.position) > randomPointRadius)
                 {
                     if (Vector3.Distance(movePosition, target.transform.position) > randomPointRadius)
                     {
-                        movePosition = GetRandomPoint();
-                        _navMeshAgent.isStopped = false;
-                        _animationController.SetState(AnimationState.RUN);
+                        var point = GetRandomPoint();
+
+                        if (point != null)
+                        {
+                            movePosition = point.Value;
+                            _navMeshAgent.isStopped = false;
+                            _animationController.SetState(AnimationState.RUN);
+                        }
                     }
                 }
                 else
                 {
                     movePosition = target.transform.position;
-                
+
                     if (target != null && Vector3.Distance(target.transform.position, _enemy.transform.position) <=
                         _navMeshAgent.stoppingDistance)
                     {
@@ -254,12 +276,18 @@ public sealed class EnemyController : MonoBehaviour
                 if (_navMeshAgent != null && _navMeshAgent.enabled && movePosition != prevMovePosition)
                 {
                     prevMovePosition = movePosition;
-                    _navMeshAgent.SetDestination(movePosition);  
+                    _navMeshAgent.SetDestination(movePosition);
                 }
-                
+
                 if (distance >= 50)
                 {
-                    transform.position = GetRandomPointAtDistance(30);
+                    var point = RandomPointOnXZCircle(target.transform.position, 40f);
+                    _testTeleportPoint = point;
+                    //
+                    // if (point != null)
+                    // {
+                    //     transform.position = point.Value;
+                    // }
                 }
             }
 
@@ -312,6 +340,7 @@ public sealed class EnemyController : MonoBehaviour
             }
             catch (Exception e)
             {
+                Debug.LogError(e.Message);
                 _navMeshAgent.enabled = false;
                 _navMeshAgent.enabled = true;
             }
