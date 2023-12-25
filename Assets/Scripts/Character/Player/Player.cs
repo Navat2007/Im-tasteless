@@ -14,7 +14,8 @@ public class Player : Character.Character
     [field: SerializeField] public float HealOnTakeAmmoPercent { get; private set; }
     [field: SerializeField] public Renderer Renderer { get; private set; }
     [field: SerializeField] public List<Transform> EnemyTeleportPoints { get; private set; }
-    
+
+    private int _lives = 1;
     private AudioListener _cameraAudioListener;
     private HealthSystem _healthSystem;
 
@@ -94,4 +95,11 @@ public class Player : Character.Character
     }
 
     public List<Transform> GetTeleportPoints => EnemyTeleportPoints;
+    
+    public bool HasLives => _lives > 0;
+
+    public void RemoveLive()
+    {
+        _lives--;
+    }
 }

@@ -25,7 +25,6 @@ public struct BuffIconStruct
     public TMP_Text timerText;
 }
 
-// Структура для Stack очереди панелей
 [Serializable]
 public struct PanelUIStruct
 {
@@ -35,11 +34,11 @@ public struct PanelUIStruct
 }
 
 [Serializable]
-public struct ResultPanelStruct
+public struct GameOverPanelStruct
 {
-    public TMP_Text rewardGoldText;
-    public Button rewardClaimButton;
-    public Button reward2XClaimButton;
+    public TMP_Text text;
+    public Button firstButton;
+    public Button secondButton;
 }
 
 [Serializable]
@@ -85,7 +84,8 @@ public struct SkillPanelStruct
 public enum PanelType
 {
     GAME,
-    RESULT,
+    GAME_OVER,
+    GAME_OVER_WITH_REVIVE,
     PAUSE,
     SETTINGS,
     SKILLS,
@@ -98,8 +98,6 @@ public class GameUI : MonoBehaviour
 
     public event Action OnUIOpen;
     public event Action OnUIClose;
-    
-    [SerializeField] private Image fadePanel;
     
     [Header("FPS")]
     [SerializeField] private Transform fpsPanel;
@@ -119,10 +117,6 @@ public class GameUI : MonoBehaviour
     
     [Header("Settings")] 
     [SerializeField] private Transform settingsPanel;
-    
-    [Header("Result")] 
-    [SerializeField] private Transform resultPanel;
-    [SerializeField] private ResultPanelStruct resultPanelStruct;
     
     [Header("Wave banner")] 
     [SerializeField] private Transform enemyCounterPanel;
@@ -177,10 +171,14 @@ public class GameUI : MonoBehaviour
     [SerializeField] private SlotStruct slot2Struct;
     [SerializeField] private SlotStruct slot3Struct;
     [SerializeField] private SlotStruct slot4Struct;
-
+    
     [Header("Game over panel")] 
-    [SerializeField] private GameObject gameOverUI;
-    [SerializeField] private Button gameOverRestartButton;
+    [SerializeField] private Transform gameOverPanel;
+    [SerializeField] private GameOverPanelStruct gameOverStruct;
+
+    [Header("Game over panel with revive button")] 
+    [SerializeField] private Transform gameOverWithRevivePanel;
+    [SerializeField] private GameOverPanelStruct gameOverWithReviveStruct;
     
     [Header("Skill choice panel")] 
     [SerializeField] private Transform skillChoicePanel;
@@ -199,11 +197,6 @@ public class GameUI : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        
-        if (gameOverRestartButton != null)
-        {
-            gameOverRestartButton.onClick.AddListener(Restart);
-        }
 
         if (openPausePanelButton != null)
         {
@@ -254,7 +247,6 @@ public class GameUI : MonoBehaviour
     }
     
     private void Update() {
-        
         healthDamagedShrinkTimer -= Time.deltaTime;
         
         if (healthDamagedShrinkTimer < 0) {
@@ -268,7 +260,7 @@ public class GameUI : MonoBehaviour
     private void Restart()
     {
         GameManager.LevelRestart();
-        ControllerManager.pauseManager.StopPause(false);
+        ControllerManager.pauseManager.StopPause();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -607,15 +599,54 @@ public class GameUI : MonoBehaviour
         }
 
         StartCoroutine(MoveEnemyCounterPanel());
-        StartCoroutine(Fade(Color.clear, Color.black, 1));
-        
-        gameOverUI.SetActive(true);
+
+        OpenPanel(ControllerManager.player.HasLives ? PanelType.GAME_OVER_WITH_REVIVE : PanelType.GAME_OVER);
+
         playerPanel.gameObject.SetActive(false);
         slotPanel.gameObject.SetActive(false);
         bulletsPanel.gameObject.SetActive(false);
         timerPanel.gameObject.SetActive(false);
 
         Cursor.visible = true;
+    }
+
+    private void OnRevive()
+    {
+        EventBus.AdsEvents.OnAdsClose += Revive;
+        EventBus.AdsEvents.OnAdsFailed += Revive;
+        
+        EventBus.AdsEvents.OnAdsNeedToShow?.Invoke();
+    }
+    
+    private void Revive()
+    {
+        IEnumerator MoveEnemyCounterPanel()
+        {
+            float newY = enemyCounterPanel.position.y;
+            float speed = 25;
+            
+            while (newY < 155)
+            {
+                newY += Time.time / speed;
+                enemyCounterPanel.position = new Vector2(enemyCounterPanel.position.x, newY);
+                yield return null;
+            }
+        }
+        
+        EventBus.AdsEvents.OnAdsClose -= Revive;
+        EventBus.AdsEvents.OnAdsFailed -= Revive;
+            
+        StartCoroutine(MoveEnemyCounterPanel());
+
+        ControllerManager.player.RemoveLive();
+        ClosePanel();
+        
+        playerPanel.gameObject.SetActive(true);
+        slotPanel.gameObject.SetActive(true);
+        bulletsPanel.gameObject.SetActive(true);
+        timerPanel.gameObject.SetActive(true);
+
+        Cursor.visible = false;
     }
 
     private void OnWeaponReloadStart()
@@ -699,7 +730,7 @@ public class GameUI : MonoBehaviour
         attackSpeedBuffIconStruct.timerText.text = $"{timeSpan:m\\:ss}";
     }
     
-    private IEnumerator Fade(Color from, Color to, float time)
+    private IEnumerator Fade(Image fadePanel, Color from, Color to, float time)
     {
         float speed = 1 / time;
         float percent = 0;
@@ -766,39 +797,57 @@ public class GameUI : MonoBehaviour
 
         switch (panelType)
         {
-            case PanelType.RESULT:
-                if (resultPanel == null) throw new NotImplementedException("Панель результата не назначена");
+            case PanelType.GAME_OVER_WITH_REVIVE:
+                if (gameOverWithRevivePanel == null) throw new NotImplementedException("Панель результата не назначена");
                 
-                resultPanelStruct.rewardClaimButton.onClick.RemoveAllListeners();
-                resultPanelStruct.reward2XClaimButton.onClick.RemoveAllListeners();
+                gameOverWithReviveStruct.firstButton.onClick.RemoveAllListeners();
+                gameOverWithReviveStruct.secondButton.onClick.RemoveAllListeners();
                 
-                resultPanelStruct.rewardGoldText.SetText($"{CurrencyManager.GetCurrency(CurrencyType.LEVEL_GOLD)}");
+                gameOverWithReviveStruct.text.SetText($"{CurrencyManager.GetCurrency(CurrencyType.LEVEL_GOLD)}");
                 
-                resultPanelStruct.rewardClaimButton.onClick.AddListener(() =>
+                gameOverWithReviveStruct.firstButton.onClick.AddListener(() =>
                 {
                     CurrencyManager.AddCurrency(CurrencyType.GOLD, CurrencyManager.GetCurrency(CurrencyType.LEVEL_GOLD)); 
                     CurrencyManager.SetCurrency(CurrencyType.LEVEL_GOLD, 0); 
                     
-                    //TODO выход назад на глобальную сцену
                     Restart();
                 });
                 
-                resultPanelStruct.reward2XClaimButton.onClick.AddListener(() =>
+                gameOverWithReviveStruct.secondButton.onClick.AddListener(() =>
                 {
-                    CurrencyManager.AddCurrency(CurrencyType.GOLD, CurrencyManager.GetCurrency(CurrencyType.LEVEL_GOLD) * 2); 
+                    OnRevive();
+                });
+                
+                _panelStack.Push(new PanelUIStruct
+                {
+                    panel = gameOverWithRevivePanel,
+                    panelType = PanelType.GAME_OVER_WITH_REVIVE,
+                    callback = GameManager.FinishLevel
+                });
+                gameOverWithRevivePanel.gameObject.SetActive(true);
+                break;
+            case PanelType.GAME_OVER:
+                if (gameOverPanel == null) throw new NotImplementedException("Панель результата не назначена");
+                
+                gameOverStruct.firstButton.onClick.RemoveAllListeners();
+                
+                gameOverStruct.text.SetText($"{CurrencyManager.GetCurrency(CurrencyType.LEVEL_GOLD)}");
+                
+                gameOverStruct.firstButton.onClick.AddListener(() =>
+                {
+                    CurrencyManager.AddCurrency(CurrencyType.GOLD, CurrencyManager.GetCurrency(CurrencyType.LEVEL_GOLD)); 
                     CurrencyManager.SetCurrency(CurrencyType.LEVEL_GOLD, 0); 
                     
-                    //TODO выход назад на глобальную сцену
                     Restart();
                 });
                 
                 _panelStack.Push(new PanelUIStruct
                 {
-                    panel = resultPanel,
-                    panelType = PanelType.RESULT,
+                    panel = gameOverPanel,
+                    panelType = PanelType.GAME_OVER,
                     callback = GameManager.FinishLevel
                 });
-                resultPanel.gameObject.SetActive(true);
+                gameOverPanel.gameObject.SetActive(true);
                 break;
             case PanelType.PAUSE:
                 if (pausePanel == null) throw new NotImplementedException("Панель паузы не назначена");

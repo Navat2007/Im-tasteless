@@ -82,7 +82,7 @@ public sealed class EnemySpawner : MonoBehaviour
 
                 if (wave.finalWave && enemyList.Count <= 0)
                 {
-                    GameUI.instance.OpenPanel(PanelType.RESULT);
+                    GameUI.instance.OpenPanel(PanelType.GAME_OVER);
                 }
             }
         }

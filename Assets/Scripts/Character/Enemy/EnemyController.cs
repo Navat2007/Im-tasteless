@@ -340,7 +340,6 @@ public sealed class EnemyController : MonoBehaviour
             }
             catch (Exception e)
             {
-                Debug.LogError(e.Message);
                 _navMeshAgent.enabled = false;
                 _navMeshAgent.enabled = true;
             }
