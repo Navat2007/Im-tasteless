@@ -1,11 +1,11 @@
 using System;
-using System.Collections;
-using UnityEngine;
 
 public static class GameManager
 {
     public static event Action<GameState> OnGameStateChange;
     public static event Action OnLevelRestart;
+    
+    private static int _lives = 1;
     
     public enum GameState
     {
@@ -28,11 +28,19 @@ public static class GameManager
 
     public static void LevelRestart()
     {
+        _lives = 1;
         OnLevelRestart?.Invoke();
     }
 
     public static void FinishLevel()
     {
         
+    }
+    
+    public static bool HasLives => _lives > 0;
+    
+    public static void RemoveLive()
+    {
+        _lives--;
     }
 }

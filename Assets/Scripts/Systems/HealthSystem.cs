@@ -52,6 +52,7 @@ public class HealthSystem : MonoBehaviour
         _isOverTimeHealActive = false;
         
         AddHealth(MaxHealth);
+        AddNextInvulnerabilityTime(InvulnerabilityTime * 10);
     }
 
     private void Update()

@@ -600,7 +600,7 @@ public class GameUI : MonoBehaviour
 
         StartCoroutine(MoveEnemyCounterPanel());
 
-        OpenPanel(ControllerManager.player.HasLives ? PanelType.GAME_OVER_WITH_REVIVE : PanelType.GAME_OVER);
+        OpenPanel(GameManager.HasLives ? PanelType.GAME_OVER_WITH_REVIVE : PanelType.GAME_OVER);
 
         playerPanel.gameObject.SetActive(false);
         slotPanel.gameObject.SetActive(false);
@@ -638,7 +638,7 @@ public class GameUI : MonoBehaviour
             
         StartCoroutine(MoveEnemyCounterPanel());
 
-        ControllerManager.player.RemoveLive();
+        GameManager.RemoveLive();
         ClosePanel();
         
         playerPanel.gameObject.SetActive(true);
@@ -647,6 +647,8 @@ public class GameUI : MonoBehaviour
         timerPanel.gameObject.SetActive(true);
 
         Cursor.visible = false;
+        
+        EventBus.PlayerEvents.OnRevive?.Invoke();
     }
 
     private void OnWeaponReloadStart()

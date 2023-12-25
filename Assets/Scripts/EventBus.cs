@@ -3,6 +3,12 @@ using UnityEngine;
 
 public static class EventBus
 {
+    public static class PlayerEvents
+    {
+        public static Action OnDeath;
+        public static Action OnRevive;
+    }
+    
     public static class SpawnerEvents
     {
         public static Action<int, int> OnNewWave;
